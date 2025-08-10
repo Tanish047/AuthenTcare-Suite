@@ -1,0 +1,506 @@
+import React, { useState, useEffect } from 'react';
+import { useAppContext } from '../../context/AppContext.jsx';
+import { useProjects } from '../../hooks/useProjects';
+import { useDevices } from '../../hooks/useDevices';
+import { useVersions } from '../../hooks/useVersions';
+import { useMarkets } from '../../hooks/useMarkets';
+import { useLicenses } from '../../hooks/useLicenses';
+
+// List Components
+import ProjectList from './ProjectList.jsx';
+import DeviceList from './DeviceList.jsx';
+import VersionList from './VersionList.jsx';
+import MarketList from './MarketList.jsx';
+import LicenseList from './LicenseList.jsx';
+
+// Modal Components
+import ProjectModals from './ProjectModals.jsx';
+import DeviceModals from './DeviceModals.jsx';
+import VersionModals from './VersionModals.jsx';
+import MarketModals from './MarketModals.jsx';
+import LicenseModals from './LicenseModals.jsx';
+import { getStorage, setStorage } from '../../utils/storage.js';
+
+function ResearchWorkspace() {
+  const { state, dispatch } = useAppContext();
+  const [currentLevel, setCurrentLevel] = useState('project');
+  const [selectedProject, setSelectedProject] = useState('');
+  const [selectedDevice, setSelectedDevice] = useState('');
+  const [selectedVersion, setSelectedVersion] = useState('');
+  const [selectedMarket, setSelectedMarket] = useState('');
+  const [selectedLicense, setSelectedLicense] = useState('');
+
+  // Navigation helper functions
+  const navigateToLevel = (level, selection) => {
+    // Clear lower-level selections
+    switch(level) {
+      case 'project':
+        setSelectedDevice('');
+        setSelectedVersion('');
+        setSelectedMarket('');
+        setSelectedLicense('');
+        break;
+      case 'device':
+        setSelectedVersion('');
+        setSelectedMarket('');
+        setSelectedLicense('');
+        break;
+      case 'version':
+        setSelectedMarket('');
+        setSelectedLicense('');
+        break;
+      case 'market':
+        setSelectedLicense('');
+        break;
+    }
+    
+    // Set current selection
+    switch(level) {
+      case 'project':
+        setSelectedProject(selection);
+        break;
+      case 'device':
+        setSelectedDevice(selection);
+        break;
+      case 'version':
+        setSelectedVersion(selection);
+        break;
+      case 'market':
+        setSelectedMarket(selection);
+        break;
+      case 'license':
+        setSelectedLicense(selection);
+        break;
+    }
+    
+    setCurrentLevel(level);
+  };
+
+  const canNavigateToLevel = (level) => {
+    switch(level) {
+      case 'project':
+        return true;
+      case 'device':
+        return !!selectedProject;
+      case 'version':
+        return !!selectedDevice;
+      case 'market':
+        return !!selectedVersion;
+      case 'license':
+        return !!selectedMarket;
+      default:
+        return false;
+    }
+  };
+
+  const { 
+    projects,
+    showCreateModal: showProjectModal,
+    showEditModal: showProjectEditModal,
+    showDeleteModal: showProjectDeleteModal,
+    handleCreateClick: handleProjectCreate,
+    handleEditClick: handleProjectEdit,
+    handleDeleteClick: handleProjectDelete,
+    setShowCreateModal: setShowProjectModal,
+    setShowEditModal: setShowProjectEditModal,
+    setShowDeleteModal: setShowProjectDeleteModal,
+    newProjectName,
+    setNewProjectName,
+    editProjectName,
+    setEditProjectName,
+    editingProject,
+    deleteProject,
+    deletePassword,
+    setDeletePassword,
+    deleteError,
+    handleCreateProject,
+    handleEditProject,
+    handleDeleteProject
+  } = useProjects(state, dispatch);
+
+  const {
+    devices,
+    showDeviceModal,
+    showDeviceEditModal,
+    showDeviceDeleteModal,
+    handleCreateClick: handleDeviceCreate,
+    handleEditClick: handleDeviceEdit,
+    handleDeleteClick: handleDeviceDelete,
+    setShowDeviceModal,
+    setShowDeviceEditModal,
+    setShowDeviceDeleteModal,
+    newDeviceName,
+    setNewDeviceName,
+    editDeviceName,
+    setEditDeviceName,
+    editingDevice,
+    deleteDevice,
+    deviceDeletePassword,
+    setDeviceDeletePassword,
+    deviceDeleteError,
+    handleCreateDevice,
+    handleEditDevice,
+    handleDeleteDevice
+  } = useDevices(state, dispatch, selectedProject);
+
+  const {
+    versions,
+    showVersionModal,
+    showVersionEditModal,
+    showVersionDeleteModal,
+    handleCreateClick: handleVersionCreate,
+    handleEditClick: handleVersionEdit,
+    handleDeleteClick: handleVersionDelete,
+    setShowVersionModal,
+    setShowVersionEditModal,
+    setShowVersionDeleteModal,
+    newVersionName,
+    setNewVersionName,
+    editVersionName,
+    setEditVersionName,
+    editingVersion,
+    deleteVersion,
+    versionDeletePassword,
+    setVersionDeletePassword,
+    versionDeleteError,
+    handleCreateVersion,
+    handleEditVersion,
+    handleDeleteVersion
+  } = useVersions(state, dispatch, selectedProject, selectedDevice);
+
+  const {
+    markets: targetMarkets,
+    allMarkets,
+    showMarketModal,
+    showMarketDeleteModal,
+    handleCreateClick: handleMarketCreate,
+    handleDeleteClick: handleMarketDelete,
+    setShowMarketModal,
+    setShowMarketDeleteModal,
+    newMarket,
+    setNewMarket,
+    deleteMarket,
+    marketDeletePassword,
+    setMarketDeletePassword,
+    marketDeleteError,
+    handleAddMarket,
+    handleDeleteMarket
+  } = useMarkets(state, dispatch);
+
+  const {
+    licenses,
+    showLicenseModal,
+    handleCreateClick: handleLicenseCreate,
+    setShowLicenseModal,
+    selectedMarket: licenseSelectedMarket,
+    newLicense,
+    setNewLicense,
+    handleAddLicense
+  } = useLicenses(state, dispatch);
+
+  // Load and save effects
+  useEffect(() => {
+    if (!state.projects || state.projects.length === 0) {
+      const projects = getStorage('authentcare_projects', []);
+      dispatch({ type: 'SET_PROJECTS', projects });
+    }
+  }, [state.projects, dispatch]);
+
+  useEffect(() => {
+    setStorage('authentcare_projects', state.projects);
+  }, [state.projects]);
+
+  useEffect(() => {
+    if (selectedProject) {
+      const devices = getStorage(`authentcare_devices_${selectedProject}`, []);
+      dispatch({ type: 'SET_DEVICES', project: selectedProject, devices });
+    }
+  }, [selectedProject, dispatch]);
+
+  useEffect(() => {
+    if (selectedProject && state.devices[selectedProject]) {
+      setStorage(`authentcare_devices_${selectedProject}`, state.devices[selectedProject]);
+    }
+  }, [selectedProject, state.devices]);
+
+  useEffect(() => {
+    if (selectedProject && selectedDevice) {
+      const key = `${selectedProject}_${selectedDevice}`;
+      const versions = getStorage(`authentcare_versions_${key}`, []);
+      dispatch({ type: 'SET_VERSIONS', key, versions });
+    }
+  }, [selectedProject, selectedDevice, dispatch]);
+
+  useEffect(() => {
+    if (selectedProject && selectedDevice && state.versions[`${selectedProject}_${selectedDevice}`]) {
+      const key = `${selectedProject}_${selectedDevice}`;
+      setStorage(`authentcare_versions_${key}`, state.versions[key]);
+    }
+  }, [selectedProject, selectedDevice, state.versions]);
+
+  useEffect(() => {
+    const targetMarkets = getStorage('authentcare_target_markets', []);
+    dispatch({ type: 'SET_TARGET_MARKETS', targetMarkets });
+  }, [dispatch]);
+
+  useEffect(() => {
+    setStorage('authentcare_target_markets', state.targetMarkets);
+  }, [state.targetMarkets]);
+
+  useEffect(() => {
+    const marketLicenses = getStorage('authentcare_market_licenses', {});
+    dispatch({ type: 'SET_MARKET_LICENSES', marketLicenses });
+  }, [dispatch]);
+
+  useEffect(() => {
+    setStorage('authentcare_market_licenses', state.marketLicenses);
+  }, [state.marketLicenses]);
+
+  // Render breadcrumb navigation
+  const renderBreadcrumb = () => (
+    <div style={{ 
+      padding: '12px 16px', 
+      backgroundColor: '#f8f9fa', 
+      borderRadius: '6px',
+      marginBottom: '20px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      fontSize: '14px'
+    }}>
+      <span 
+        onClick={() => navigateToLevel('project', null)}
+        style={{ 
+          cursor: 'pointer', 
+          color: currentLevel === 'project' ? '#2c5aa0' : '#666',
+          fontWeight: currentLevel === 'project' ? '600' : 'normal'
+        }}
+      >
+        Projects
+      </span>
+      
+      {selectedProject && (
+        <>
+          <span style={{ color: '#666' }}>/</span>
+          <span 
+            onClick={() => canNavigateToLevel('device') && navigateToLevel('device', selectedProject)}
+            style={{ 
+              cursor: canNavigateToLevel('device') ? 'pointer' : 'not-allowed', 
+              color: currentLevel === 'device' ? '#2c5aa0' : '#666',
+              fontWeight: currentLevel === 'device' ? '600' : 'normal'
+            }}
+          >
+            {selectedProject}
+          </span>
+        </>
+      )}
+
+      {selectedDevice && (
+        <>
+          <span style={{ color: '#666' }}>/</span>
+          <span 
+            onClick={() => canNavigateToLevel('version') && navigateToLevel('version', selectedDevice)}
+            style={{ 
+              cursor: canNavigateToLevel('version') ? 'pointer' : 'not-allowed',
+              color: currentLevel === 'version' ? '#2c5aa0' : '#666',
+              fontWeight: currentLevel === 'version' ? '600' : 'normal'
+            }}
+          >
+            {selectedDevice}
+          </span>
+        </>
+      )}
+
+      {selectedVersion && (
+        <>
+          <span style={{ color: '#666' }}>/</span>
+          <span 
+            onClick={() => canNavigateToLevel('market') && navigateToLevel('market', selectedVersion)}
+            style={{ 
+              cursor: canNavigateToLevel('market') ? 'pointer' : 'not-allowed',
+              color: currentLevel === 'market' ? '#2c5aa0' : '#666',
+              fontWeight: currentLevel === 'market' ? '600' : 'normal'
+            }}
+          >
+            {selectedVersion}
+          </span>
+        </>
+      )}
+
+      {selectedMarket && (
+        <>
+          <span style={{ color: '#666' }}>/</span>
+          <span 
+            onClick={() => canNavigateToLevel('license') && navigateToLevel('license', selectedMarket)}
+            style={{ 
+              cursor: canNavigateToLevel('license') ? 'pointer' : 'not-allowed',
+              color: currentLevel === 'license' ? '#2c5aa0' : '#666',
+              fontWeight: currentLevel === 'license' ? '600' : 'normal'
+            }}
+          >
+            {selectedMarket}
+          </span>
+        </>
+      )}
+    </div>
+  );
+
+  // Main render
+  return (
+    <div style={{ padding: 32, height: 'calc(100vh - 100px)' }} className="research-workspace">
+      <h2 style={{ color: '#2c5aa0', fontWeight: 800, fontSize: 28, marginBottom: 24 }}>Research Workspace</h2>
+      
+      {renderBreadcrumb()}
+
+      <div className="content-section">
+        {currentLevel === 'project' && (
+          <div className="projects-section">
+            <ProjectList 
+              projects={projects}
+              onSelect={(project) => navigateToLevel('device', project)}
+              onCreate={handleProjectCreate}
+              onEdit={handleProjectEdit}
+              onDelete={handleProjectDelete}
+            />
+            <ProjectModals
+              showCreate={showProjectModal}
+              showEdit={showProjectEditModal}
+              showDelete={showProjectDeleteModal}
+              onCloseCreate={() => setShowProjectModal(false)}
+              onCloseEdit={() => setShowProjectEditModal(false)}
+              onCloseDelete={() => setShowProjectDeleteModal(false)}
+              newProjectName={newProjectName}
+              setNewProjectName={setNewProjectName}
+              editProjectName={editProjectName}
+              setEditProjectName={setEditProjectName}
+              editingProject={editingProject}
+              deleteProject={deleteProject}
+              deletePassword={deletePassword}
+              setDeletePassword={setDeletePassword}
+              deleteError={deleteError}
+              handleCreateProject={handleCreateProject}
+              handleEditProject={handleEditProject}
+              handleDeleteProject={handleDeleteProject}
+            />
+          </div>
+        )}
+
+        {currentLevel === 'device' && selectedProject && (
+          <div className="devices-section">
+            <DeviceList
+              selectedProject={selectedProject}
+              devices={devices}
+              onSelect={(device) => navigateToLevel('version', device)}
+              onCreate={handleDeviceCreate}
+              onEdit={handleDeviceEdit}
+              onDelete={handleDeviceDelete}
+            />
+            <DeviceModals
+              showCreate={showDeviceModal}
+              showEdit={showDeviceEditModal}
+              showDelete={showDeviceDeleteModal}
+              onCloseCreate={() => setShowDeviceModal(false)}
+              onCloseEdit={() => setShowDeviceEditModal(false)}
+              onCloseDelete={() => setShowDeviceDeleteModal(false)}
+              newDeviceName={newDeviceName}
+              setNewDeviceName={setNewDeviceName}
+              editDeviceName={editDeviceName}
+              setEditDeviceName={setEditDeviceName}
+              editingDevice={editingDevice}
+              deleteDevice={deleteDevice}
+              deviceDeletePassword={deviceDeletePassword}
+              setDeviceDeletePassword={setDeviceDeletePassword}
+              deviceDeleteError={deviceDeleteError}
+              handleCreateDevice={handleCreateDevice}
+              handleEditDevice={handleEditDevice}
+              handleDeleteDevice={handleDeleteDevice}
+            />
+          </div>
+        )}
+
+        {currentLevel === 'version' && selectedDevice && (
+          <div className="versions-section">
+            <VersionList
+              selectedProject={selectedProject}
+              selectedDevice={selectedDevice}
+              versions={versions}
+              onSelect={(version) => navigateToLevel('market', version)}
+              onCreate={handleVersionCreate}
+              onEdit={handleVersionEdit}
+              onDelete={handleVersionDelete}
+            />
+            <VersionModals
+              showCreate={showVersionModal}
+              showEdit={showVersionEditModal}
+              showDelete={showVersionDeleteModal}
+              onCloseCreate={() => setShowVersionModal(false)}
+              onCloseEdit={() => setShowVersionEditModal(false)}
+              onCloseDelete={() => setShowVersionDeleteModal(false)}
+              newVersionName={newVersionName}
+              setNewVersionName={setNewVersionName}
+              editVersionName={editVersionName}
+              setEditVersionName={setEditVersionName}
+              editingVersion={editingVersion}
+              deleteVersion={deleteVersion}
+              versionDeletePassword={versionDeletePassword}
+              setVersionDeletePassword={setVersionDeletePassword}
+              versionDeleteError={versionDeleteError}
+              handleCreateVersion={handleCreateVersion}
+              handleEditVersion={handleEditVersion}
+              handleDeleteVersion={handleDeleteVersion}
+            />
+          </div>
+        )}
+
+        {currentLevel === 'market' && selectedVersion && (
+          <div className="markets-section">
+            <MarketList
+              targetMarkets={targetMarkets}
+              selectedMarket={selectedMarket}
+              onSelect={(market) => navigateToLevel('license', market)}
+              onCreate={handleMarketCreate}
+              onDelete={handleDeleteMarket}
+            />
+            <MarketModals
+              showCreate={showMarketModal}
+              showDelete={showMarketDeleteModal}
+              onCloseCreate={() => setShowMarketModal(false)}
+              onCloseDelete={() => setShowMarketDeleteModal(false)}
+              newMarket={newMarket}
+              setNewMarket={setNewMarket}
+              deleteMarket={deleteMarket}
+              marketDeletePassword={marketDeletePassword}
+              setMarketDeletePassword={setMarketDeletePassword}
+              marketDeleteError={marketDeleteError}
+              allMarkets={allMarkets}
+              targetMarkets={targetMarkets}
+              handleAddMarket={handleAddMarket}
+              handleDeleteMarket={handleDeleteMarket}
+            />
+          </div>
+        )}
+
+        {currentLevel === 'license' && selectedMarket && (
+          <div className="licenses-section">
+            <LicenseList
+              selectedMarket={selectedMarket}
+              licenses={licenses}
+              onCreate={handleLicenseCreate}
+              onDelete={handleDeleteLicense}
+            />
+            <LicenseModals
+              showCreate={showLicenseModal}
+              onCloseCreate={() => setShowLicenseModal(false)}
+              selectedMarket={selectedMarket}
+              newLicense={newLicense}
+              setNewLicense={setNewLicense}
+              handleAddLicense={handleAddLicense}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default ResearchWorkspace;

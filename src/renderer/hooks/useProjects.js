@@ -1,0 +1,123 @@
+import { useState, useCallback } from 'react';
+import { checkPassword } from '../utils/password.js';
+
+export const useProjects = (state, dispatch) => {
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [newProjectName, setNewProjectName] = useState('');
+  const [editProjectName, setEditProjectName] = useState('');
+  const [editingProject, setEditingProject] = useState(null);
+  const [deleteProject, setDeleteProject] = useState(null);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const loadProjects = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await window.dbAPI.getProjects();
+      dispatch({ type: 'SET_PROJECTS', projects: result.data });
+    } catch (err) {
+      setError(err.message);
+      console.error('Failed to load projects:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [dispatch]);
+
+  const handleCreateProject = async (e) => {
+    e.preventDefault();
+    if (!newProjectName.trim()) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+      const project = await window.dbAPI.createProject({ 
+        name: newProjectName.trim() 
+      });
+      dispatch({ type: 'ADD_PROJECT', project });
+      setShowCreateModal(false);
+      setNewProjectName('');
+    } catch (err) {
+      setError(err.message);
+      console.error('Failed to create project:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditProject = async (e) => {
+    e.preventDefault();
+    if (!editProjectName.trim() || !editingProject) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+      const updated = await window.dbAPI.updateProject(editingProject.id, { 
+        name: editProjectName.trim() 
+      });
+      dispatch({ type: 'UPDATE_PROJECT', project: updated });
+      setShowEditModal(false);
+      setEditProjectName('');
+      setEditingProject(null);
+    } catch (err) {
+      setError(err.message);
+      console.error('Failed to update project:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteProject = async (e) => {
+    e.preventDefault();
+    if (!deleteProject || !checkPassword(deletePassword)) {
+      setDeleteError('Incorrect password.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      await window.dbAPI.deleteProject(deleteProject.id);
+      dispatch({ type: 'REMOVE_PROJECT', id: deleteProject.id });
+      setShowDeleteModal(false);
+      setDeleteProject(null);
+      setDeletePassword('');
+      setDeleteError('');
+    } catch (err) {
+      setDeleteError(err.message);
+      console.error('Failed to delete project:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    showCreateModal,
+    setShowCreateModal,
+    showEditModal,
+    setShowEditModal,
+    showDeleteModal,
+    setShowDeleteModal,
+    newProjectName,
+    setNewProjectName,
+    editProjectName,
+    setEditProjectName,
+    editingProject,
+    setEditingProject,
+    deleteProject,
+    setDeleteProject,
+    deletePassword,
+    setDeletePassword,
+    deleteError,
+    loading,
+    error,
+    loadProjects,
+    handleCreateProject,
+    handleEditProject,
+    handleDeleteProject
+  };
+};
