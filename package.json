@@ -8,7 +8,12 @@
     "build": "webpack",
     "start": "set NODE_ENV=development && electron .",
     "start:prod": "set NODE_ENV=production && electron .",
-    "audit": "npm audit fix"
+    "audit": "npm audit fix",
+
+      "make:index": "node scripts/make-index.mjs",
+
+   
+
   },
   "keywords": [],
   "author": "Your Name",
