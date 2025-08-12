@@ -10,7 +10,7 @@
     "start:prod": "set NODE_ENV=production && electron .",
     "audit": "npm audit fix",
 
-      "make:index": "node scripts/make-index.mjs",
+      "make:index""node scripts/make-index.mjs"
 
    
 
