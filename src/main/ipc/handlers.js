@@ -1,4 +1,6 @@
-import { ipcMain } from 'electron';
+import { ipcMain } from 'electron
+  import './webCrawler.js';
+
 
 export default class IPCHandler {
   constructor(db) {
