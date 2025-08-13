@@ -4,28 +4,33 @@ import { open } from 'sqlite';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { runMigrations } from './database/migrationRunner.js';
+import { migrate } from './storage/sqlite/migrate.js';
 import IPCHandler from './main/ipc/handlers.js';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname  = path.dirname(__filename);
 
 let currentTheme = 'light';
 let db;
 let ipcHandler;
 
-// Initialize SQLite database
+// Initialise SQLite database and run migrations
 async function initDatabase() {
   const dbPath = path.join(app.getPath('userData'), 'authentcare.db');
 
+  // Apply SQL migrations from src/storage/sqlite/migrations
+  await migrate(dbPath, path.join(__dirname, 'storage/sqlite/migrations'));
+
+  // Open the SQLite DB
   db = await open({
     filename: dbPath,
     driver: sqlite3.verbose().Database,
   });
 
-  // Run migrations
+  // Run JS-based schema/index/data migrations
   await runMigrations(db);
 
-  // Initialize IPC handlers
+  // Register IPC handlers that require DB access
   ipcHandler = new IPCHandler(db);
 }
 
@@ -41,14 +46,15 @@ function createWindow() {
       nodeIntegration: false,
       webSecurity: true,
       allowRunningInsecureContent: false,
+      sandbox: true,               // ← enable renderer sandbox
     },
-    show: false, // Don't show until ready
+    show: false, // don’t show until ready
   });
 
   // Load the built index.html from the dist folder
   mainWindow.loadURL(`file://${path.join(__dirname, '../dist/index.html')}`);
 
-  // Show window when ready to prevent visual flash
+  // Show window when ready to avoid visual flash
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
   });
@@ -57,46 +63,51 @@ function createWindow() {
     mainWindow = null;
   });
 
-  // Suppress console errors from DevTools extensions
+  // Suppress common DevTools extension errors
   mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
-    // Filter out DevTools extension errors
-    if (sourceId.includes('devtools://') || 
-        message.includes('Autofill.enable') || 
-        message.includes('Autofill.setAddresses') ||
-        message.includes('Service worker registration failed')) {
-      return; // Suppress these messages
-    }
+    const suppressed = [
+      'devtools://', 'Autofill.enable', 'Autofill.setAddresses',
+      'Service worker registration failed'
+    ];
+    if (suppressed.some(s => sourceId.includes(s) || message.includes(s))) return;
   });
 }
 
 // Theme IPC handlers
 ipcMain.handle('get-theme', () => currentTheme);
-
 ipcMain.on('set-theme', (event, theme) => {
   currentTheme = theme;
-  BrowserWindow.getAllWindows().forEach((w) =>
-    w.webContents.send('theme-changed', currentTheme)
+  BrowserWindow.getAllWindows().forEach(w =>
+    w.webContents.send('theme-changed', currentTheme),
   );
 });
 
-// SQLite IPC handlers
+// Simple user example (unchanged)
 ipcMain.handle('add-user', async (_, name) => {
   const result = await db.run('INSERT INTO users (name) VALUES (?)', [name]);
   return { id: result.lastID, name };
 });
-
 ipcMain.handle('get-users', async () => {
   return await db.all('SELECT * FROM users');
 });
 
+// Manual DB maintenance: re-run SQL migrations on demand
+ipcMain.handle('run-db-maintenance', async () => {
+  const dbPath = path.join(app.getPath('userData'), 'authentcare.db');
+  await migrate(dbPath, path.join(__dirname, 'storage/sqlite/migrations'));
+  return { ok: true };
+});
+
+// App lifecycle
 app.whenReady().then(async () => {
   await initDatabase();
   createWindow();
-  
-  // Only install React DevTools in development
+
+  // Install React DevTools only in development
   if (!app.isPackaged && process.env.NODE_ENV === 'development') {
     try {
-      const { default: installExtension, REACT_DEVELOPER_TOOLS } = await import('electron-devtools-installer');
+      const { default: installExtension, REACT_DEVELOPER_TOOLS } =
+        await import('electron-devtools-installer');
       await installExtension(REACT_DEVELOPER_TOOLS);
     } catch (err) {
       console.log('React DevTools not available:', err);
@@ -116,43 +127,28 @@ app.on('activate', () => {
   }
 });
 
-// Improved error handling - only suppress known harmless errors
+// Ignore known harmless uncaught exceptions/unhandled rejections
 process.on('uncaughtException', (error) => {
-  // Only suppress specific known harmless errors
-  const harmlessErrors = [
+  const harmless = [
     'Extension',
     'DevTools',
     'Autofill',
     'Service worker registration failed',
-    'Failed to load resource'
+    'Failed to load resource',
   ];
-  
-  const isHarmless = harmlessErrors.some(keyword => 
-    error.message && error.message.includes(keyword)
-  );
-  
-  if (isHarmless) {
-    return; // Suppress harmless errors
+  if (harmless.some(keyword => error.message && error.message.includes(keyword))) {
+    return;
   }
-  // Uncaught Exception occurred
 });
-
-// Improved promise rejection handling
 process.on('unhandledRejection', (reason) => {
-  // Only suppress specific known harmless rejections
-  const harmlessRejections = [
+  const harmless = [
     'Extension',
-    'DevTools', 
+    'DevTools',
     'Autofill',
     'Service worker registration failed',
-    'Failed to load resource'
+    'Failed to load resource',
   ];
-  
-  const isHarmless = reason && reason.message && 
-    harmlessRejections.some(keyword => reason.message.includes(keyword));
-  
-  if (isHarmless) {
-    return; // Suppress harmless rejections
+  if (reason && reason.message && harmless.some(keyword => reason.message.includes(keyword))) {
+    return;
   }
-  // Unhandled Rejection occurred
 });
