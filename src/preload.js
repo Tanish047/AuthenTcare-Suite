@@ -88,3 +88,8 @@ contextBridge.exposeInMainWorld('dbAPI', {
 contextBridge.exposeInMainWorld('webCrawlerAPI', {
   fetch: (url) => ipcRenderer.invoke('webCrawler:fetch', url),
 });
+
+// Maintenance API
+contextBridge.exposeInMainWorld('maintenanceAPI', {
+  runDbMaintenance: () => ipcRenderer.invoke('run-db-maintenance'),
+});

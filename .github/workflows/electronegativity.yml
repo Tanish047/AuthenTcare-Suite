@@ -1,15 +1,40 @@
-name: Electronegativity
-on: [push, pull_request]
+name: Electronegativity Security Scan
+
+on:
+  push:
+    branches: [ main, context-router-index ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
-  scan:
+  security-scan:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - run: npx @doyensec/electronegativity -i . -o electronegativity-report.json -t json || true
-      - uses: actions/upload-artifact@v4
-        with:
-          name: electronegativity-report
-          path: electronegativity-report.json
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js 18
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Electronegativity
+      run: npm install -g @doyensec/electronegativity
+    
+    - name: Run Electronegativity scan
+      run: electronegativity -i ./ -o electronegativity-report.sarif -f sarif
+      continue-on-error: true
+    
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: electronegativity-report.sarif
+        category: electronegativity
+    
+    - name: Run Electronegativity scan (console output)
+      run: electronegativity -i ./

@@ -4,14 +4,6 @@
   "description": "Authentcare Suite",
   "type": "module",
   "main": "src/main.js",
-  "scripts": {
-    "build": "webpack",
-    "start": "cross-env NODE_ENV=development electron .",
-    "start:prod": "cross-env NODE_ENV=production electron .",
-    "audit": "npm audit fix",
-    "make:index": "node scripts/make-index.mjs",
-    "migrate": "node src/storage/sqlite/migrate.js"
-  },
   "keywords": [],
   "author": "Your Name",
   "license": "MIT",
