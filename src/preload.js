@@ -84,3 +84,7 @@ contextBridge.exposeInMainWorld('dbAPI', {
   createNotification: (data) => ipcRenderer.invoke('db-create-notification', data),
   deleteNotification: (id) => ipcRenderer.invoke('db-delete-notification', id),
 });
+
+contextBridge.exposeInMainWorld('webCrawlerAPI', {
+  fetch: (url) => ipcRenderer.invoke('webCrawler:fetch', url),
+});
