@@ -13,4 +13,3 @@ ipcMain.handle('webCrawler:fetch', async (_event, url) => {
   const result = await fetchPageContent(validatedUrl);
   return result;
 });
-
