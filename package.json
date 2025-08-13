@@ -49,7 +49,13 @@
     "cross-env": "^7.0.3"
   },
   "scripts": {
-    "test": "node --test",
-    "test:ci": "node --test --test-reporter tap"
+  "build": "webpack",
+  "start": "cross-env NODE_ENV=development electron .",
+  "start:prod": "cross-env NODE_ENV=production electron .",
+  "audit": "npm audit fix",
+  "make:index": "node scripts/make-index.mjs",
+  "migrate": "node src/storage/sqlite/migrate.js",
+  "test": "node --test",
+  "test:ci": "node --test --test-reporter tap"
   }
 }
