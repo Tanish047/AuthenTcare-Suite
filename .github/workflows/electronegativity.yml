@@ -1,0 +1,15 @@
+name: Electronegativity
+on: [push, pull_request]
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npx @doyensec/electronegativity -i . -o electronegativity-report.json -t json || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: electronegativity-report
+          path: electronegativity-report.json
