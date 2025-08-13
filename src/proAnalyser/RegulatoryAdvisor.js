@@ -46,8 +46,8 @@ export default class RegulatoryAdvisor extends BaseAnalyser {
 
       // 4. Generate market selection
       await this.generateMarketSelection();
-      this.emit(PLUGIN_EVENTS.REGULATORY_MARKET_SELECTED, { 
-        selectedMarkets: this.selectedMarkets 
+      this.emit(PLUGIN_EVENTS.REGULATORY_MARKET_SELECTED, {
+        selectedMarkets: this.selectedMarkets,
       });
       this.updateProgress(90);
 
@@ -71,8 +71,8 @@ export default class RegulatoryAdvisor extends BaseAnalyser {
           selectedMarkets: this.selectedMarkets,
           timelineAnalysis: this.timelineAnalysis,
           costAnalysis: this.costAnalysis,
-          recommendations: await this.generateRecommendations()
-        }
+          recommendations: await this.generateRecommendations(),
+        },
       };
 
       this.emit(PLUGIN_EVENTS.REGULATORY_COMPLETED, { report });

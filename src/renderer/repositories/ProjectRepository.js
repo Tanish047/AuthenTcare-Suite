@@ -11,10 +11,7 @@ class ProjectRepository extends BaseRepository {
     const project = await this.findById(id);
     if (!project) return null;
 
-    const devices = await this.dbAPI.query(
-      'SELECT * FROM devices WHERE project_id = ?',
-      [id]
-    );
+    const devices = await this.dbAPI.query('SELECT * FROM devices WHERE project_id = ?', [id]);
 
     project.devices = devices.map(d => Device.fromJSON(d));
     return project;
@@ -22,7 +19,7 @@ class ProjectRepository extends BaseRepository {
 
   async findAllWithDevices(options = {}) {
     const result = await this.findAll(options);
-    
+
     // Get all devices for these projects
     const projectIds = result.data.map(p => p.id);
     if (projectIds.length > 0) {

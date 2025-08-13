@@ -1,11 +1,6 @@
 import React from 'react';
 
-const LicenseList = ({
-  selectedMarket,
-  licenses,
-  onCreate,
-  onDelete
-}) => {
+const LicenseList = ({ selectedMarket, licenses, onCreate, onDelete }) => {
   if (!selectedMarket) return null;
 
   return (
@@ -17,17 +12,17 @@ const LicenseList = ({
         {licenses && licenses.length > 0 ? (
           licenses.map(license => (
             <li key={license} style={{ marginBottom: 12, display: 'flex', alignItems: 'center' }}>
-              <span 
-                style={{ 
+              <span
+                style={{
                   flex: 1,
                   padding: '8px',
                   borderRadius: '4px',
-                  backgroundColor: 'transparent'
+                  backgroundColor: 'transparent',
                 }}
               >
                 {license}
               </span>
-              <button 
+              <button
                 onClick={() => onDelete(license)}
                 style={{
                   marginLeft: '8px',
@@ -35,7 +30,7 @@ const LicenseList = ({
                   borderRadius: '4px',
                   border: '1px solid #ccc',
                   backgroundColor: 'transparent',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 Delete
@@ -55,7 +50,7 @@ const LicenseList = ({
           backgroundColor: '#2c5aa0',
           color: 'white',
           border: 'none',
-          cursor: 'pointer'
+          cursor: 'pointer',
         }}
       >
         Add License

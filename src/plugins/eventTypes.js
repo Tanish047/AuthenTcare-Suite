@@ -2,42 +2,42 @@ export const PLUGIN_EVENTS = {
   // App lifecycle events
   APP_STARTED: 'app:started',
   APP_CLOSING: 'app:closing',
-  
+
   // Data events
   DATA_CREATED: 'data:created',
   DATA_UPDATED: 'data:updated',
   DATA_DELETED: 'data:deleted',
-  
+
   // Client events
   CLIENT_ADDED: 'client:added',
   CLIENT_UPDATED: 'client:updated',
   CLIENT_DELETED: 'client:deleted',
-  
+
   // Calendar events
   EVENT_CREATED: 'calendar:eventCreated',
   EVENT_UPDATED: 'calendar:eventUpdated',
   EVENT_DELETED: 'calendar:eventDeleted',
-  
+
   // News events
   NEWS_ADDED: 'news:added',
   NEWS_UPDATED: 'news:updated',
   NEWS_DELETED: 'news:deleted',
-  
+
   // Notification events
   NOTIFICATION_CREATED: 'notification:created',
   NOTIFICATION_READ: 'notification:read',
   NOTIFICATION_DELETED: 'notification:deleted',
-  
+
   // User events
   USER_LOGIN: 'user:login',
   USER_LOGOUT: 'user:logout',
   USER_SETTINGS_CHANGED: 'user:settingsChanged',
-  
+
   // System events
   SYSTEM_ERROR: 'system:error',
   SYSTEM_WARNING: 'system:warning',
   SYSTEM_INFO: 'system:info',
-  
+
   // Plugin events
   PLUGIN_ENABLED: 'plugin:enabled',
   PLUGIN_DISABLED: 'plugin:disabled',
@@ -101,5 +101,5 @@ export const PLUGIN_EVENTS = {
   // PMS events
   PMS_ANALYSIS_STARTED: 'pms:analysisStarted',
   PMS_PLAN_UPDATED: 'pms:planUpdated',
-  PMS_COMPLETED: 'pms:completed'
+  PMS_COMPLETED: 'pms:completed',
 };

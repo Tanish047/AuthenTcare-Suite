@@ -25,16 +25,13 @@ class NotificationRepository extends BaseRepository {
         page,
         limit,
         total: total[0].count,
-        totalPages: Math.ceil(total[0].count / limit)
-      }
+        totalPages: Math.ceil(total[0].count / limit),
+      },
     };
   }
 
   async markAsRead(id) {
-    await this.dbAPI.query(
-      'UPDATE notifications SET read = TRUE WHERE id = ?',
-      [id]
-    );
+    await this.dbAPI.query('UPDATE notifications SET read = TRUE WHERE id = ?', [id]);
   }
 
   async markAllAsRead() {
@@ -61,8 +58,8 @@ class NotificationRepository extends BaseRepository {
         page,
         limit,
         total: total[0].count,
-        totalPages: Math.ceil(total[0].count / limit)
-      }
+        totalPages: Math.ceil(total[0].count / limit),
+      },
     };
   }
 }

@@ -1,7 +1,15 @@
 import React, { useRef } from 'react';
 import DropdownMenu from './DropdownMenu.jsx';
 
-function NavDropdown({ item, openMenu, setOpenMenu, closeTimer, handleAnyMouseEnter, handleAnyMouseLeave, onItemClick }) {
+function NavDropdown({
+  item,
+  openMenu,
+  setOpenMenu,
+  closeTimer,
+  handleAnyMouseEnter,
+  handleAnyMouseLeave,
+  onItemClick,
+}) {
   const hasChildren = Array.isArray(item.children) && item.children.length > 0;
   const navBtnRef = useRef();
 
@@ -55,7 +63,13 @@ function NavDropdown({ item, openMenu, setOpenMenu, closeTimer, handleAnyMouseEn
             }}
           >
             <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-              <path d="M6 8l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path
+                d="M6 8l4 4 4-4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </span>
         )}
@@ -75,4 +89,4 @@ function NavDropdown({ item, openMenu, setOpenMenu, closeTimer, handleAnyMouseEn
   );
 }
 
-export default NavDropdown; 
+export default NavDropdown;

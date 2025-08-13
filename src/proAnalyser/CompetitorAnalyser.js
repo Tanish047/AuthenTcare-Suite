@@ -65,8 +65,8 @@ export default class CompetitorAnalyser extends BaseAnalyser {
           marketPositioning: this.marketPositioning,
           featureComparison: this.featureComparison,
           strengthsWeaknesses: this.strengthsWeaknesses,
-          recommendations: await this.generateRecommendations()
-        }
+          recommendations: await this.generateRecommendations(),
+        },
       };
 
       this.emit(PLUGIN_EVENTS.COMPETITOR_ANALYSIS_COMPLETED, { report });

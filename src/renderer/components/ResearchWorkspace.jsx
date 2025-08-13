@@ -20,11 +20,11 @@ import VersionModals from './research/VersionModals.jsx';
 import MarketModals from './research/MarketModals.jsx';
 import LicenseModals from './research/LicenseModals.jsx';
 
-function ResearchWorkspace({ 
+function ResearchWorkspace({
   currentLevel: initialLevel = 'project',
   onDeviceSelect,
   onVersionSelect,
-  onMarketSelect
+  onMarketSelect,
 }) {
   const { state, dispatch } = useAppContext();
   const [currentLevel, setCurrentLevel] = useState(initialLevel);
@@ -36,8 +36,8 @@ function ResearchWorkspace({
   // Navigation helper functions
   const navigateToLevel = (level, selection) => {
     // Reset all lower level selections
-    const resetLowerLevels = (currentLevel) => {
-      switch(currentLevel) {
+    const resetLowerLevels = currentLevel => {
+      switch (currentLevel) {
         case 'project':
           setSelectedDevice(null);
           setSelectedVersion(null);
@@ -54,7 +54,7 @@ function ResearchWorkspace({
     };
 
     // Update the current selection and navigate
-    switch(level) {
+    switch (level) {
       case 'project':
         resetLowerLevels('project');
         setSelectedProject(selection);
@@ -89,8 +89,8 @@ function ResearchWorkspace({
     }
   };
 
-  const canNavigateToLevel = (level) => {
-    switch(level) {
+  const canNavigateToLevel = level => {
+    switch (level) {
       case 'project':
         return true;
       case 'device':
@@ -106,7 +106,7 @@ function ResearchWorkspace({
     }
   };
 
-  const { 
+  const {
     projects,
     showCreateModal: showProjectModal,
     showEditModal: showProjectEditModal,
@@ -126,7 +126,7 @@ function ResearchWorkspace({
     deletePassword,
     setDeletePassword,
     deleteError,
-    loadProjects
+    loadProjects,
   } = useProjects(state, dispatch);
 
   const {
@@ -152,7 +152,7 @@ function ResearchWorkspace({
     handleCreateDevice,
     handleEditDevice,
     handleDeleteDevice,
-    loadDevices
+    loadDevices,
   } = useDevices(state, dispatch, selectedProject);
 
   const {
@@ -177,7 +177,7 @@ function ResearchWorkspace({
     versionDeleteError,
     handleCreateVersion,
     handleEditVersion,
-    handleDeleteVersion
+    handleDeleteVersion,
   } = useVersions(state, dispatch, selectedProject, selectedDevice);
 
   const {
@@ -195,7 +195,7 @@ function ResearchWorkspace({
     deleteMarket,
     marketDeletePassword,
     setMarketDeletePassword,
-    marketDeleteError
+    marketDeleteError,
   } = useMarkets(state, dispatch);
 
   const {
@@ -204,7 +204,7 @@ function ResearchWorkspace({
     handleCreateClick: handleLicenseCreate,
     setShowLicenseModal,
     newLicense,
-    setNewLicense
+    setNewLicense,
   } = useLicenses(state, dispatch);
 
   // Load and save effects
@@ -216,10 +216,10 @@ function ResearchWorkspace({
           console.log('Found localStorage data, migrating to database...');
           await migrateLocalStorageToDatabase();
         }
-        
+
         // Load projects from database
         await loadProjects();
-        
+
         // Restore last selected project if available
         const lastProject = getStorage('lastSelectedProject');
         if (lastProject && currentLevel === 'project') {
@@ -269,36 +269,40 @@ function ResearchWorkspace({
 
   // Render breadcrumb navigation
   const renderBreadcrumb = () => (
-    <div style={{ 
-      padding: '12px 16px', 
-      backgroundColor: '#f8f9fa', 
-      borderRadius: '6px',
-      marginBottom: '20px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-      fontSize: '14px'
-    }}>
-      <span 
+    <div
+      style={{
+        padding: '12px 16px',
+        backgroundColor: '#f8f9fa',
+        borderRadius: '6px',
+        marginBottom: '20px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        fontSize: '14px',
+      }}
+    >
+      <span
         onClick={() => navigateToLevel('project', null)}
-        style={{ 
-          cursor: 'pointer', 
+        style={{
+          cursor: 'pointer',
           color: currentLevel === 'project' ? '#2c5aa0' : '#666',
-          fontWeight: currentLevel === 'project' ? '600' : 'normal'
+          fontWeight: currentLevel === 'project' ? '600' : 'normal',
         }}
       >
         Projects
       </span>
-      
+
       {selectedProject && (
         <>
           <span style={{ color: '#666' }}>/</span>
-          <span 
-            onClick={() => canNavigateToLevel('device') && navigateToLevel('device', selectedProject)}
-            style={{ 
-              cursor: canNavigateToLevel('device') ? 'pointer' : 'not-allowed', 
+          <span
+            onClick={() =>
+              canNavigateToLevel('device') && navigateToLevel('device', selectedProject)
+            }
+            style={{
+              cursor: canNavigateToLevel('device') ? 'pointer' : 'not-allowed',
               color: currentLevel === 'device' ? '#2c5aa0' : '#666',
-              fontWeight: currentLevel === 'device' ? '600' : 'normal'
+              fontWeight: currentLevel === 'device' ? '600' : 'normal',
             }}
           >
             {selectedProject}
@@ -309,12 +313,14 @@ function ResearchWorkspace({
       {selectedDevice && (
         <>
           <span style={{ color: '#666' }}>/</span>
-          <span 
-            onClick={() => canNavigateToLevel('version') && navigateToLevel('version', selectedDevice)}
-            style={{ 
+          <span
+            onClick={() =>
+              canNavigateToLevel('version') && navigateToLevel('version', selectedDevice)
+            }
+            style={{
               cursor: canNavigateToLevel('version') ? 'pointer' : 'not-allowed',
               color: currentLevel === 'version' ? '#2c5aa0' : '#666',
-              fontWeight: currentLevel === 'version' ? '600' : 'normal'
+              fontWeight: currentLevel === 'version' ? '600' : 'normal',
             }}
           >
             {selectedDevice}
@@ -325,12 +331,14 @@ function ResearchWorkspace({
       {selectedVersion && (
         <>
           <span style={{ color: '#666' }}>/</span>
-          <span 
-            onClick={() => canNavigateToLevel('market') && navigateToLevel('market', selectedVersion)}
-            style={{ 
+          <span
+            onClick={() =>
+              canNavigateToLevel('market') && navigateToLevel('market', selectedVersion)
+            }
+            style={{
               cursor: canNavigateToLevel('market') ? 'pointer' : 'not-allowed',
               color: currentLevel === 'market' ? '#2c5aa0' : '#666',
-              fontWeight: currentLevel === 'market' ? '600' : 'normal'
+              fontWeight: currentLevel === 'market' ? '600' : 'normal',
             }}
           >
             {selectedVersion}
@@ -341,12 +349,14 @@ function ResearchWorkspace({
       {selectedMarket && (
         <>
           <span style={{ color: '#666' }}>/</span>
-          <span 
-            onClick={() => canNavigateToLevel('license') && navigateToLevel('license', selectedMarket)}
-            style={{ 
+          <span
+            onClick={() =>
+              canNavigateToLevel('license') && navigateToLevel('license', selectedMarket)
+            }
+            style={{
               cursor: canNavigateToLevel('license') ? 'pointer' : 'not-allowed',
               color: currentLevel === 'license' ? '#2c5aa0' : '#666',
-              fontWeight: currentLevel === 'license' ? '600' : 'normal'
+              fontWeight: currentLevel === 'license' ? '600' : 'normal',
             }}
           >
             {selectedMarket}
@@ -359,17 +369,19 @@ function ResearchWorkspace({
   // Main render
   return (
     <div style={{ padding: 32, height: 'calc(100vh - 100px)' }} className="research-workspace">
-      <h2 style={{ color: '#2c5aa0', fontWeight: 800, fontSize: 28, marginBottom: 24 }}>Research Workspace</h2>
-      
+      <h2 style={{ color: '#2c5aa0', fontWeight: 800, fontSize: 28, marginBottom: 24 }}>
+        Research Workspace
+      </h2>
+
       {renderBreadcrumb()}
 
       <div className="content-section">
         {currentLevel === 'project' && (
           <div className="projects-section">
-            <ProjectList 
+            <ProjectList
               projects={projects}
               selectedProject={selectedProject ? selectedProject.id : null}
-              onSelect={(project) => {
+              onSelect={project => {
                 setSelectedProject(project);
                 setCurrentLevel('device');
                 if (project) {
@@ -379,12 +391,12 @@ function ResearchWorkspace({
                 }
               }}
               onCreate={() => setShowProjectModal(true)}
-              onEdit={(project) => {
+              onEdit={project => {
                 setEditingProject(project);
                 setEditProjectName(project.name);
                 setShowProjectEditModal(true);
               }}
-              onDelete={(project) => {
+              onDelete={project => {
                 setDeleteProject(project);
                 setShowProjectDeleteModal(true);
               }}
@@ -417,7 +429,7 @@ function ResearchWorkspace({
             <DeviceList
               selectedProject={selectedProject}
               devices={devices}
-              onSelect={(device) => navigateToLevel('version', device)}
+              onSelect={device => navigateToLevel('version', device)}
               onCreate={handleDeviceCreate}
               onEdit={handleDeviceEdit}
               onDelete={handleDeviceDelete}
@@ -451,7 +463,7 @@ function ResearchWorkspace({
               selectedProject={selectedProject}
               selectedDevice={selectedDevice}
               versions={versions}
-              onSelect={(version) => navigateToLevel('market', version)}
+              onSelect={version => navigateToLevel('market', version)}
               onCreate={handleVersionCreate}
               onEdit={handleVersionEdit}
               onDelete={handleVersionDelete}
@@ -485,7 +497,7 @@ function ResearchWorkspace({
             <MarketList
               targetMarkets={targetMarkets}
               selectedMarket={selectedMarket}
-              onSelect={(market) => navigateToLevel('license', market)}
+              onSelect={market => navigateToLevel('license', market)}
               onCreate={handleMarketCreate}
               onEdit={handleMarketEdit}
               onDelete={handleMarketDelete}

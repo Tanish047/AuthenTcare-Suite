@@ -1,6 +1,5 @@
 import { ipcMain } from 'electron';
-  import './webCrawler.js';
-
+import './webCrawler.js';
 
 export default class IPCHandler {
   constructor(db) {
@@ -117,10 +116,10 @@ export default class IPCHandler {
   async createProject(event, data) {
     try {
       const { name, description = '' } = data;
-      const result = await this.db.run(
-        'INSERT INTO projects (name, description) VALUES (?, ?)',
-        [name, description]
-      );
+      const result = await this.db.run('INSERT INTO projects (name, description) VALUES (?, ?)', [
+        name,
+        description,
+      ]);
       const project = await this.db.get('SELECT * FROM projects WHERE id = ?', result.lastID);
       return project;
     } catch (error) {
@@ -441,7 +440,16 @@ export default class IPCHandler {
 
   async createLicense(event, data) {
     try {
-      const { project_id, market_id, version_id, license_number = '', status = 'pending', issued_date = null, expiry_date = null, notes = '' } = data;
+      const {
+        project_id,
+        market_id,
+        version_id,
+        license_number = '',
+        status = 'pending',
+        issued_date = null,
+        expiry_date = null,
+        notes = '',
+      } = data;
       const result = await this.db.run(
         'INSERT INTO licenses (project_id, market_id, version_id, license_number, status, issued_date, expiry_date, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
         [project_id, market_id, version_id, license_number, status, issued_date, expiry_date, notes]
@@ -498,33 +506,85 @@ export default class IPCHandler {
   }
 
   // Existing handlers (placeholder implementations)
-  async getClients(event, options) { return { data: [] }; }
-  async getClient(event, id) { return null; }
-  async createClient(event, data) { return null; }
-  async updateClient(event, id, data) { return null; }
-  async deleteClient(event, id) { return { success: true }; }
-  async searchClients(event, query) { return { data: [] }; }
+  async getClients(event, options) {
+    return { data: [] };
+  }
+  async getClient(event, id) {
+    return null;
+  }
+  async createClient(event, data) {
+    return null;
+  }
+  async updateClient(event, id, data) {
+    return null;
+  }
+  async deleteClient(event, id) {
+    return { success: true };
+  }
+  async searchClients(event, query) {
+    return { data: [] };
+  }
 
-  async getNews(event, options) { return { data: [] }; }
-  async getNewsItem(event, id) { return null; }
-  async createNews(event, data) { return null; }
-  async updateNews(event, id, data) { return null; }
-  async deleteNews(event, id) { return { success: true }; }
-  async getNewsByCategory(event, category) { return { data: [] }; }
-  async searchNews(event, query) { return { data: [] }; }
+  async getNews(event, options) {
+    return { data: [] };
+  }
+  async getNewsItem(event, id) {
+    return null;
+  }
+  async createNews(event, data) {
+    return null;
+  }
+  async updateNews(event, id, data) {
+    return null;
+  }
+  async deleteNews(event, id) {
+    return { success: true };
+  }
+  async getNewsByCategory(event, category) {
+    return { data: [] };
+  }
+  async searchNews(event, query) {
+    return { data: [] };
+  }
 
-  async getEvents(event, options) { return { data: [] }; }
-  async getEvent(event, id) { return null; }
-  async createEvent(event, data) { return null; }
-  async updateEvent(event, id, data) { return null; }
-  async deleteEvent(event, id) { return { success: true }; }
-  async getEventsByDateRange(event, startDate, endDate) { return { data: [] }; }
-  async getUpcomingEvents(event, limit) { return { data: [] }; }
+  async getEvents(event, options) {
+    return { data: [] };
+  }
+  async getEvent(event, id) {
+    return null;
+  }
+  async createEvent(event, data) {
+    return null;
+  }
+  async updateEvent(event, id, data) {
+    return null;
+  }
+  async deleteEvent(event, id) {
+    return { success: true };
+  }
+  async getEventsByDateRange(event, startDate, endDate) {
+    return { data: [] };
+  }
+  async getUpcomingEvents(event, limit) {
+    return { data: [] };
+  }
 
-  async getNotifications(event, options) { return { data: [] }; }
-  async getUnreadNotifications(event, options) { return { data: [] }; }
-  async markNotificationAsRead(event, id) { return { success: true }; }
-  async markAllNotificationsAsRead(event) { return { success: true }; }
-  async createNotification(event, data) { return null; }
-  async deleteNotification(event, id) { return { success: true }; }
+  async getNotifications(event, options) {
+    return { data: [] };
+  }
+  async getUnreadNotifications(event, options) {
+    return { data: [] };
+  }
+  async markNotificationAsRead(event, id) {
+    return { success: true };
+  }
+  async markAllNotificationsAsRead(event) {
+    return { success: true };
+  }
+  async createNotification(event, data) {
+    return null;
+  }
+  async deleteNotification(event, id) {
+    return { success: true };
+  }
 }

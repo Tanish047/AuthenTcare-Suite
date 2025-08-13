@@ -5,7 +5,7 @@ export default class Device {
     name,
     versions = [],
     createdAt = new Date(),
-    updatedAt = new Date()
+    updatedAt = new Date(),
   }) {
     this.id = id;
     this.projectId = projectId;
@@ -20,7 +20,7 @@ export default class Device {
       ...json,
       projectId: json.project_id,
       createdAt: json.created_at ? new Date(json.created_at) : new Date(),
-      updatedAt: json.updated_at ? new Date(json.updated_at) : new Date()
+      updatedAt: json.updated_at ? new Date(json.updated_at) : new Date(),
     });
   }
 
@@ -31,7 +31,7 @@ export default class Device {
       name: this.name,
       versions: this.versions,
       created_at: this.createdAt.toISOString(),
-      updated_at: this.updatedAt.toISOString()
+      updated_at: this.updatedAt.toISOString(),
     };
   }
 }

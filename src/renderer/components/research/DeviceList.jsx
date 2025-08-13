@@ -7,7 +7,7 @@ const DeviceList = ({
   onSelect,
   onCreate,
   onEdit,
-  onDelete
+  onDelete,
 }) => {
   if (!selectedProject) return null;
 
@@ -20,21 +20,21 @@ const DeviceList = ({
         {devices && devices.length > 0 ? (
           devices.map(device => (
             <li key={device} style={{ marginBottom: 12, display: 'flex', alignItems: 'center' }}>
-              <span 
-                style={{ 
-                  flex: 1, 
+              <span
+                style={{
+                  flex: 1,
                   cursor: 'pointer',
                   textDecoration: selectedDevice === device ? 'underline' : 'none',
                   padding: '8px',
                   borderRadius: '4px',
                   backgroundColor: selectedDevice === device ? '#f0f7ff' : 'transparent',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
                 }}
                 onClick={() => onSelect(device)}
               >
                 {device}
               </span>
-              <button 
+              <button
                 onClick={() => onEdit(device)}
                 style={{
                   marginLeft: '8px',
@@ -42,12 +42,12 @@ const DeviceList = ({
                   borderRadius: '4px',
                   border: '1px solid #ccc',
                   backgroundColor: 'transparent',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 Edit
               </button>
-              <button 
+              <button
                 onClick={() => onDelete(device)}
                 style={{
                   marginLeft: '8px',
@@ -55,7 +55,7 @@ const DeviceList = ({
                   borderRadius: '4px',
                   border: '1px solid #ccc',
                   backgroundColor: 'transparent',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 Delete

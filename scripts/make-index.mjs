@@ -9,9 +9,9 @@ import path from 'path';
 async function generateIndex() {
   const projectRoot = process.cwd();
   const indexPath = path.join(projectRoot, 'INDEX.md');
-  
+
   console.log('Generating INDEX.md...');
-  
+
   const content = `# AuthenTcare Suite - Project Index
 
 Generated on: ${new Date().toISOString()}

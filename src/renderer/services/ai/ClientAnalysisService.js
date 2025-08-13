@@ -7,7 +7,7 @@ export default class ClientAnalysisService extends AIService {
     this.modelTypes = {
       SENTIMENT: 'sentiment',
       CATEGORIZATION: 'categorization',
-      RISK_ASSESSMENT: 'risk-assessment'
+      RISK_ASSESSMENT: 'risk-assessment',
     };
   }
 
@@ -20,7 +20,7 @@ export default class ClientAnalysisService extends AIService {
       return {
         sentiment: prediction.sentiment,
         confidence: prediction.confidence,
-        recommendations: this.generateRecommendations(prediction)
+        recommendations: this.generateRecommendations(prediction),
       };
     } catch (error) {
       console.error('Sentiment analysis failed:', error);
@@ -37,7 +37,7 @@ export default class ClientAnalysisService extends AIService {
       return {
         category: prediction.category,
         confidence: prediction.confidence,
-        attributes: prediction.attributes
+        attributes: prediction.attributes,
       };
     } catch (error) {
       console.error('Client categorization failed:', error);
@@ -54,7 +54,7 @@ export default class ClientAnalysisService extends AIService {
       return {
         riskLevel: prediction.riskLevel,
         confidence: prediction.confidence,
-        factors: prediction.contributingFactors
+        factors: prediction.contributingFactors,
       };
     } catch (error) {
       console.error('Risk assessment failed:', error);
@@ -71,7 +71,7 @@ export default class ClientAnalysisService extends AIService {
     // Client data preprocessing logic
     return {
       ...data,
-      processedAt: new Date()
+      processedAt: new Date(),
     };
   }
 

@@ -24,12 +24,12 @@ export default class GapAnalyser extends BaseAnalyser {
     try {
       this.setStatus('analysing');
       this.updateProgress(30);
-      
+
       // Here we'll add logic to:
       // 1. Compare client data against requirements
       // 2. Identify missing elements
       // 3. Categorize gaps by priority
-      
+
       this.updateProgress(70);
       return true;
     } catch (error) {
@@ -42,18 +42,18 @@ export default class GapAnalyser extends BaseAnalyser {
     try {
       this.setStatus('generating');
       this.updateProgress(80);
-      
+
       // Here we'll add logic to:
       // 1. Format gaps into readable report
       // 2. Add recommendations
       // 3. Include priority levels
-      
+
       this.updateProgress(100);
       this.setStatus('completed');
       return {
         success: true,
         gaps: this.gaps,
-        recommendations: []
+        recommendations: [],
       };
     } catch (error) {
       this.setError(error);

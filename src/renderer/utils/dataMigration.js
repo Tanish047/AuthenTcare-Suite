@@ -3,7 +3,7 @@ import { getStorage, setStorage } from './storage.js';
 export async function migrateLocalStorageToDatabase() {
   try {
     console.log('Starting data migration from localStorage to database...');
-    
+
     // Migrate projects
     const projects = getStorage('authentcare_projects', []);
     if (projects.length > 0) {
@@ -12,7 +12,7 @@ export async function migrateLocalStorageToDatabase() {
         try {
           await window.dbAPI.createProject({
             name: project.name,
-            description: project.description || ''
+            description: project.description || '',
           });
         } catch (error) {
           console.warn(`Failed to migrate project "${project.name}":`, error.message);
@@ -24,7 +24,9 @@ export async function migrateLocalStorageToDatabase() {
     }
 
     // Migrate devices
-    const deviceKeys = Object.keys(localStorage).filter(key => key.startsWith('authentcare_devices_'));
+    const deviceKeys = Object.keys(localStorage).filter(key =>
+      key.startsWith('authentcare_devices_')
+    );
     for (const key of deviceKeys) {
       const projectId = key.replace('authentcare_devices_', '');
       const devices = getStorage(key, []);
@@ -36,7 +38,7 @@ export async function migrateLocalStorageToDatabase() {
               project_id: parseInt(projectId),
               name: device.name,
               type: device.type || '',
-              specifications: device.specifications || ''
+              specifications: device.specifications || '',
             });
           } catch (error) {
             console.warn(`Failed to migrate device "${device.name}":`, error.message);
@@ -48,7 +50,9 @@ export async function migrateLocalStorageToDatabase() {
     console.log('✓ Devices migrated successfully');
 
     // Migrate versions
-    const versionKeys = Object.keys(localStorage).filter(key => key.startsWith('authentcare_versions_'));
+    const versionKeys = Object.keys(localStorage).filter(key =>
+      key.startsWith('authentcare_versions_')
+    );
     for (const key of versionKeys) {
       const versionData = key.replace('authentcare_versions_', '');
       const [projectId, deviceId] = versionData.split('_');
@@ -61,7 +65,7 @@ export async function migrateLocalStorageToDatabase() {
               device_id: parseInt(deviceId),
               version_number: version.name,
               release_date: version.releaseDate || null,
-              changes: version.changes || ''
+              changes: version.changes || '',
             });
           } catch (error) {
             console.warn(`Failed to migrate version "${version.name}":`, error.message);
@@ -82,7 +86,7 @@ export async function migrateLocalStorageToDatabase() {
             name: market.name,
             region: market.region || '',
             regulatory_body: market.regulatoryBody || '',
-            requirements: market.requirements || ''
+            requirements: market.requirements || '',
           });
         } catch (error) {
           console.warn(`Failed to migrate market "${market.name}":`, error.message);
@@ -109,7 +113,7 @@ export async function migrateLocalStorageToDatabase() {
             status: license.status || 'pending',
             issued_date: license.issuedDate || null,
             expiry_date: license.expiryDate || null,
-            notes: license.notes || ''
+            notes: license.notes || '',
           });
         } catch (error) {
           console.warn(`Failed to migrate license for key "${key}":`, error.message);
@@ -129,14 +133,20 @@ export async function migrateLocalStorageToDatabase() {
 
 export function hasLocalStorageData() {
   const projects = getStorage('authentcare_projects', []);
-  const deviceKeys = Object.keys(localStorage).filter(key => key.startsWith('authentcare_devices_'));
-  const versionKeys = Object.keys(localStorage).filter(key => key.startsWith('authentcare_versions_'));
+  const deviceKeys = Object.keys(localStorage).filter(key =>
+    key.startsWith('authentcare_devices_')
+  );
+  const versionKeys = Object.keys(localStorage).filter(key =>
+    key.startsWith('authentcare_versions_')
+  );
   const markets = getStorage('authentcare_target_markets', []);
   const licenses = getStorage('authentcare_market_licenses', {});
-  
-  return projects.length > 0 || 
-         deviceKeys.length > 0 || 
-         versionKeys.length > 0 || 
-         markets.length > 0 || 
-         Object.keys(licenses).length > 0;
-} 
+
+  return (
+    projects.length > 0 ||
+    deviceKeys.length > 0 ||
+    versionKeys.length > 0 ||
+    markets.length > 0 ||
+    Object.keys(licenses).length > 0
+  );
+}

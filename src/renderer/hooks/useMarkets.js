@@ -13,10 +13,29 @@ export const useMarkets = (state, dispatch) => {
   const [marketDeleteError, setMarketDeleteError] = useState('');
 
   const allMarkets = [
-    'Australia', 'Bangladesh', 'Brunei', 'Cambodia', 'China', 'Europe', 'Hong Kong', 
-    'India', 'Indonesia', 'Japan', 'Korea', 'Lao', 'Malaysia', 'Maynmar', 'Myanmar', 
-    'New Zealand', 'Philippines', 'Singapore', 'Sri Lanka', 'Taiwan', 'Thailand', 
-    'USA', 'Vietnam'
+    'Australia',
+    'Bangladesh',
+    'Brunei',
+    'Cambodia',
+    'China',
+    'Europe',
+    'Hong Kong',
+    'India',
+    'Indonesia',
+    'Japan',
+    'Korea',
+    'Lao',
+    'Malaysia',
+    'Maynmar',
+    'Myanmar',
+    'New Zealand',
+    'Philippines',
+    'Singapore',
+    'Sri Lanka',
+    'Taiwan',
+    'Thailand',
+    'USA',
+    'Vietnam',
   ].sort();
 
   const handleCreateMarket = () => {
@@ -29,9 +48,9 @@ export const useMarkets = (state, dispatch) => {
 
   const handleEditMarket = (oldMarket, newName) => {
     if (newName && oldMarket && !state.targetMarkets.includes(newName)) {
-      dispatch({ 
-        type: 'SET_TARGET_MARKETS', 
-        targetMarkets: state.targetMarkets.map(m => m === oldMarket ? newName : m) 
+      dispatch({
+        type: 'SET_TARGET_MARKETS',
+        targetMarkets: state.targetMarkets.map(m => (m === oldMarket ? newName : m)),
       });
       setEditMarket('');
       setEditMarketName('');
@@ -41,9 +60,9 @@ export const useMarkets = (state, dispatch) => {
 
   const handleDeleteMarket = () => {
     if (checkPassword(marketDeletePassword)) {
-      dispatch({ 
-        type: 'SET_TARGET_MARKETS', 
-        targetMarkets: state.targetMarkets.filter(m => m !== deleteMarket) 
+      dispatch({
+        type: 'SET_TARGET_MARKETS',
+        targetMarkets: state.targetMarkets.filter(m => m !== deleteMarket),
       });
       setShowMarketDeleteModal(false);
       setDeleteMarket('');
@@ -58,13 +77,13 @@ export const useMarkets = (state, dispatch) => {
     setShowMarketModal(true);
   };
 
-  const handleEditClick = (market) => {
+  const handleEditClick = market => {
     setEditMarket(market);
     setEditMarketName(market);
     setShowMarketEditModal(true);
   };
 
-  const handleDeleteClick = (market) => {
+  const handleDeleteClick = market => {
     setDeleteMarket(market);
     setShowMarketDeleteModal(true);
   };
@@ -94,6 +113,6 @@ export const useMarkets = (state, dispatch) => {
     setMarketDeletePassword,
     marketDeleteError,
     onDelete: handleDeleteClick,
-    onDeleteMarket: handleDeleteMarket
+    onDeleteMarket: handleDeleteMarket,
   };
 };

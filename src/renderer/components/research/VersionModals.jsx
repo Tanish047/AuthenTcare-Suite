@@ -19,7 +19,7 @@ const VersionModals = ({
   versionDeleteError,
   handleCreateVersion,
   handleEditVersion,
-  handleDeleteVersion
+  handleDeleteVersion,
 }) => {
   return (
     <>
@@ -28,8 +28,12 @@ const VersionModals = ({
         onClose={() => setShowVersionModal(false)}
         title="Add Version"
         actions={[
-          <button key="cancel" onClick={() => setShowVersionModal(false)}>Cancel</button>,
-          <button key="save" onClick={handleCreateVersion} disabled={!newVersionName.trim()}>Save</button>
+          <button key="cancel" onClick={() => setShowVersionModal(false)}>
+            Cancel
+          </button>,
+          <button key="save" onClick={handleCreateVersion} disabled={!newVersionName.trim()}>
+            Save
+          </button>,
         ]}
       >
         <form onSubmit={handleCreateVersion} style={{ width: '100%' }}>
@@ -50,8 +54,16 @@ const VersionModals = ({
         onClose={() => setShowVersionEditModal(false)}
         title="Edit Version"
         actions={[
-          <button key="cancel" onClick={() => setShowVersionEditModal(false)}>Cancel</button>,
-          <button key="save" onClick={handleEditVersion} disabled={!editVersionName.trim() || editVersionName.trim() === editingVersion}>Save</button>
+          <button key="cancel" onClick={() => setShowVersionEditModal(false)}>
+            Cancel
+          </button>,
+          <button
+            key="save"
+            onClick={handleEditVersion}
+            disabled={!editVersionName.trim() || editVersionName.trim() === editingVersion}
+          >
+            Save
+          </button>,
         ]}
       >
         <form onSubmit={handleEditVersion} style={{ width: '100%' }}>
@@ -69,15 +81,30 @@ const VersionModals = ({
 
       <Modal
         open={showVersionDeleteModal}
-        onClose={() => { setShowVersionDeleteModal(false); setVersionDeletePassword(''); }}
+        onClose={() => {
+          setShowVersionDeleteModal(false);
+          setVersionDeletePassword('');
+        }}
         title="Delete Version"
         actions={[
-          <button key="cancel" onClick={() => { setShowVersionDeleteModal(false); setVersionDeletePassword(''); }}>Cancel</button>,
-          <button key="delete" onClick={handleDeleteVersion} disabled={!versionDeletePassword}>Delete</button>
+          <button
+            key="cancel"
+            onClick={() => {
+              setShowVersionDeleteModal(false);
+              setVersionDeletePassword('');
+            }}
+          >
+            Cancel
+          </button>,
+          <button key="delete" onClick={handleDeleteVersion} disabled={!versionDeletePassword}>
+            Delete
+          </button>,
         ]}
       >
         <form onSubmit={handleDeleteVersion} style={{ width: '100%' }}>
-          <div style={{ marginBottom: 12 }}>Enter password to delete <b>{deleteVersion}</b>:</div>
+          <div style={{ marginBottom: 12 }}>
+            Enter password to delete <b>{deleteVersion}</b>:
+          </div>
           <input
             type="password"
             value={versionDeletePassword}
@@ -87,7 +114,9 @@ const VersionModals = ({
             autoFocus
             required
           />
-          {versionDeleteError && <div style={{ color: '#d63031', marginBottom: 8 }}>{versionDeleteError}</div>}
+          {versionDeleteError && (
+            <div style={{ color: '#d63031', marginBottom: 8 }}>{versionDeleteError}</div>
+          )}
         </form>
       </Modal>
     </>

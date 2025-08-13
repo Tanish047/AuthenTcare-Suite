@@ -26,4 +26,4 @@ function Button({ children, onClick, type = 'button', disabled = false, style = 
   );
 }
 
-export default Button; 
+export default Button;

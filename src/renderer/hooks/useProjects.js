@@ -28,15 +28,15 @@ export const useProjects = (state, dispatch) => {
     }
   }, [dispatch]);
 
-  const handleCreateProject = async (e) => {
+  const handleCreateProject = async e => {
     e.preventDefault();
     if (!newProjectName.trim()) return;
 
     try {
       setLoading(true);
       setError(null);
-      const project = await window.dbAPI.createProject({ 
-        name: newProjectName.trim() 
+      const project = await window.dbAPI.createProject({
+        name: newProjectName.trim(),
       });
       dispatch({ type: 'ADD_PROJECT', project });
       setShowCreateModal(false);
@@ -49,15 +49,15 @@ export const useProjects = (state, dispatch) => {
     }
   };
 
-  const handleEditProject = async (e) => {
+  const handleEditProject = async e => {
     e.preventDefault();
     if (!editProjectName.trim() || !editingProject) return;
 
     try {
       setLoading(true);
       setError(null);
-      const updated = await window.dbAPI.updateProject(editingProject.id, { 
-        name: editProjectName.trim() 
+      const updated = await window.dbAPI.updateProject(editingProject.id, {
+        name: editProjectName.trim(),
       });
       dispatch({ type: 'UPDATE_PROJECT', project: updated });
       setShowEditModal(false);
@@ -71,7 +71,7 @@ export const useProjects = (state, dispatch) => {
     }
   };
 
-  const handleDeleteProject = async (e) => {
+  const handleDeleteProject = async e => {
     e.preventDefault();
     if (!deleteProject || !checkPassword(deletePassword)) {
       setDeleteError('Incorrect password.');
@@ -118,6 +118,6 @@ export const useProjects = (state, dispatch) => {
     loadProjects,
     handleCreateProject,
     handleEditProject,
-    handleDeleteProject
+    handleDeleteProject,
   };
 };

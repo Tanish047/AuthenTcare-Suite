@@ -1,5 +1,14 @@
 import React from 'react';
-function Input({ value, onChange, type = 'text', placeholder = '', required = false, autoFocus = false, style = {}, ...props }) {
+function Input({
+  value,
+  onChange,
+  type = 'text',
+  placeholder = '',
+  required = false,
+  autoFocus = false,
+  style = {},
+  ...props
+}) {
   const defaultStyle = {
     width: '100%',
     padding: '12px 16px',
@@ -23,4 +32,4 @@ function Input({ value, onChange, type = 'text', placeholder = '', required = fa
   );
 }
 
-export default Input; 
+export default Input;

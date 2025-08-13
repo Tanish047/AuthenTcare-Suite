@@ -69,8 +69,8 @@ export default class StrategyMaker extends BaseAnalyser {
           risks: this.risks,
           implementationPlan: this.implementationPlan,
           timeline: this.timeline,
-          recommendations: await this.generateRecommendations()
-        }
+          recommendations: await this.generateRecommendations(),
+        },
       };
 
       this.emit(PLUGIN_EVENTS.STRATEGY_COMPLETED, { report });

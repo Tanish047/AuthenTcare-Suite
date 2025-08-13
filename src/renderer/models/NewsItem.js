@@ -6,7 +6,7 @@ class NewsItem {
     source = null,
     category = null,
     publishedAt = new Date(),
-    createdAt = new Date()
+    createdAt = new Date(),
   }) {
     this.id = id;
     this.title = title;
@@ -21,7 +21,7 @@ class NewsItem {
     return new NewsItem({
       ...json,
       publishedAt: json.published_at ? new Date(json.published_at) : new Date(),
-      createdAt: json.created_at ? new Date(json.created_at) : new Date()
+      createdAt: json.created_at ? new Date(json.created_at) : new Date(),
     });
   }
 
@@ -33,7 +33,7 @@ class NewsItem {
       source: this.source,
       category: this.category,
       published_at: this.publishedAt.toISOString(),
-      created_at: this.createdAt.toISOString()
+      created_at: this.createdAt.toISOString(),
     };
   }
 }

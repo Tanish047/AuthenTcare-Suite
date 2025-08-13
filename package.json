@@ -10,7 +10,9 @@
   "dependencies": {
     "babel-loader": "^8.2.2",
     "babel-preset-react": "^6.24.1",
+    "cheerio": "^1.0.0-rc.12",
     "electron": "^37.1.0",
+    "node-fetch": "^3.3.1",
     "react": "^18.2.0",
     "react-calendar": "^6.0.0",
     "react-dom": "^18.2.0",
@@ -19,8 +21,6 @@
     "tar-fs": "^3.0.9",
     "webpack": "^5.51.1",
     "webpack-cli": "^4.8.0",
-    "node-fetch": "^3.3.1",
-    "cheerio": "^1.0.0-rc.12",
     "zod": "^3.22.2"
   },
   "devDependencies": {
@@ -32,22 +32,29 @@
     "@eslint/js": "^9.31.0",
     "babel-loader": "^8.2.2",
     "copy-webpack-plugin": "^13.0.0",
+    "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
     "electron-devtools-installer": "^4.0.0",
     "eslint": "^9.31.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.37.5",
+    "prettier": "^3.6.2",
     "style-loader": "^4.0.0",
-    "webpack-dev-server": "^5.2.2",
-    "cross-env": "^7.0.3"
+    "webpack-dev-server": "^5.2.2"
   },
   "scripts": {
-  "build": "webpack",
-  "start": "cross-env NODE_ENV=development electron .",
-  "start:prod": "cross-env NODE_ENV=production electron .",
-  "audit": "npm audit fix",
-  "make:index": "node scripts/make-index.mjs",
-  "migrate": "node src/storage/sqlite/migrate.js",
-  "test": "node --test",
-  "test:ci": "node --test --test-reporter tap"
+    "build": "webpack",
+    "start": "cross-env NODE_ENV=development electron .",
+    "start:prod": "cross-env NODE_ENV=production electron .",
+    "audit": "npm audit fix",
+    "make:index": "node scripts/make-index.mjs",
+    "migrate": "node src/storage/sqlite/migrate.js",
+    "test": "node --test",
+    "test:ci": "node --test --test-reporter tap",
+    "lint": "eslint src/ test/ scripts/",
+    "lint:fix": "eslint src/ test/ scripts/ --fix",
+    "format": "prettier --write src/ test/ scripts/",
+    "format:check": "prettier --check src/ test/ scripts/"
   }
 }

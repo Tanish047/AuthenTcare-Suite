@@ -19,7 +19,7 @@ const ProjectModals = ({
   deleteError,
   handleCreateProject,
   handleEditProject,
-  handleDeleteProject
+  handleDeleteProject,
 }) => {
   return (
     <>
@@ -31,8 +31,8 @@ const ProjectModals = ({
         }}
         title="Create New Project"
         actions={[
-          <button 
-            key="cancel" 
+          <button
+            key="cancel"
             onClick={() => {
               setShowCreateModal(false);
               setNewProjectName('');
@@ -42,14 +42,14 @@ const ProjectModals = ({
               borderRadius: '4px',
               border: '1px solid #ccc',
               background: 'transparent',
-              cursor: 'pointer'
+              cursor: 'pointer',
             }}
           >
             Cancel
           </button>,
-          <button 
-            key="save" 
-            onClick={handleCreateProject} 
+          <button
+            key="save"
+            onClick={handleCreateProject}
             disabled={!newProjectName.trim()}
             style={{
               padding: '6px 16px',
@@ -57,11 +57,11 @@ const ProjectModals = ({
               border: 'none',
               background: !newProjectName.trim() ? '#ccc' : '#2c5aa0',
               color: 'white',
-              cursor: !newProjectName.trim() ? 'not-allowed' : 'pointer'
+              cursor: !newProjectName.trim() ? 'not-allowed' : 'pointer',
             }}
           >
             Create Project
-          </button>
+          </button>,
         ]}
       >
         <form onSubmit={handleCreateProject} style={{ width: '100%' }}>
@@ -74,12 +74,12 @@ const ProjectModals = ({
               value={newProjectName}
               onChange={e => setNewProjectName(e.target.value)}
               placeholder="Enter project name"
-              style={{ 
+              style={{
                 width: '100%',
                 padding: '8px 12px',
                 borderRadius: '4px',
                 border: '1px solid #ccc',
-                fontSize: '14px'
+                fontSize: '14px',
               }}
               autoFocus
               required
@@ -96,8 +96,16 @@ const ProjectModals = ({
         onClose={() => setShowEditModal(false)}
         title="Edit Project"
         actions={[
-          <button key="cancel" onClick={() => setShowEditModal(false)}>Cancel</button>,
-          <button key="save" onClick={handleEditProject} disabled={!editProjectName.trim() || editProjectName.trim() === editingProject}>Save</button>
+          <button key="cancel" onClick={() => setShowEditModal(false)}>
+            Cancel
+          </button>,
+          <button
+            key="save"
+            onClick={handleEditProject}
+            disabled={!editProjectName.trim() || editProjectName.trim() === editingProject}
+          >
+            Save
+          </button>,
         ]}
       >
         <form onSubmit={handleEditProject} style={{ width: '100%' }}>
@@ -115,15 +123,30 @@ const ProjectModals = ({
 
       <Modal
         open={showDeleteModal}
-        onClose={() => { setShowDeleteModal(false); setDeletePassword(''); }}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDeletePassword('');
+        }}
         title="Delete Project"
         actions={[
-          <button key="cancel" onClick={() => { setShowDeleteModal(false); setDeletePassword(''); }}>Cancel</button>,
-          <button key="delete" onClick={handleDeleteProject} disabled={!deletePassword}>Delete</button>
+          <button
+            key="cancel"
+            onClick={() => {
+              setShowDeleteModal(false);
+              setDeletePassword('');
+            }}
+          >
+            Cancel
+          </button>,
+          <button key="delete" onClick={handleDeleteProject} disabled={!deletePassword}>
+            Delete
+          </button>,
         ]}
       >
         <form onSubmit={handleDeleteProject} style={{ width: '100%' }}>
-          <div style={{ marginBottom: 12 }}>Enter password to delete <b>{deleteProject}</b>:</div>
+          <div style={{ marginBottom: 12 }}>
+            Enter password to delete <b>{deleteProject}</b>:
+          </div>
           <input
             type="password"
             value={deletePassword}

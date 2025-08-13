@@ -7,10 +7,7 @@ class ClientRepository extends BaseRepository {
   }
 
   async findByEmail(email) {
-    const result = await this.dbAPI.query(
-      'SELECT * FROM clients WHERE email = ?',
-      [email]
-    );
+    const result = await this.dbAPI.query('SELECT * FROM clients WHERE email = ?', [email]);
     return result ? Client.fromJSON(result) : null;
   }
 
@@ -34,8 +31,8 @@ class ClientRepository extends BaseRepository {
         page,
         limit,
         total: total[0].count,
-        totalPages: Math.ceil(total[0].count / limit)
-      }
+        totalPages: Math.ceil(total[0].count / limit),
+      },
     };
   }
 }

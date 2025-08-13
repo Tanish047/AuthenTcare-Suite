@@ -43,7 +43,7 @@ class BasePlugin {
     // Default implementation logs the event
     if (process.env.NODE_ENV === 'development') {
       // Only log in development
-      // eslint-disable-next-line no-console
+
       console.debug(`Plugin ${this.name} received event:`, eventName, data);
     }
   }
@@ -52,12 +52,12 @@ class BasePlugin {
     if (!this.enabled) {
       return;
     }
-    
+
     try {
       this.handleEvent(eventName, {
         ...data,
         plugin: this.name,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       // Prevent event handling errors from breaking the plugin
@@ -69,9 +69,9 @@ class BasePlugin {
     const eventData = {
       plugin: this.name,
       error: error instanceof Error ? error : new Error(error),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    
+
     this.handleEvent('plugin:error', eventData);
   }
 }

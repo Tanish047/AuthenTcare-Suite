@@ -45,7 +45,7 @@ export default class PMSAdvisorPro extends BaseAnalyser {
       // 4. Develop review procedures
       await this.developReviewProcedures();
       this.emit(PLUGIN_EVENTS.PMS_PLAN_UPDATED, {
-        plans: this.pmsPlans
+        plans: this.pmsPlans,
       });
       this.updateProgress(90);
 
@@ -70,8 +70,8 @@ export default class PMSAdvisorPro extends BaseAnalyser {
           monitoringStrategy: this.monitoringStrategy,
           dataCollection: this.dataCollectionStrategy,
           reviewProcedures: this.reviewProcedures,
-          recommendations: await this.generateRecommendations()
-        }
+          recommendations: await this.generateRecommendations(),
+        },
       };
 
       this.emit(PLUGIN_EVENTS.PMS_COMPLETED, { report });

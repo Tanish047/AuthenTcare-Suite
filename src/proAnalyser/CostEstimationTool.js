@@ -69,8 +69,8 @@ export default class CostEstimationTool extends BaseAnalyser {
           lifecycle: this.lifecycleCosts,
           marketSpecific: this.marketCosts,
           optimizations: this.costOptimizations,
-          recommendations: await this.generateRecommendations()
-        }
+          recommendations: await this.generateRecommendations(),
+        },
       };
 
       this.emit(PLUGIN_EVENTS.COST_COMPLETED, { report });

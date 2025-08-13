@@ -68,8 +68,8 @@ export default class TimelinePro extends BaseAnalyser {
           milestones: this.milestones,
           criticalPath: this.criticalPath,
           timeEstimates: this.timeEstimates,
-          recommendations: await this.generateRecommendations()
-        }
+          recommendations: await this.generateRecommendations(),
+        },
       };
 
       this.emit(PLUGIN_EVENTS.TIMELINE_COMPLETED, { report });

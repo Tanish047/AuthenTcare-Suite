@@ -45,7 +45,7 @@ export default class PredicateFinder extends BaseAnalyser {
       // 4. Rank predicate devices
       await this.rankPredicateDevices();
       this.emit(PLUGIN_EVENTS.PREDICATE_FOUND, {
-        predicates: this.predicateDevices
+        predicates: this.predicateDevices,
       });
       this.updateProgress(90);
 
@@ -69,8 +69,8 @@ export default class PredicateFinder extends BaseAnalyser {
           approvalTimelines: this.approvalTimelines,
           similarities: this.similarityAnalysis,
           rankings: this.deviceRankings,
-          recommendations: await this.generateRecommendations()
-        }
+          recommendations: await this.generateRecommendations(),
+        },
       };
 
       this.emit(PLUGIN_EVENTS.PREDICATE_REPORT_GENERATED, { report });

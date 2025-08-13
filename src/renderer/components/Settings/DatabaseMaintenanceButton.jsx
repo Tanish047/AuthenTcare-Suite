@@ -5,7 +5,8 @@ export default function DatabaseMaintenanceButton() {
   const [msg, setMsg] = useState('');
 
   const runMaintenance = async () => {
-    setBusy(true); setMsg('');
+    setBusy(true);
+    setMsg('');
     try {
       await window.maintenanceAPI.run();
       setMsg('DB maintenance completed.');

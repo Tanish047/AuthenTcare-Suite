@@ -4,7 +4,7 @@ export const ANALYSER_STATUS = {
   ANALYZING: 'analyzing',
   GENERATING: 'generating',
   COMPLETED: 'completed',
-  ERROR: 'error'
+  ERROR: 'error',
 };
 
 // Separate progress tracking functionality
@@ -62,7 +62,7 @@ export default class BaseAnalyser {
     this.progressTracker = new ProgressTracker();
     this.statusManager = new StatusManager();
     this.validators = new Map(); // For validation strategies
-    this.reporters = new Map();  // For report generation strategies
+    this.reporters = new Map(); // For report generation strategies
   }
 
   // Progress delegation

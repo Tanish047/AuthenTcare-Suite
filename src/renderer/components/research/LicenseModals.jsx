@@ -7,7 +7,7 @@ const LicenseModals = ({
   selectedMarket,
   newLicense,
   setNewLicense,
-  handleAddLicense
+  handleAddLicense,
 }) => {
   return (
     <Modal
@@ -15,8 +15,12 @@ const LicenseModals = ({
       onClose={() => setShowLicenseModal(false)}
       title="Add License"
       actions={[
-        <button key="cancel" onClick={() => setShowLicenseModal(false)}>Cancel</button>,
-        <button key="save" onClick={handleAddLicense} disabled={!newLicense}>Save</button>
+        <button key="cancel" onClick={() => setShowLicenseModal(false)}>
+          Cancel
+        </button>,
+        <button key="save" onClick={handleAddLicense} disabled={!newLicense}>
+          Save
+        </button>,
       ]}
     >
       <form onSubmit={handleAddLicense} style={{ width: '100%' }}>

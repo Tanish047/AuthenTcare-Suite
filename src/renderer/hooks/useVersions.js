@@ -25,10 +25,15 @@ export const useVersions = (state, dispatch, selectedProject, selectedDevice) =>
   };
 
   const handleEditVersion = () => {
-    if (editVersionName.trim() && editVersionName.trim() !== editingVersion && selectedProject && selectedDevice) {
+    if (
+      editVersionName.trim() &&
+      editVersionName.trim() !== editingVersion &&
+      selectedProject &&
+      selectedDevice
+    ) {
       const key = `${selectedProject}_${selectedDevice}`;
       const versions = state.versions[key] || [];
-      const newVersions = versions.map(v => v === editingVersion ? editVersionName.trim() : v);
+      const newVersions = versions.map(v => (v === editingVersion ? editVersionName.trim() : v));
       dispatch({ type: 'SET_VERSIONS', key, versions: newVersions });
       setShowVersionEditModal(false);
       setEditVersionName('');
@@ -57,13 +62,13 @@ export const useVersions = (state, dispatch, selectedProject, selectedDevice) =>
     setShowVersionModal(true);
   };
 
-  const handleEditClick = (version) => {
+  const handleEditClick = version => {
     setEditingVersion(version);
     setEditVersionName(version);
     setShowVersionEditModal(true);
   };
 
-  const handleDeleteClick = (version) => {
+  const handleDeleteClick = version => {
     setDeleteVersion(version);
     setShowVersionDeleteModal(true);
   };
@@ -97,6 +102,6 @@ export const useVersions = (state, dispatch, selectedProject, selectedDevice) =>
     setVersionDeletePassword,
     versionDeleteError,
     onDelete: handleDeleteClick,
-    onDeleteVersion: handleDeleteVersion
+    onDeleteVersion: handleDeleteVersion,
   };
 };

@@ -11,7 +11,14 @@ import Settings from './components/Settings.jsx';
 
 const menuData = [
   {
-    label: <><span role="img" aria-label="Dashboard" style={{ marginRight: 6 }}>✨</span>Dashboard</>,
+    label: (
+      <>
+        <span role="img" aria-label="Dashboard" style={{ marginRight: 6 }}>
+          ✨
+        </span>
+        Dashboard
+      </>
+    ),
     key: 'dashboard',
     children: [
       {
@@ -53,22 +60,50 @@ const menuData = [
     ],
   },
   {
-    label: <><span role="img" aria-label="Notifications" style={{ marginRight: 6 }}>🔔</span>Notifications</>,
+    label: (
+      <>
+        <span role="img" aria-label="Notifications" style={{ marginRight: 6 }}>
+          🔔
+        </span>
+        Notifications
+      </>
+    ),
     key: 'notifications',
-    children: null
+    children: null,
   },
   {
-    label: <><span role="img" aria-label="Clients" style={{ marginRight: 6 }}>🤝</span>Clients</>,
+    label: (
+      <>
+        <span role="img" aria-label="Clients" style={{ marginRight: 6 }}>
+          🤝
+        </span>
+        Clients
+      </>
+    ),
     key: 'clients',
-    children: null // No dropdown - direct page transition
+    children: null, // No dropdown - direct page transition
   },
   {
-    label: <><span role="img" aria-label="Research" style={{ marginRight: 6 }}>🔍</span>Research Zone</>,
+    label: (
+      <>
+        <span role="img" aria-label="Research" style={{ marginRight: 6 }}>
+          🔍
+        </span>
+        Research Zone
+      </>
+    ),
     key: 'research',
-    children: null // No dropdown - direct page transition
+    children: null, // No dropdown - direct page transition
   },
   {
-    label: <><span role="img" aria-label="Intelligence" style={{ marginRight: 6 }}>🌐</span>Global Intelligence</>,
+    label: (
+      <>
+        <span role="img" aria-label="Intelligence" style={{ marginRight: 6 }}>
+          🌐
+        </span>
+        Global Intelligence
+      </>
+    ),
     key: 'global-intelligence',
     children: [
       {
@@ -101,7 +136,14 @@ const menuData = [
     ],
   },
   {
-    label: <><span role="img" aria-label="Settings" style={{ marginRight: 6 }}>⚙️</span>Settings</>,
+    label: (
+      <>
+        <span role="img" aria-label="Settings" style={{ marginRight: 6 }}>
+          ⚙️
+        </span>
+        Settings
+      </>
+    ),
     key: 'settings',
     children: [
       {
@@ -166,16 +208,16 @@ function AppContent() {
   // Dropdown close logic
   const closeTimer = React.useRef();
 
-  const handleNavClick = (key) => {
+  const handleNavClick = key => {
     dispatch({ type: 'SET_PAGE', page: key, pageParent: null });
   };
 
-  const handleDropdownItemClick = (key) => {
+  const handleDropdownItemClick = key => {
     dispatch({ type: 'SET_PAGE', page: key, pageParent: null });
     dispatch({ type: 'SET_OPEN_MENU', openMenu: null });
   };
 
-  const handleAnyMouseEnter = (key) => {
+  const handleAnyMouseEnter = key => {
     if (closeTimer.current) {
       clearTimeout(closeTimer.current);
     }
@@ -227,15 +269,35 @@ function AppContent() {
         {page === 'clients' && <ClientsLanding />}
         {page === 'client-workspace' && <ClientWorkspace />}
         {page === 'research' && (
-          <ResearchLanding 
-            onWorkspace={(nextPage) => dispatch({ type: 'SET_PAGE', page: nextPage, pageParent: 'research' })} 
+          <ResearchLanding
+            onWorkspace={nextPage =>
+              dispatch({ type: 'SET_PAGE', page: nextPage, pageParent: 'research' })
+            }
           />
         )}
         {page === 'research-workspace' && (
-          <ResearchWorkspace 
-            onDeviceSelect={() => dispatch({ type: 'SET_PAGE', page: 'device-workspace', pageParent: 'research-workspace' })}
-            onVersionSelect={() => dispatch({ type: 'SET_PAGE', page: 'version-workspace', pageParent: 'device-workspace' })}
-            onMarketSelect={() => dispatch({ type: 'SET_PAGE', page: 'market-workspace', pageParent: 'version-workspace' })}
+          <ResearchWorkspace
+            onDeviceSelect={() =>
+              dispatch({
+                type: 'SET_PAGE',
+                page: 'device-workspace',
+                pageParent: 'research-workspace',
+              })
+            }
+            onVersionSelect={() =>
+              dispatch({
+                type: 'SET_PAGE',
+                page: 'version-workspace',
+                pageParent: 'device-workspace',
+              })
+            }
+            onMarketSelect={() =>
+              dispatch({
+                type: 'SET_PAGE',
+                page: 'market-workspace',
+                pageParent: 'version-workspace',
+              })
+            }
           />
         )}
         {page === 'device-workspace' && <ResearchWorkspace currentLevel="device" />}

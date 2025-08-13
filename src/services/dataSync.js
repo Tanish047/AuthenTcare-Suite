@@ -13,10 +13,10 @@ export class DataSyncService {
     try {
       // Placeholder for data sync logic
       console.log('Data sync started...');
-      
+
       // Simulate sync process
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       console.log('Data sync completed');
       return { status: 'success' };
     } catch (error) {

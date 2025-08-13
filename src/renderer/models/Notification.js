@@ -1,12 +1,5 @@
 class Notification {
-  constructor({
-    id = null,
-    title,
-    message,
-    type = null,
-    read = false,
-    createdAt = new Date()
-  }) {
+  constructor({ id = null, title, message, type = null, read = false, createdAt = new Date() }) {
     this.id = id;
     this.title = title;
     this.message = message;
@@ -18,7 +11,7 @@ class Notification {
   static fromJSON(json) {
     return new Notification({
       ...json,
-      createdAt: json.created_at ? new Date(json.created_at) : new Date()
+      createdAt: json.created_at ? new Date(json.created_at) : new Date(),
     });
   }
 
@@ -29,7 +22,7 @@ class Notification {
       message: this.message,
       type: this.type,
       read: this.read,
-      created_at: this.createdAt.toISOString()
+      created_at: this.createdAt.toISOString(),
     };
   }
 

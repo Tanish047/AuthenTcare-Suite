@@ -35,7 +35,7 @@ export const useDevices = (state, dispatch, selectedProject) => {
       setLoading(true);
       const device = await window.dbAPI.createDevice({
         name: newDeviceName.trim(),
-        projectId: selectedProject.id
+        projectId: selectedProject.id,
       });
       dispatch({ type: 'ADD_DEVICE', projectId: selectedProject.id, device });
       setShowDeviceModal(false);
@@ -47,16 +47,14 @@ export const useDevices = (state, dispatch, selectedProject) => {
     }
   };
 
-
-
-  const handleEditDevice = async (e) => {
+  const handleEditDevice = async e => {
     e.preventDefault();
     if (!editDeviceName.trim() || !editingDevice || !selectedProject) return;
 
     try {
       setLoading(true);
       const updated = await window.dbAPI.updateDevice(editingDevice.id, {
-        name: editDeviceName.trim()
+        name: editDeviceName.trim(),
       });
       dispatch({ type: 'UPDATE_DEVICE', projectId: selectedProject.id, device: updated });
       setShowDeviceEditModal(false);
@@ -69,7 +67,7 @@ export const useDevices = (state, dispatch, selectedProject) => {
     }
   };
 
-  const handleDeleteDevice = async (e) => {
+  const handleDeleteDevice = async e => {
     e.preventDefault();
     if (!deleteDevice || !selectedProject || !checkPassword(deviceDeletePassword)) {
       setDeviceDeleteError('Incorrect password.');
@@ -79,10 +77,10 @@ export const useDevices = (state, dispatch, selectedProject) => {
     try {
       setLoading(true);
       await window.dbAPI.deleteDevice(deleteDevice.id);
-      dispatch({ 
-        type: 'REMOVE_DEVICE', 
-        projectId: selectedProject.id, 
-        deviceId: deleteDevice.id 
+      dispatch({
+        type: 'REMOVE_DEVICE',
+        projectId: selectedProject.id,
+        deviceId: deleteDevice.id,
       });
       setShowDeviceDeleteModal(false);
       setDeleteDevice(null);
@@ -118,6 +116,6 @@ export const useDevices = (state, dispatch, selectedProject) => {
     loadDevices,
     handleCreateDevice,
     handleEditDevice,
-    handleDeleteDevice
+    handleDeleteDevice,
   };
 };

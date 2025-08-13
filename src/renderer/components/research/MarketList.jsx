@@ -1,13 +1,6 @@
 import React from 'react';
 
-const MarketList = ({
-  targetMarkets,
-  selectedMarket,
-  onSelect,
-  onCreate,
-  onEdit,
-  onDelete
-}) => {
+const MarketList = ({ targetMarkets, selectedMarket, onSelect, onCreate, onEdit, onDelete }) => {
   return (
     <div style={{ marginTop: 32 }}>
       <h4 style={{ color: '#2c5aa0', fontWeight: 700, fontSize: 18, marginBottom: 12 }}>
@@ -17,21 +10,21 @@ const MarketList = ({
         {targetMarkets && targetMarkets.length > 0 ? (
           targetMarkets.map(market => (
             <li key={market} style={{ marginBottom: 12, display: 'flex', alignItems: 'center' }}>
-              <span 
-                style={{ 
-                  flex: 1, 
+              <span
+                style={{
+                  flex: 1,
                   cursor: 'pointer',
                   textDecoration: selectedMarket === market ? 'underline' : 'none',
                   padding: '8px',
                   borderRadius: '4px',
                   backgroundColor: selectedMarket === market ? '#f0f7ff' : 'transparent',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
                 }}
                 onClick={() => onSelect(market)}
               >
                 {market}
               </span>
-              <button 
+              <button
                 onClick={() => onEdit(market)}
                 style={{
                   marginLeft: '8px',
@@ -39,12 +32,12 @@ const MarketList = ({
                   borderRadius: '4px',
                   border: '1px solid #ccc',
                   backgroundColor: 'transparent',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 Edit
               </button>
-              <button 
+              <button
                 onClick={() => onDelete(market)}
                 style={{
                   marginLeft: '8px',
@@ -52,7 +45,7 @@ const MarketList = ({
                   borderRadius: '4px',
                   border: '1px solid #ccc',
                   backgroundColor: 'transparent',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 Delete
@@ -72,7 +65,7 @@ const MarketList = ({
           backgroundColor: '#2c5aa0',
           color: 'white',
           border: 'none',
-          cursor: 'pointer'
+          cursor: 'pointer',
         }}
       >
         Create New Market

@@ -28,9 +28,7 @@ function appReducer(state, action) {
     case 'UPDATE_PROJECT':
       return {
         ...state,
-        projects: state.projects.map(p => 
-          p.id === action.project.id ? action.project : p
-        )
+        projects: state.projects.map(p => (p.id === action.project.id ? action.project : p)),
       };
     case 'REMOVE_PROJECT':
       return {
@@ -45,11 +43,8 @@ function appReducer(state, action) {
         ...state,
         devices: {
           ...state.devices,
-          [action.projectId]: [
-            ...(state.devices[action.projectId] || []),
-            action.device
-          ]
-        }
+          [action.projectId]: [...(state.devices[action.projectId] || []), action.device],
+        },
       };
     case 'UPDATE_DEVICE':
       return {
@@ -58,19 +53,17 @@ function appReducer(state, action) {
           ...state.devices,
           [action.projectId]: state.devices[action.projectId].map(d =>
             d.id === action.device.id ? action.device : d
-          )
-        }
+          ),
+        },
       };
     case 'REMOVE_DEVICE':
       return {
         ...state,
         devices: {
           ...state.devices,
-          [action.projectId]: state.devices[action.projectId].filter(d =>
-            d.id !== action.deviceId
-          )
+          [action.projectId]: state.devices[action.projectId].filter(d => d.id !== action.deviceId),
         },
-        versions: { ...state.versions, [action.deviceId]: undefined }
+        versions: { ...state.versions, [action.deviceId]: undefined },
       };
     case 'SET_VERSIONS':
       return { ...state, versions: { ...state.versions, [action.deviceId]: action.versions } };
@@ -79,11 +72,8 @@ function appReducer(state, action) {
         ...state,
         versions: {
           ...state.versions,
-          [action.deviceId]: [
-            ...(state.versions[action.deviceId] || []),
-            action.version
-          ]
-        }
+          [action.deviceId]: [...(state.versions[action.deviceId] || []), action.version],
+        },
       };
     case 'UPDATE_VERSION':
       return {
@@ -92,18 +82,16 @@ function appReducer(state, action) {
           ...state.versions,
           [action.deviceId]: state.versions[action.deviceId].map(v =>
             v.id === action.version.id ? action.version : v
-          )
-        }
+          ),
+        },
       };
     case 'REMOVE_VERSION':
       return {
         ...state,
         versions: {
           ...state.versions,
-          [action.deviceId]: state.versions[action.deviceId].filter(v =>
-            v.id !== action.versionId
-          )
-        }
+          [action.deviceId]: state.versions[action.deviceId].filter(v => v.id !== action.versionId),
+        },
       };
     case 'SET_TARGET_MARKETS':
       return { ...state, targetMarkets: action.targetMarkets };
@@ -146,15 +134,11 @@ export function AppProvider({ children }) {
     }
   }, [state.darkMode]);
 
-  return (
-    <AppContext.Provider value={{ state, dispatch }}>
-      {children}
-    </AppContext.Provider>
-  );
+  return <AppContext.Provider value={{ state, dispatch }}>{children}</AppContext.Provider>;
 }
 
 export function useAppContext() {
   const context = useContext(AppContext);
   if (!context) throw new Error('useAppContext must be used within AppProvider');
   return context;
-} 
+}

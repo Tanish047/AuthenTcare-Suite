@@ -1,18 +1,20 @@
+import js from '@eslint/js';
+import react from 'eslint-plugin-react';
+import prettier from 'eslint-plugin-prettier';
+import prettierConfig from 'eslint-config-prettier';
+
 export default [
+  js.configs.recommended,
   {
-    files: ['**/*.{js,jsx}'],
+    files: ['**/*.{js,jsx,mjs}'],
+    plugins: {
+      react,
+      prettier,
+    },
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
-      parser: await import('@babel/eslint-parser'),
       parserOptions: {
-        requireConfigFile: false,
-        babelOptions: {
-          presets: [
-            '@babel/preset-env',
-            '@babel/preset-react',
-          ],
-        },
         ecmaFeatures: {
           jsx: true,
         },
@@ -20,22 +22,29 @@ export default [
       globals: {
         window: 'readonly',
         document: 'readonly',
-        navigator: 'readonly',
         console: 'readonly',
-        module: 'writable',
-        require: 'readonly',
         process: 'readonly',
+        Buffer: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        global: 'readonly',
+        require: 'readonly',
+        module: 'readonly',
+        exports: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        localStorage: 'readonly',
+        URL: 'readonly',
       },
     },
-    plugins: {
-      react: await import('eslint-plugin-react'),
-    },
     rules: {
-      'react/jsx-uses-react': 'off',
-      'react/react-in-jsx-scope': 'off',
+      ...prettierConfig.rules,
+      'prettier/prettier': 'error',
+      'react/jsx-uses-react': 'error',
+      'react/jsx-uses-vars': 'error',
       'react/prop-types': 'off',
-      'no-unused-vars': 'warn',
-      'no-console': 'warn',
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-console': 'off',
     },
     settings: {
       react: {
@@ -43,4 +52,13 @@ export default [
       },
     },
   },
-]; 
+  {
+    files: ['test/**/*.js'],
+    languageOptions: {
+      globals: {
+        test: 'readonly',
+        assert: 'readonly',
+      },
+    },
+  },
+];

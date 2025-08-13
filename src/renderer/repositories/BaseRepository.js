@@ -6,27 +6,26 @@ export default class BaseRepository {
   }
 
   async findById(id) {
-    const result = await this.dbAPI.query(
-      `SELECT * FROM ${this.tableName} WHERE id = ?`,
-      [id]
-    );
+    const result = await this.dbAPI.query(`SELECT * FROM ${this.tableName} WHERE id = ?`, [id]);
     return result ? this.modelClass.fromJSON(result) : null;
   }
 
   async findAll(options = {}) {
     const { page = 1, limit = 10, where = {} } = options;
     const offset = (page - 1) * limit;
-    
+
     let whereClause = '';
     const params = [];
-    
+
     if (Object.keys(where).length > 0) {
-      whereClause = 'WHERE ' + Object.keys(where)
-        .map(key => {
-          params.push(where[key]);
-          return `${key} = ?`;
-        })
-        .join(' AND ');
+      whereClause =
+        'WHERE ' +
+        Object.keys(where)
+          .map(key => {
+            params.push(where[key]);
+            return `${key} = ?`;
+          })
+          .join(' AND ');
     }
 
     const results = await this.dbAPI.query(
@@ -45,8 +44,8 @@ export default class BaseRepository {
         page,
         limit,
         total: total[0].count,
-        totalPages: Math.ceil(total[0].count / limit)
-      }
+        totalPages: Math.ceil(total[0].count / limit),
+      },
     };
   }
 
@@ -77,9 +76,6 @@ export default class BaseRepository {
   }
 
   async delete(id) {
-    await this.dbAPI.query(
-      `DELETE FROM ${this.tableName} WHERE id = ?`,
-      [id]
-    );
+    await this.dbAPI.query(`DELETE FROM ${this.tableName} WHERE id = ?`, [id]);
   }
 }

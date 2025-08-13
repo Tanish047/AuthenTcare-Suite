@@ -1,11 +1,5 @@
 export default class Client {
-  constructor({
-    id = null,
-    name,
-    email,
-    createdAt = new Date(),
-    updatedAt = new Date()
-  }) {
+  constructor({ id = null, name, email, createdAt = new Date(), updatedAt = new Date() }) {
     this.id = id;
     this.name = name;
     this.email = email;
@@ -17,7 +11,7 @@ export default class Client {
     return new Client({
       ...json,
       createdAt: json.created_at ? new Date(json.created_at) : new Date(),
-      updatedAt: json.updated_at ? new Date(json.updated_at) : new Date()
+      updatedAt: json.updated_at ? new Date(json.updated_at) : new Date(),
     });
   }
 
@@ -27,7 +21,7 @@ export default class Client {
       name: this.name,
       email: this.email,
       created_at: this.createdAt.toISOString(),
-      updated_at: this.updatedAt.toISOString()
+      updated_at: this.updatedAt.toISOString(),
     };
   }
 }

@@ -3,7 +3,15 @@ import { useAppContext } from '../context/AppContext.jsx';
 import BackButton from './BackButton.jsx';
 import NavDropdown from './NavDropdown.jsx';
 
-function NavBar({ handleBackClick, handleNavClick, handleDropdownItemClick, menuData, closeTimer, handleAnyMouseEnter, handleAnyMouseLeave }) {
+function NavBar({
+  handleBackClick,
+  handleNavClick,
+  handleDropdownItemClick,
+  menuData,
+  closeTimer,
+  handleAnyMouseEnter,
+  handleAnyMouseLeave,
+}) {
   const { state, dispatch } = useAppContext();
   const { openMenu, darkMode, page, pageParent } = state;
   const showBackButton = page !== 'dashboard';
@@ -11,7 +19,7 @@ function NavBar({ handleBackClick, handleNavClick, handleDropdownItemClick, menu
   return (
     <nav className="navbar">
       <BackButton onBack={handleBackClick} visible={showBackButton} />
-      {menuData.map((item) => {
+      {menuData.map(item => {
         const hasChildren = Array.isArray(item.children) && item.children.length > 0;
         if (hasChildren) {
           return (
@@ -19,7 +27,7 @@ function NavBar({ handleBackClick, handleNavClick, handleDropdownItemClick, menu
               key={item.key}
               item={item}
               openMenu={openMenu}
-              setOpenMenu={(openMenu) => dispatch({ type: 'SET_OPEN_MENU', openMenu })}
+              setOpenMenu={openMenu => dispatch({ type: 'SET_OPEN_MENU', openMenu })}
               onItemClick={handleDropdownItemClick}
               closeTimer={closeTimer}
               handleAnyMouseEnter={handleAnyMouseEnter}
@@ -56,4 +64,4 @@ function NavBar({ handleBackClick, handleNavClick, handleDropdownItemClick, menu
   );
 }
 
-export default NavBar; 
+export default NavBar;

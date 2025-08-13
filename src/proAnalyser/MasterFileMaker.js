@@ -45,7 +45,7 @@ export default class MasterFileMaker extends BaseAnalyser {
       // 4. Validate content
       await this.validateContent();
       this.emit(PLUGIN_EVENTS.MASTERFILE_SECTION_COMPLETED, {
-        sections: Object.keys(this.sections)
+        sections: Object.keys(this.sections),
       });
       this.updateProgress(90);
 
@@ -68,8 +68,8 @@ export default class MasterFileMaker extends BaseAnalyser {
           sections: this.sections,
           validationResults: this.validationResults,
           completeness: this.completenessCheck,
-          recommendations: await this.generateRecommendations()
-        }
+          recommendations: await this.generateRecommendations(),
+        },
       };
 
       this.emit(PLUGIN_EVENTS.MASTERFILE_COMPLETED, { report });

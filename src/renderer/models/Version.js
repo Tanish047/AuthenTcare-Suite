@@ -5,7 +5,7 @@ class Version {
     projectId,
     name,
     createdAt = new Date(),
-    updatedAt = new Date()
+    updatedAt = new Date(),
   }) {
     this.id = id;
     this.deviceId = deviceId;
@@ -21,7 +21,7 @@ class Version {
       deviceId: json.device_id,
       projectId: json.project_id,
       createdAt: json.created_at ? new Date(json.created_at) : new Date(),
-      updatedAt: json.updated_at ? new Date(json.updated_at) : new Date()
+      updatedAt: json.updated_at ? new Date(json.updated_at) : new Date(),
     });
   }
 
@@ -32,7 +32,7 @@ class Version {
       project_id: this.projectId,
       name: this.name,
       created_at: this.createdAt.toISOString(),
-      updated_at: this.updatedAt.toISOString()
+      updated_at: this.updatedAt.toISOString(),
     };
   }
 }

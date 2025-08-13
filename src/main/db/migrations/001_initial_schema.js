@@ -35,7 +35,7 @@ const migrations = [
     type TEXT,
     read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  )`
+  )`,
 ];
 
 export async function up(db) {

@@ -45,7 +45,7 @@ export default class QMSAdvisorPro extends BaseAnalyser {
       // 4. Create implementation guide
       await this.createImplementationGuide();
       this.emit(PLUGIN_EVENTS.QMS_REQUIREMENTS_UPDATED, {
-        requirements: this.requirements
+        requirements: this.requirements,
       });
       this.updateProgress(90);
 
@@ -70,8 +70,8 @@ export default class QMSAdvisorPro extends BaseAnalyser {
           complianceMatrix: this.complianceMatrix,
           gaps: this.gaps,
           implementationGuide: this.implementationGuide,
-          recommendations: await this.generateRecommendations()
-        }
+          recommendations: await this.generateRecommendations(),
+        },
       };
 
       this.emit(PLUGIN_EVENTS.QMS_COMPLETED, { report });

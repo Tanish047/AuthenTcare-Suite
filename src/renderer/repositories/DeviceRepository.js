@@ -27,8 +27,8 @@ class DeviceRepository extends BaseRepository {
         page,
         limit,
         total: total[0].count,
-        totalPages: Math.ceil(total[0].count / limit)
-      }
+        totalPages: Math.ceil(total[0].count / limit),
+      },
     };
   }
 
@@ -36,10 +36,7 @@ class DeviceRepository extends BaseRepository {
     const device = await this.findById(id);
     if (!device) return null;
 
-    const versions = await this.dbAPI.query(
-      'SELECT * FROM versions WHERE device_id = ?',
-      [id]
-    );
+    const versions = await this.dbAPI.query('SELECT * FROM versions WHERE device_id = ?', [id]);
 
     device.versions = versions.map(v => Version.fromJSON(v));
     return device;
@@ -47,7 +44,7 @@ class DeviceRepository extends BaseRepository {
 
   async findAllWithVersions(projectId) {
     const result = await this.findByProject(projectId);
-    
+
     // Get all versions for these devices
     const deviceIds = result.data.map(d => d.id);
     if (deviceIds.length > 0) {

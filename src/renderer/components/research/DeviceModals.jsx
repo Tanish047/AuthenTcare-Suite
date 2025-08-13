@@ -19,7 +19,7 @@ const DeviceModals = ({
   deviceDeleteError,
   handleCreateDevice,
   handleEditDevice,
-  handleDeleteDevice
+  handleDeleteDevice,
 }) => {
   return (
     <>
@@ -28,8 +28,12 @@ const DeviceModals = ({
         onClose={() => setShowDeviceModal(false)}
         title="Add Device"
         actions={[
-          <button key="cancel" onClick={() => setShowDeviceModal(false)}>Cancel</button>,
-          <button key="save" onClick={handleCreateDevice} disabled={!newDeviceName.trim()}>Save</button>
+          <button key="cancel" onClick={() => setShowDeviceModal(false)}>
+            Cancel
+          </button>,
+          <button key="save" onClick={handleCreateDevice} disabled={!newDeviceName.trim()}>
+            Save
+          </button>,
         ]}
       >
         <form onSubmit={handleCreateDevice} style={{ width: '100%' }}>
@@ -50,8 +54,16 @@ const DeviceModals = ({
         onClose={() => setShowDeviceEditModal(false)}
         title="Edit Device"
         actions={[
-          <button key="cancel" onClick={() => setShowDeviceEditModal(false)}>Cancel</button>,
-          <button key="save" onClick={handleEditDevice} disabled={!editDeviceName.trim() || editDeviceName.trim() === editingDevice}>Save</button>
+          <button key="cancel" onClick={() => setShowDeviceEditModal(false)}>
+            Cancel
+          </button>,
+          <button
+            key="save"
+            onClick={handleEditDevice}
+            disabled={!editDeviceName.trim() || editDeviceName.trim() === editingDevice}
+          >
+            Save
+          </button>,
         ]}
       >
         <form onSubmit={handleEditDevice} style={{ width: '100%' }}>
@@ -69,15 +81,30 @@ const DeviceModals = ({
 
       <Modal
         open={showDeviceDeleteModal}
-        onClose={() => { setShowDeviceDeleteModal(false); setDeviceDeletePassword(''); }}
+        onClose={() => {
+          setShowDeviceDeleteModal(false);
+          setDeviceDeletePassword('');
+        }}
         title="Delete Device"
         actions={[
-          <button key="cancel" onClick={() => { setShowDeviceDeleteModal(false); setDeviceDeletePassword(''); }}>Cancel</button>,
-          <button key="delete" onClick={handleDeleteDevice} disabled={!deviceDeletePassword}>Delete</button>
+          <button
+            key="cancel"
+            onClick={() => {
+              setShowDeviceDeleteModal(false);
+              setDeviceDeletePassword('');
+            }}
+          >
+            Cancel
+          </button>,
+          <button key="delete" onClick={handleDeleteDevice} disabled={!deviceDeletePassword}>
+            Delete
+          </button>,
         ]}
       >
         <form onSubmit={handleDeleteDevice} style={{ width: '100%' }}>
-          <div style={{ marginBottom: 12 }}>Enter password to delete <b>{deleteDevice}</b>:</div>
+          <div style={{ marginBottom: 12 }}>
+            Enter password to delete <b>{deleteDevice}</b>:
+          </div>
           <input
             type="password"
             value={deviceDeletePassword}
@@ -87,7 +114,9 @@ const DeviceModals = ({
             autoFocus
             required
           />
-          {deviceDeleteError && <div style={{ color: '#d63031', marginBottom: 8 }}>{deviceDeleteError}</div>}
+          {deviceDeleteError && (
+            <div style={{ color: '#d63031', marginBottom: 8 }}>{deviceDeleteError}</div>
+          )}
         </form>
       </Modal>
     </>

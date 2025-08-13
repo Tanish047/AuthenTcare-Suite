@@ -12,8 +12,8 @@ export const useLicenses = (state, dispatch, selectedMarket) => {
           type: 'SET_MARKET_LICENSES',
           marketLicenses: {
             ...state.marketLicenses,
-            [selectedMarket]: [...licenses, newLicense]
-          }
+            [selectedMarket]: [...licenses, newLicense],
+          },
         });
         setShowLicenseModal(false);
         setNewLicense('');
@@ -27,8 +27,8 @@ export const useLicenses = (state, dispatch, selectedMarket) => {
       type: 'SET_MARKET_LICENSES',
       marketLicenses: {
         ...state.marketLicenses,
-        [market]: licenses.filter(l => l !== license)
-      }
+        [market]: licenses.filter(l => l !== license),
+      },
     });
   };
 
@@ -36,7 +36,7 @@ export const useLicenses = (state, dispatch, selectedMarket) => {
     setShowLicenseModal(true);
   };
 
-  const handleDeleteClick = (license) => {
+  const handleDeleteClick = license => {
     handleDeleteLicense(selectedMarket, license);
   };
 
@@ -50,6 +50,6 @@ export const useLicenses = (state, dispatch, selectedMarket) => {
     onDelete: handleDeleteClick,
     onCreateLicense: handleCreateLicense,
     handleCreateLicense,
-    handleDeleteClick
+    handleDeleteClick,
   };
 };

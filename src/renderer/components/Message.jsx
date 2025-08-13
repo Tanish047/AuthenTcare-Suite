@@ -17,4 +17,4 @@ function Message({ children, type = 'info', style = {}, ...props }) {
   );
 }
 
-export default Message; 
+export default Message;

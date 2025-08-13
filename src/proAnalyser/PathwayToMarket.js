@@ -68,8 +68,8 @@ export default class PathwayToMarket extends BaseAnalyser {
           pathways: this.pathways,
           requirements: this.requirements,
           timeline: this.timeline,
-          recommendations: await this.generateRecommendations()
-        }
+          recommendations: await this.generateRecommendations(),
+        },
       };
 
       this.emit(PLUGIN_EVENTS.PATHWAY_COMPLETED, { report });

@@ -128,7 +128,7 @@ export const schema = {
       read BOOLEAN DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
-  `
+  `,
 };
 
 // Indexes for better performance
@@ -142,5 +142,5 @@ export const indexes = [
   'CREATE INDEX IF NOT EXISTS idx_clients_name ON clients(name)',
   'CREATE INDEX IF NOT EXISTS idx_news_category ON news(category)',
   'CREATE INDEX IF NOT EXISTS idx_events_start_date ON events(start_date)',
-  'CREATE INDEX IF NOT EXISTS idx_notifications_read ON notifications(read)'
-]; 
+  'CREATE INDEX IF NOT EXISTS idx_notifications_read ON notifications(read)',
+];

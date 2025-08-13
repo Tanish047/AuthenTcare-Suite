@@ -36,16 +36,16 @@ export default class ProAnalyserPlugin extends BasePlugin {
 
     try {
       this.emit(PLUGIN_EVENTS.ANALYSIS_STARTED, { context: this.currentContext });
-      
+
       await this.analyser.initialize(this.currentContext, options);
       const result = await this.analyser.analyse();
-      
+
       if (result) {
         const report = await this.analyser.generateReport();
         this.emit(PLUGIN_EVENTS.ANALYSIS_COMPLETED, { report });
         return report;
       }
-      
+
       const error = new Error('Analysis failed');
       this.emit(PLUGIN_EVENTS.ANALYSIS_ERROR, { error });
       return { success: false, error: error.message };
@@ -59,7 +59,7 @@ export default class ProAnalyserPlugin extends BasePlugin {
     return {
       status: this.analyser.status,
       progress: this.analyser.progress,
-      error: this.analyser.error
+      error: this.analyser.error,
     };
   }
 }

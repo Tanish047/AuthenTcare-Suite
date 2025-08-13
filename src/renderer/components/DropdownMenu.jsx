@@ -2,7 +2,15 @@ import React from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
-function DropdownMenu({ items, parentRect, isRoot, closeTimer, handleAnyMouseEnter, handleAnyMouseLeave, onItemClick }) {
+function DropdownMenu({
+  items,
+  parentRect,
+  isRoot,
+  closeTimer,
+  handleAnyMouseEnter,
+  handleAnyMouseLeave,
+  onItemClick,
+}) {
   const [openChild, setOpenChild] = useState(null);
   const menuRef = useRef();
   const [position, setPosition] = useState({ top: 0, left: 0 });
@@ -39,7 +47,17 @@ function DropdownMenu({ items, parentRect, isRoot, closeTimer, handleAnyMouseEnt
     <div
       className="dropdown-menu"
       ref={menuRef}
-      style={isRoot && parentRect ? { position: 'fixed', top: position.top, left: position.left, zIndex: 20000, marginTop: 0 } : { position: 'absolute', top: 0, left: '100%', zIndex: 21000 }}
+      style={
+        isRoot && parentRect
+          ? {
+              position: 'fixed',
+              top: position.top,
+              left: position.left,
+              zIndex: 20000,
+              marginTop: 0,
+            }
+          : { position: 'absolute', top: 0, left: '100%', zIndex: 21000 }
+      }
       onMouseEnter={handleDropdownMouseEnter}
       onMouseLeave={handleDropdownMouseLeave}
     >
@@ -49,15 +67,16 @@ function DropdownMenu({ items, parentRect, isRoot, closeTimer, handleAnyMouseEnt
           <div
             key={item.key}
             className="dropdown-item"
-            onMouseEnter={() => { handleDropdownMouseEnter(); if (hasChildren) setOpenChild(item.key); }}
+            onMouseEnter={() => {
+              handleDropdownMouseEnter();
+              if (hasChildren) setOpenChild(item.key);
+            }}
             onMouseLeave={handleDropdownMouseLeave}
             onClick={() => onItemClick && onItemClick(item.key)}
             style={{ position: 'relative', cursor: 'pointer' }}
           >
             {item.label}
-            {hasChildren && (
-              <span className="dropdown-chevron">▶</span>
-            )}
+            {hasChildren && <span className="dropdown-chevron">▶</span>}
             {hasChildren && openChild === item.key && (
               <DropdownMenu
                 items={item.children}
@@ -92,4 +111,4 @@ function DropdownMenu({ items, parentRect, isRoot, closeTimer, handleAnyMouseEnt
   );
 }
 
-export default DropdownMenu; 
+export default DropdownMenu;

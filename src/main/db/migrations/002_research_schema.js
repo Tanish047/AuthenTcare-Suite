@@ -44,7 +44,7 @@ const migrations = [
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (market_id) REFERENCES target_markets(id)
       ON DELETE CASCADE
-  )`
+  )`,
 ];
 
 export async function up(db) {
@@ -57,5 +57,5 @@ export async function down(db) {
   const tables = ['market_licenses', 'target_markets', 'versions', 'devices', 'projects'];
   for (const table of tables) {
     await db.exec(`DROP TABLE IF EXISTS ${table}`);
-    }
   }
+}

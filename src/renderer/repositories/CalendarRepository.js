@@ -30,8 +30,8 @@ class CalendarRepository extends BaseRepository {
         page,
         limit,
         total: total[0].count,
-        totalPages: Math.ceil(total[0].count / limit)
-      }
+        totalPages: Math.ceil(total[0].count / limit),
+      },
     };
   }
 
@@ -70,8 +70,8 @@ class CalendarRepository extends BaseRepository {
         page,
         limit,
         total: total[0].count,
-        totalPages: Math.ceil(total[0].count / limit)
-      }
+        totalPages: Math.ceil(total[0].count / limit),
+      },
     };
   }
 }

@@ -8,7 +8,7 @@ const VersionList = ({
   onSelect,
   onCreate,
   onEdit,
-  onDelete
+  onDelete,
 }) => {
   if (!selectedProject || !selectedDevice) return null;
 
@@ -21,21 +21,21 @@ const VersionList = ({
         {versions && versions.length > 0 ? (
           versions.map(version => (
             <li key={version} style={{ marginBottom: 12, display: 'flex', alignItems: 'center' }}>
-              <span 
-                style={{ 
-                  flex: 1, 
+              <span
+                style={{
+                  flex: 1,
                   cursor: 'pointer',
                   textDecoration: selectedVersion === version ? 'underline' : 'none',
                   padding: '8px',
                   borderRadius: '4px',
                   backgroundColor: selectedVersion === version ? '#f0f7ff' : 'transparent',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
                 }}
                 onClick={() => onSelect(version)}
               >
                 {version}
               </span>
-              <button 
+              <button
                 onClick={() => onEdit(version)}
                 style={{
                   marginLeft: '8px',
@@ -43,12 +43,12 @@ const VersionList = ({
                   borderRadius: '4px',
                   border: '1px solid #ccc',
                   backgroundColor: 'transparent',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 Edit
               </button>
-              <button 
+              <button
                 onClick={() => onDelete(version)}
                 style={{
                   marginLeft: '8px',
@@ -56,7 +56,7 @@ const VersionList = ({
                   borderRadius: '4px',
                   border: '1px solid #ccc',
                   backgroundColor: 'transparent',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 Delete
@@ -76,7 +76,7 @@ const VersionList = ({
           backgroundColor: '#2c5aa0',
           color: 'white',
           border: 'none',
-          cursor: 'pointer'
+          cursor: 'pointer',
         }}
       >
         Create New Version

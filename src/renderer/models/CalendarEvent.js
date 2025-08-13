@@ -7,7 +7,7 @@ class CalendarEvent {
     endDate = null,
     eventType = null,
     clientId = null,
-    createdAt = new Date()
+    createdAt = new Date(),
   }) {
     this.id = id;
     this.title = title;
@@ -25,7 +25,7 @@ class CalendarEvent {
       startDate: json.start_date ? new Date(json.start_date) : null,
       endDate: json.end_date ? new Date(json.end_date) : null,
       createdAt: json.created_at ? new Date(json.created_at) : new Date(),
-      clientId: json.client_id
+      clientId: json.client_id,
     });
   }
 
@@ -38,7 +38,7 @@ class CalendarEvent {
       end_date: this.endDate?.toISOString(),
       event_type: this.eventType,
       client_id: this.clientId,
-      created_at: this.createdAt.toISOString()
+      created_at: this.createdAt.toISOString(),
     };
   }
 }
