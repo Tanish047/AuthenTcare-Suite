@@ -46,7 +46,7 @@ function createWindow() {
       nodeIntegration: false,
       webSecurity: true,
       allowRunningInsecureContent: false,
-      sandbox: true,               // ← enable renderer sandbox
+      sandbox: true,               // renderer sandbox
     },
     show: false, // don’t show until ready
   });
@@ -66,7 +66,9 @@ function createWindow() {
   // Suppress common DevTools extension errors
   mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
     const suppressed = [
-      'devtools://', 'Autofill.enable', 'Autofill.setAddresses',
+      'devtools://',
+      'Autofill.enable',
+      'Autofill.setAddresses',
       'Service worker registration failed'
     ];
     if (suppressed.some(s => sourceId.includes(s) || message.includes(s))) return;
@@ -98,9 +100,17 @@ ipcMain.handle('run-db-maintenance', async () => {
   return { ok: true };
 });
 
-// App lifecycle
 app.whenReady().then(async () => {
   await initDatabase();
+
+  // --- Runtime CSP (covers dev & prod) ---
+  const csp = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';";
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    const headers = { ...details.responseHeaders, 'Content-Security-Policy': [csp] };
+    callback({ responseHeaders: headers });
+  });
+  // ---------------------------------------
+
   createWindow();
 
   // Install React DevTools only in development
