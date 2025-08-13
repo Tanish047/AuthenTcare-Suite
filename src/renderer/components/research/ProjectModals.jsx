@@ -49,7 +49,8 @@ const ProjectModals = ({
           </button>,
           <button
             key="save"
-            onClick={handleCreateProject}
+            type="submit"
+            form="create-project-form"
             disabled={!newProjectName.trim()}
             style={{
               padding: '6px 16px',
@@ -64,7 +65,7 @@ const ProjectModals = ({
           </button>,
         ]}
       >
-        <form onSubmit={handleCreateProject} style={{ width: '100%' }}>
+        <form id="create-project-form" onSubmit={handleCreateProject} style={{ width: '100%' }}>
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', marginBottom: 8, color: '#333', fontSize: '14px' }}>
               Project Name

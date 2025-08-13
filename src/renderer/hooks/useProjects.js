@@ -18,7 +18,9 @@ export const useProjects = (state, dispatch) => {
     try {
       setLoading(true);
       setError(null);
+      console.log('Loading projects...');
       const result = await window.dbAPI.getProjects();
+      console.log('Projects loaded:', result);
       dispatch({ type: 'SET_PROJECTS', projects: result.data });
     } catch (err) {
       setError(err.message);
@@ -30,14 +32,23 @@ export const useProjects = (state, dispatch) => {
 
   const handleCreateProject = async e => {
     e.preventDefault();
-    if (!newProjectName.trim()) return;
+    console.log('handleCreateProject called with name:', newProjectName);
+    
+    if (!newProjectName.trim()) {
+      console.log('Project name is empty, returning');
+      return;
+    }
 
     try {
       setLoading(true);
       setError(null);
+      console.log('Creating project with data:', { name: newProjectName.trim() });
+      
       const project = await window.dbAPI.createProject({
         name: newProjectName.trim(),
       });
+      
+      console.log('Project created successfully:', project);
       dispatch({ type: 'ADD_PROJECT', project });
       setShowCreateModal(false);
       setNewProjectName('');
@@ -96,6 +107,7 @@ export const useProjects = (state, dispatch) => {
   };
 
   return {
+    projects: state.projects, // Add projects from state
     showCreateModal,
     setShowCreateModal,
     showEditModal,

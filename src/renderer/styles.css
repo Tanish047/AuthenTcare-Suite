@@ -255,6 +255,21 @@ body.dark-mode .nav-btn:hover {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: top center;
   animation: dropdownExpand 0.3s ease-out;
+  /* Add small margin to create space for easier navigation */
+  margin-top: 4px;
+}
+
+/* Create a bridge between button and dropdown for easier navigation */
+.nav-btn-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: transparent;
+  z-index: 999;
+  pointer-events: auto;
 }
 
 @keyframes dropdownExpand {

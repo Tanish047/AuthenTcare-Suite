@@ -221,13 +221,15 @@ function AppContent() {
     if (closeTimer.current) {
       clearTimeout(closeTimer.current);
     }
-    dispatch({ type: 'SET_OPEN_MENU', openMenu: key });
+    if (key) {
+      dispatch({ type: 'SET_OPEN_MENU', openMenu: key });
+    }
   };
 
   const handleAnyMouseLeave = () => {
     closeTimer.current = setTimeout(() => {
       dispatch({ type: 'SET_OPEN_MENU', openMenu: null });
-    }, 300);
+    }, 500); // Increased delay from 300ms to 500ms for easier navigation
   };
 
   const handleBackClick = () => {

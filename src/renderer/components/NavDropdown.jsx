@@ -13,23 +13,17 @@ function NavDropdown({
   const hasChildren = Array.isArray(item.children) && item.children.length > 0;
   const navBtnRef = useRef();
 
-  // Blur logic and coordinated close
+  // Improved hover logic with longer delay and better coordination
   const handleEnter = () => {
     if (hasChildren) {
       if (closeTimer && closeTimer.current) clearTimeout(closeTimer.current);
-      handleAnyMouseEnter && handleAnyMouseEnter();
+      handleAnyMouseEnter && handleAnyMouseEnter(item.key);
       setOpenMenu(item.key);
     }
   };
   const handleLeave = () => {
     if (hasChildren) {
       handleAnyMouseLeave && handleAnyMouseLeave();
-      if (closeTimer && closeTimer.current !== undefined) {
-        clearTimeout(closeTimer.current);
-        closeTimer.current = setTimeout(() => {
-          setOpenMenu(null);
-        }, 300);
-      }
     }
   };
 
@@ -43,7 +37,17 @@ function NavDropdown({
     >
       <button
         className="nav-btn"
-        onClick={() => setOpenMenu(item.key)}
+        onClick={() => {
+          if (hasChildren) {
+            if (openMenu === item.key) {
+              setOpenMenu(null);
+            } else {
+              setOpenMenu(item.key);
+            }
+          } else {
+            onItemClick && onItemClick(item.key);
+          }
+        }}
         tabIndex={0}
         style={{ fontWeight: 700, fontSize: '0.95rem', padding: '0 10px', margin: '0 0.5px' }}
       >

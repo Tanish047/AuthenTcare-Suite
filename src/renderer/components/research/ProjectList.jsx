@@ -67,8 +67,37 @@ const ProjectList = ({ projects, selectedProject, onSelect, onCreate, onEdit, on
                 onClick={() => onSelect(project)}
               >
                 <div>
-                  <h4 style={{ margin: '0 0 4px 0', color: '#2c5aa0' }}>{project.name}</h4>
-                  <small style={{ color: '#666' }}>Click to view project details</small>
+                  <button
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      margin: 0,
+                      color: '#2c5aa0',
+                      fontSize: '18px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      textDecoration: 'underline',
+                      textDecorationColor: 'transparent',
+                      transition: 'text-decoration-color 0.2s ease',
+                    }}
+                    onMouseEnter={e => {
+                      e.target.style.textDecorationColor = '#2c5aa0';
+                    }}
+                    onMouseLeave={e => {
+                      e.target.style.textDecorationColor = 'transparent';
+                    }}
+                    onClick={e => {
+                      e.stopPropagation();
+                      onSelect(project);
+                    }}
+                  >
+                    {project.name}
+                  </button>
+                  <small style={{ display: 'block', color: '#666', marginTop: '4px' }}>
+                    Click project name to view details
+                  </small>
                 </div>
                 <div style={{ position: 'relative' }}>
                   <button

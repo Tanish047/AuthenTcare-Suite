@@ -24,7 +24,12 @@ function DropdownMenu({
     }
   }, [parentRect, isRoot]);
 
-  const handleDropdownMouseEnter = () => handleAnyMouseEnter && handleAnyMouseEnter();
+  const handleDropdownMouseEnter = () => {
+    if (closeTimer && closeTimer.current) {
+      clearTimeout(closeTimer.current);
+    }
+    handleAnyMouseEnter && handleAnyMouseEnter();
+  };
   const handleDropdownMouseLeave = () => handleAnyMouseLeave && handleAnyMouseLeave();
 
   const blurOverlay = (
@@ -69,9 +74,18 @@ function DropdownMenu({
             className="dropdown-item"
             onMouseEnter={() => {
               handleDropdownMouseEnter();
-              if (hasChildren) setOpenChild(item.key);
+              if (hasChildren) {
+                setOpenChild(item.key);
+              } else {
+                setOpenChild(null);
+              }
             }}
-            onMouseLeave={handleDropdownMouseLeave}
+            onMouseLeave={() => {
+              // Don't immediately close child menus, let the parent handle it
+              if (!hasChildren) {
+                handleDropdownMouseLeave();
+              }
+            }}
             onClick={() => onItemClick && onItemClick(item.key)}
             style={{ position: 'relative', cursor: 'pointer' }}
           >
