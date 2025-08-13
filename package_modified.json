@@ -1,0 +1,51 @@
+{
+  "name": "authentcare-suite",
+  "version": "1.0.0",
+  "description": "Authentcare Suite",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "build": "webpack",
+    "start": "cross-env NODE_ENV=development electron .",
+    "start:prod": "cross-env NODE_ENV=production electron .",
+    "audit": "npm audit fix",
+    "make:index": "node scripts/make-index.mjs",
+    "migrate": "node src/storage/sqlite/migrate.js"
+  },
+  "keywords": [],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "babel-loader": "^8.2.2",
+    "babel-preset-react": "^6.24.1",
+    "electron": "^37.1.0",
+    "react": "^18.2.0",
+    "react-calendar": "^6.0.0",
+    "react-dom": "^18.2.0",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
+    "tar-fs": "^3.0.9",
+    "webpack": "^5.51.1",
+    "webpack-cli": "^4.8.0",
+    "node-fetch": "^3.3.1",
+    "cheerio": "^1.0.0-rc.12",
+    "zod": "^3.22.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.5",
+    "@babel/eslint-parser": "^7.28.0",
+    "@babel/plugin-transform-classes": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-react": "^7.27.1",
+    "@eslint/js": "^9.31.0",
+    "babel-loader": "^8.2.2",
+    "copy-webpack-plugin": "^13.0.0",
+    "css-loader": "^7.1.2",
+    "electron-devtools-installer": "^4.0.0",
+    "eslint": "^9.31.0",
+    "eslint-plugin-react": "^7.37.5",
+    "style-loader": "^4.0.0",
+    "webpack-dev-server": "^5.2.2",
+    "cross-env": "^7.0.3"
+  }
+}
