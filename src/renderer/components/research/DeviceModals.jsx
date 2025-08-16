@@ -2,12 +2,12 @@ import React from 'react';
 import Modal from '../Modal.jsx';
 
 const DeviceModals = ({
-  showDeviceModal,
-  setShowDeviceModal,
-  showDeviceEditModal,
-  setShowDeviceEditModal,
-  showDeviceDeleteModal,
-  setShowDeviceDeleteModal,
+  showCreate: showDeviceModal,
+  showEdit: showDeviceEditModal,
+  showDelete: showDeviceDeleteModal,
+  onCloseCreate,
+  onCloseEdit,
+  onCloseDelete,
   newDeviceName,
   setNewDeviceName,
   editDeviceName,
@@ -25,18 +25,28 @@ const DeviceModals = ({
     <>
       <Modal
         open={showDeviceModal}
-        onClose={() => setShowDeviceModal(false)}
+        onClose={onCloseCreate}
         title="Add Device"
         actions={[
-          <button key="cancel" onClick={() => setShowDeviceModal(false)}>
+          <button key="cancel" onClick={onCloseCreate}>
             Cancel
           </button>,
-          <button key="save" onClick={handleCreateDevice} disabled={!newDeviceName.trim()}>
+          <button 
+            key="save" 
+            onClick={(e) => {
+              e.preventDefault();
+              handleCreateDevice();
+            }} 
+            disabled={!newDeviceName.trim()}
+          >
             Save
           </button>,
         ]}
       >
-        <form onSubmit={handleCreateDevice} style={{ width: '100%' }}>
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          handleCreateDevice(e);
+        }} style={{ width: '100%' }}>
           <input
             type="text"
             value={newDeviceName}
@@ -51,16 +61,16 @@ const DeviceModals = ({
 
       <Modal
         open={showDeviceEditModal}
-        onClose={() => setShowDeviceEditModal(false)}
+        onClose={onCloseEdit}
         title="Edit Device"
         actions={[
-          <button key="cancel" onClick={() => setShowDeviceEditModal(false)}>
+          <button key="cancel" onClick={onCloseEdit}>
             Cancel
           </button>,
           <button
             key="save"
             onClick={handleEditDevice}
-            disabled={!editDeviceName.trim() || editDeviceName.trim() === editingDevice}
+            disabled={!editDeviceName.trim() || editDeviceName.trim() === editingDevice?.name}
           >
             Save
           </button>,
@@ -81,19 +91,10 @@ const DeviceModals = ({
 
       <Modal
         open={showDeviceDeleteModal}
-        onClose={() => {
-          setShowDeviceDeleteModal(false);
-          setDeviceDeletePassword('');
-        }}
+        onClose={onCloseDelete}
         title="Delete Device"
         actions={[
-          <button
-            key="cancel"
-            onClick={() => {
-              setShowDeviceDeleteModal(false);
-              setDeviceDeletePassword('');
-            }}
-          >
+          <button key="cancel" onClick={onCloseDelete}>
             Cancel
           </button>,
           <button key="delete" onClick={handleDeleteDevice} disabled={!deviceDeletePassword}>
@@ -103,7 +104,7 @@ const DeviceModals = ({
       >
         <form onSubmit={handleDeleteDevice} style={{ width: '100%' }}>
           <div style={{ marginBottom: 12 }}>
-            Enter password to delete <b>{deleteDevice}</b>:
+            Enter password to delete <b>{deleteDevice?.name}</b>:
           </div>
           <input
             type="password"

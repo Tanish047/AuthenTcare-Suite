@@ -123,6 +123,8 @@ export async function migrateLocalStorageToDatabase() {
       console.log('✓ Licenses migrated successfully');
     }
 
+    // Mark migration as completed
+    setStorage('authentcare_migration_completed', true);
     console.log('Data migration completed successfully!');
     return true;
   } catch (error) {
@@ -132,6 +134,12 @@ export async function migrateLocalStorageToDatabase() {
 }
 
 export function hasLocalStorageData() {
+  // Check if migration has already been completed
+  const migrationCompleted = getStorage('authentcare_migration_completed', false);
+  if (migrationCompleted) {
+    return false;
+  }
+
   const projects = getStorage('authentcare_projects', []);
   const deviceKeys = Object.keys(localStorage).filter(key =>
     key.startsWith('authentcare_devices_')

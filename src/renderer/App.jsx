@@ -235,16 +235,16 @@ function AppContent() {
   const handleBackClick = () => {
     switch (page) {
       case 'research-workspace':
-        dispatch({ type: 'SET_PAGE', page: 'research', pageParent: null });
-        break;
       case 'device-workspace':
-        dispatch({ type: 'SET_PAGE', page: 'research-workspace', pageParent: 'research' });
-        break;
       case 'version-workspace':
-        dispatch({ type: 'SET_PAGE', page: 'device-workspace', pageParent: 'research-workspace' });
-        break;
       case 'market-workspace':
-        dispatch({ type: 'SET_PAGE', page: 'version-workspace', pageParent: 'device-workspace' });
+        // Use the ResearchWorkspace's internal back navigation
+        if (window.researchWorkspaceBackHandler) {
+          window.researchWorkspaceBackHandler();
+        } else {
+          // Fallback to research landing if handler not available
+          dispatch({ type: 'SET_PAGE', page: 'research', pageParent: null });
+        }
         break;
       default:
         dispatch({ type: 'SET_PAGE', page: 'dashboard', pageParent: null });
@@ -277,34 +277,17 @@ function AppContent() {
             }
           />
         )}
-        {page === 'research-workspace' && (
+        {(page === 'research-workspace' || page === 'device-workspace' || page === 'version-workspace' || page === 'market-workspace') && (
           <ResearchWorkspace
-            onDeviceSelect={() =>
-              dispatch({
-                type: 'SET_PAGE',
-                page: 'device-workspace',
-                pageParent: 'research-workspace',
-              })
+            currentLevel={
+              page === 'research-workspace' ? 'project' :
+              page === 'device-workspace' ? 'device' :
+              page === 'version-workspace' ? 'version' :
+              page === 'market-workspace' ? 'market' : 'project'
             }
-            onVersionSelect={() =>
-              dispatch({
-                type: 'SET_PAGE',
-                page: 'version-workspace',
-                pageParent: 'device-workspace',
-              })
-            }
-            onMarketSelect={() =>
-              dispatch({
-                type: 'SET_PAGE',
-                page: 'market-workspace',
-                pageParent: 'version-workspace',
-              })
-            }
+            onBackNavigation={() => dispatch({ type: 'SET_PAGE', page: 'research', pageParent: null })}
           />
         )}
-        {page === 'device-workspace' && <ResearchWorkspace currentLevel="device" />}
-        {page === 'version-workspace' && <ResearchWorkspace currentLevel="version" />}
-        {page === 'market-workspace' && <ResearchWorkspace currentLevel="market" />}
         {page === 'settings' && <Settings menuData={menuData} />}
         {/* Add more page components as needed */}
       </main>

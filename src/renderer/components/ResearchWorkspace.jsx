@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAppContext } from '../context/AppContext.jsx';
 import { useProjects } from '../hooks/useProjects';
 import { useDevices } from '../hooks/useDevices';
@@ -14,9 +14,11 @@ import DeviceList from './research/DeviceList.jsx';
 import VersionList from './research/VersionList.jsx';
 import MarketList from './research/MarketList.jsx';
 import LicenseList from './research/LicenseList.jsx';
+import CompletionSummary from './research/CompletionSummary.jsx';
 import ProjectModals from './research/ProjectModals.jsx';
 import DeviceModals from './research/DeviceModals.jsx';
 import VersionModals from './research/VersionModals.jsx';
+import RenewalVersionSelector from './research/RenewalVersionSelector.jsx';
 import MarketModals from './research/MarketModals.jsx';
 import LicenseModals from './research/LicenseModals.jsx';
 
@@ -25,6 +27,7 @@ function ResearchWorkspace({
   onDeviceSelect,
   onVersionSelect,
   onMarketSelect,
+  onBackNavigation,
 }) {
   const { state, dispatch } = useAppContext();
   const [currentLevel, setCurrentLevel] = useState(initialLevel);
@@ -32,6 +35,7 @@ function ResearchWorkspace({
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [selectedVersion, setSelectedVersion] = useState(null);
   const [selectedMarket, setSelectedMarket] = useState(null);
+  const [selectedLicense, setSelectedLicense] = useState(null);
 
   // Navigation helper functions
   const navigateToLevel = (level, selection) => {
@@ -49,6 +53,8 @@ function ResearchWorkspace({
           break;
         case 'version':
           setSelectedMarket(null);
+          break;
+        case 'market':
           break;
       }
     };
@@ -86,6 +92,10 @@ function ResearchWorkspace({
         setSelectedMarket(selection);
         setCurrentLevel('license');
         break;
+      case 'license':
+        setSelectedLicense(selection);
+        setCurrentLevel('completion');
+        break;
     }
   };
 
@@ -101,10 +111,61 @@ function ResearchWorkspace({
         return !!selectedVersion;
       case 'license':
         return !!selectedMarket;
+      case 'completion':
+        return !!selectedLicense;
       default:
         return false;
     }
   };
+
+  // Back navigation function
+  const handleBackNavigation = () => {
+    switch (currentLevel) {
+      case 'device':
+        setCurrentLevel('project');
+        setSelectedDevice(null);
+        setSelectedVersion(null);
+        setSelectedMarket(null);
+        break;
+      case 'version':
+        setCurrentLevel('device');
+        setSelectedVersion(null);
+        setSelectedMarket(null);
+        break;
+      case 'market':
+        setCurrentLevel('version');
+        setSelectedMarket(null);
+        break;
+      case 'license':
+        setCurrentLevel('market');
+        break;
+      case 'completion':
+        setCurrentLevel('license');
+        setSelectedLicense(null);
+        break;
+      case 'project':
+      default:
+        // If we're at the project level or unknown level, go back to research landing
+        if (onBackNavigation) {
+          onBackNavigation();
+        }
+        break;
+    }
+  };
+
+  // Expose back navigation to parent component
+  useEffect(() => {
+    // Store the back navigation function in the global context so NavBar can access it
+    if (window.researchWorkspaceBackHandler) {
+      window.researchWorkspaceBackHandler = handleBackNavigation;
+    } else {
+      window.researchWorkspaceBackHandler = handleBackNavigation;
+    }
+    
+    return () => {
+      window.researchWorkspaceBackHandler = null;
+    };
+  }, [currentLevel, selectedProject, selectedDevice, selectedVersion, selectedMarket, selectedLicense]);
 
   const {
     projects,
@@ -122,7 +183,9 @@ function ResearchWorkspace({
     editProjectName,
     setEditProjectName,
     editingProject,
+    setEditingProject,
     deleteProject,
+    setDeleteProject,
     deletePassword,
     setDeletePassword,
     deleteError,
@@ -157,27 +220,36 @@ function ResearchWorkspace({
 
   const {
     versions,
+    loading: versionsLoading,
+    error: versionsError,
+    loadVersions,
     showVersionModal,
-    showVersionEditModal,
-    showVersionDeleteModal,
-    handleCreateClick: handleVersionCreate,
-    handleEditClick: handleVersionEdit,
-    handleDeleteClick: handleVersionDelete,
     setShowVersionModal,
+    showVersionEditModal,
     setShowVersionEditModal,
+    showVersionDeleteModal,
     setShowVersionDeleteModal,
     newVersionName,
     setNewVersionName,
     editVersionName,
     setEditVersionName,
     editingVersion,
+    setEditingVersion,
     deleteVersion,
+    setDeleteVersion,
     versionDeletePassword,
     setVersionDeletePassword,
     versionDeleteError,
     handleCreateVersion,
     handleEditVersion,
     handleDeleteVersion,
+    handleCreateClick: handleVersionCreate,
+    handleEditClick: handleVersionEdit,
+    handleDeleteClick: handleVersionDelete,
+    showRenewalSelector,
+    setShowRenewalSelector,
+    handleRenewalVersionSelect,
+    handleBulkDelete,
   } = useVersions(state, dispatch, selectedProject, selectedDevice);
 
   const {
@@ -199,13 +271,33 @@ function ResearchWorkspace({
   } = useMarkets(state, dispatch);
 
   const {
-    licenses,
+    licenses: allLicenses,
     showLicenseModal,
     handleCreateClick: handleLicenseCreate,
+    handleDeleteClick,
     setShowLicenseModal,
     newLicense,
     setNewLicense,
   } = useLicenses(state, dispatch);
+
+  // Filter licenses for the current selection
+  const licenses = useMemo(() => {
+    if (!selectedProject || !selectedVersion || !selectedMarket || !state.marketLicenses) {
+      return [];
+    }
+    
+    // If marketLicenses is an array (from database), filter it
+    if (Array.isArray(state.marketLicenses)) {
+      return state.marketLicenses.filter(license => 
+        license.project_id === selectedProject.id &&
+        license.version_id === selectedVersion.id &&
+        license.market_id === selectedMarket.id
+      );
+    }
+    
+    // If marketLicenses is organized by market (old format), use it
+    return state.marketLicenses[selectedMarket.id] || [];
+  }, [state.marketLicenses, selectedProject, selectedVersion, selectedMarket]);
 
   // Load and save effects
   useEffect(() => {
@@ -241,6 +333,13 @@ function ResearchWorkspace({
     }
   }, [selectedProject, loadDevices]);
 
+  // Load versions when device is selected
+  useEffect(() => {
+    if (selectedDevice) {
+      loadVersions();
+    }
+  }, [selectedDevice, loadVersions]);
+
   // Load markets from database
   useEffect(() => {
     const loadMarkets = async () => {
@@ -267,117 +366,41 @@ function ResearchWorkspace({
     loadLicenses();
   }, [dispatch]);
 
-  // Render breadcrumb navigation
-  const renderBreadcrumb = () => (
-    <div
-      style={{
-        padding: '12px 16px',
-        backgroundColor: '#f8f9fa',
-        borderRadius: '6px',
-        marginBottom: '20px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        fontSize: '14px',
-      }}
-    >
-      <span
-        onClick={() => navigateToLevel('project', null)}
-        style={{
-          cursor: 'pointer',
-          color: currentLevel === 'project' ? '#2c5aa0' : '#666',
-          fontWeight: currentLevel === 'project' ? '600' : 'normal',
-        }}
-      >
-        Projects
-      </span>
 
-      {selectedProject && (
-        <>
-          <span style={{ color: '#666' }}>/</span>
-          <span
-            onClick={() =>
-              canNavigateToLevel('device') && navigateToLevel('device', selectedProject)
-            }
-            style={{
-              cursor: canNavigateToLevel('device') ? 'pointer' : 'not-allowed',
-              color: currentLevel === 'device' ? '#2c5aa0' : '#666',
-              fontWeight: currentLevel === 'device' ? '600' : 'normal',
-            }}
-          >
-            {selectedProject}
-          </span>
-        </>
-      )}
 
-      {selectedDevice && (
-        <>
-          <span style={{ color: '#666' }}>/</span>
-          <span
-            onClick={() =>
-              canNavigateToLevel('version') && navigateToLevel('version', selectedDevice)
-            }
-            style={{
-              cursor: canNavigateToLevel('version') ? 'pointer' : 'not-allowed',
-              color: currentLevel === 'version' ? '#2c5aa0' : '#666',
-              fontWeight: currentLevel === 'version' ? '600' : 'normal',
-            }}
-          >
-            {selectedDevice}
-          </span>
-        </>
-      )}
-
-      {selectedVersion && (
-        <>
-          <span style={{ color: '#666' }}>/</span>
-          <span
-            onClick={() =>
-              canNavigateToLevel('market') && navigateToLevel('market', selectedVersion)
-            }
-            style={{
-              cursor: canNavigateToLevel('market') ? 'pointer' : 'not-allowed',
-              color: currentLevel === 'market' ? '#2c5aa0' : '#666',
-              fontWeight: currentLevel === 'market' ? '600' : 'normal',
-            }}
-          >
-            {selectedVersion}
-          </span>
-        </>
-      )}
-
-      {selectedMarket && (
-        <>
-          <span style={{ color: '#666' }}>/</span>
-          <span
-            onClick={() =>
-              canNavigateToLevel('license') && navigateToLevel('license', selectedMarket)
-            }
-            style={{
-              cursor: canNavigateToLevel('license') ? 'pointer' : 'not-allowed',
-              color: currentLevel === 'license' ? '#2c5aa0' : '#666',
-              fontWeight: currentLevel === 'license' ? '600' : 'normal',
-            }}
-          >
-            {selectedMarket}
-          </span>
-        </>
-      )}
-    </div>
-  );
+  // Get dynamic title based on current level and selections
+  const getPageTitle = () => {
+    switch (currentLevel) {
+      case 'project':
+        return 'Research Workspace';
+      case 'device':
+        return selectedProject ? `${selectedProject.name} - Devices` : 'Research Workspace';
+      case 'version':
+        return selectedDevice ? `${selectedDevice.name} - Versions` : 'Research Workspace';
+      case 'market':
+        return selectedVersion ? `Version ${selectedVersion.version_number} - Markets` : 'Research Workspace';
+      case 'license':
+        return selectedMarket ? `${selectedMarket.name} - Licenses` : 'Research Workspace';
+      case 'completion':
+        return 'Pathway Complete';
+      default:
+        return 'Research Workspace';
+    }
+  };
 
   // Main render
   return (
     <div style={{ padding: 32, height: 'calc(100vh - 100px)' }} className="research-workspace">
       <h2 style={{ color: '#2c5aa0', fontWeight: 800, fontSize: 28, marginBottom: 24 }}>
-        Research Workspace
+        {getPageTitle()}
       </h2>
-
-      {renderBreadcrumb()}
 
       <div className="content-section">
         {currentLevel === 'project' && (
           <div className="projects-section">
+            <h3 style={{ color: '#2c5aa0', fontWeight: 700, fontSize: 22, marginBottom: 18 }}>
+              Project List
+            </h3>
             <ProjectList
               projects={projects}
               selectedProject={selectedProject ? selectedProject.id : null}
@@ -426,10 +449,19 @@ function ResearchWorkspace({
 
         {currentLevel === 'device' && selectedProject && (
           <div className="devices-section">
+            <h3 style={{ color: '#2c5aa0', fontWeight: 700, fontSize: 22, marginBottom: 18 }}>
+              Device List
+            </h3>
             <DeviceList
               selectedProject={selectedProject}
               devices={devices}
-              onSelect={device => navigateToLevel('version', device)}
+              selectedDevice={selectedDevice}
+              onSelect={device => {
+                setSelectedDevice(device);
+                setCurrentLevel('version');
+                // Load versions for this device
+                loadVersions();
+              }}
               onCreate={handleDeviceCreate}
               onEdit={handleDeviceEdit}
               onDelete={handleDeviceDelete}
@@ -459,14 +491,23 @@ function ResearchWorkspace({
 
         {currentLevel === 'version' && selectedDevice && (
           <div className="versions-section">
+            <h3 style={{ color: '#2c5aa0', fontWeight: 700, fontSize: 22, marginBottom: 18 }}>
+              Version List
+            </h3>
             <VersionList
               selectedProject={selectedProject}
               selectedDevice={selectedDevice}
               versions={versions}
-              onSelect={version => navigateToLevel('market', version)}
+              selectedVersion={selectedVersion}
+              onSelect={version => {
+                setSelectedVersion(version);
+                setCurrentLevel('market');
+                // Load markets if needed
+              }}
               onCreate={handleVersionCreate}
               onEdit={handleVersionEdit}
               onDelete={handleVersionDelete}
+              onBulkDelete={handleBulkDelete}
             />
             <VersionModals
               showCreate={showVersionModal}
@@ -488,19 +529,34 @@ function ResearchWorkspace({
               handleEditVersion={handleEditVersion}
               handleDeleteVersion={handleDeleteVersion}
             />
+            <RenewalVersionSelector
+              show={showRenewalSelector}
+              onClose={() => setShowRenewalSelector(false)}
+              versions={versions}
+              onSelectVersion={handleRenewalVersionSelect}
+            />
           </div>
         )}
 
         {/* Market Level */}
         {currentLevel === 'market' && selectedVersion && (
           <div className="markets-section">
+            <h3 style={{ color: '#2c5aa0', fontWeight: 700, fontSize: 22, marginBottom: 18 }}>
+              Market List
+            </h3>
+
             <MarketList
-              targetMarkets={targetMarkets}
+              targetMarkets={state.targetMarkets}
               selectedMarket={selectedMarket}
-              onSelect={market => navigateToLevel('license', market)}
+              onSelect={market => {
+                setSelectedMarket(market);
+                setCurrentLevel('license');
+                // Load licenses if needed
+              }}
               onCreate={handleMarketCreate}
               onEdit={handleMarketEdit}
               onDelete={handleMarketDelete}
+              dispatch={dispatch}
             />
             <MarketModals
               showCreate={showMarketModal}
@@ -524,11 +580,23 @@ function ResearchWorkspace({
         {/* License Level */}
         {currentLevel === 'license' && selectedMarket && (
           <div className="licenses-section">
+            <h3 style={{ color: '#2c5aa0', fontWeight: 700, fontSize: 22, marginBottom: 18 }}>
+              License List
+            </h3>
             <LicenseList
+              selectedProject={selectedProject}
+              selectedDevice={selectedDevice}
+              selectedVersion={selectedVersion}
               selectedMarket={selectedMarket}
               licenses={licenses}
               onCreate={handleLicenseCreate}
               onDelete={handleDeleteClick}
+              onSelect={license => {
+                console.log('Selected license:', license);
+                setSelectedLicense(license);
+                setCurrentLevel('completion');
+              }}
+              dispatch={dispatch}
             />
             <LicenseModals
               showCreate={showLicenseModal}
@@ -537,6 +605,32 @@ function ResearchWorkspace({
               newLicense={newLicense}
               setNewLicense={setNewLicense}
               onAddLicense={handleLicenseCreate}
+            />
+          </div>
+        )}
+
+        {/* Completion Level */}
+        {currentLevel === 'completion' && selectedLicense && (
+          <div className="completion-section">
+            <CompletionSummary
+              selectedProject={selectedProject}
+              selectedDevice={selectedDevice}
+              selectedVersion={selectedVersion}
+              selectedMarket={selectedMarket}
+              selectedLicense={selectedLicense}
+              onBack={() => {
+                setCurrentLevel('license');
+                setSelectedLicense(null);
+              }}
+              onStartNew={() => {
+                // Reset all selections and go back to project level
+                setSelectedProject(null);
+                setSelectedDevice(null);
+                setSelectedVersion(null);
+                setSelectedMarket(null);
+                setSelectedLicense(null);
+                setCurrentLevel('project');
+              }}
             />
           </div>
         )}

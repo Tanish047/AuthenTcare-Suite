@@ -58,8 +58,8 @@ const MarketModals = ({
             <option value="" disabled>
               Select a market...
             </option>
-            {allMarkets
-              .filter(m => !targetMarkets.includes(m))
+            {(allMarkets || [])
+              .filter(m => !(targetMarkets || []).includes(m))
               .map(market => (
                 <option key={market} value={market}>
                   {market}

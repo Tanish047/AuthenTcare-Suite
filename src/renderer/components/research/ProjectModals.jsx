@@ -146,7 +146,7 @@ const ProjectModals = ({
       >
         <form onSubmit={handleDeleteProject} style={{ width: '100%' }}>
           <div style={{ marginBottom: 12 }}>
-            Enter password to delete <b>{deleteProject}</b>:
+            Enter password to delete <b>{deleteProject?.name}</b>:
           </div>
           <input
             type="password"

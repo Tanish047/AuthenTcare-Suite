@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { checkPassword } from '../utils/password.js';
 
 export const useDevices = (state, dispatch, selectedProject) => {
@@ -14,6 +14,23 @@ export const useDevices = (state, dispatch, selectedProject) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Memoized devices for the selected project (normalized state)
+  const devices = useMemo(() => {
+    if (!selectedProject?.id || !state.devices) return [];
+    return state.devices.filter(device => device.project_id === selectedProject.id);
+  }, [state.devices, selectedProject?.id]);
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      // Clear any pending operations when component unmounts
+      setLoading(false);
+      setError(null);
+      dispatch({ type: 'CLEAR_LOADING', key: `devices-${selectedProject?.id}` });
+      dispatch({ type: 'CLEAR_ERROR', key: `devices-${selectedProject?.id}` });
+    };
+  }, [selectedProject?.id, dispatch]);
+
   const loadDevices = useCallback(async () => {
     if (!selectedProject) return;
 
@@ -28,20 +45,22 @@ export const useDevices = (state, dispatch, selectedProject) => {
     }
   }, [selectedProject, dispatch]);
 
-  const handleCreateDevice = async () => {
+  const handleCreateDevice = async (e) => {
+    if (e) e.preventDefault();
     if (!newDeviceName.trim() || !selectedProject) return;
 
     try {
       setLoading(true);
       const device = await window.dbAPI.createDevice({
         name: newDeviceName.trim(),
-        projectId: selectedProject.id,
+        project_id: selectedProject.id, // Use project_id instead of projectId
       });
-      dispatch({ type: 'ADD_DEVICE', projectId: selectedProject.id, device });
+      dispatch({ type: 'ADD_DEVICE', device });
       setShowDeviceModal(false);
       setNewDeviceName('');
     } catch (err) {
       setError(err.message);
+      console.error('Failed to create device:', err);
     } finally {
       setLoading(false);
     }
@@ -56,7 +75,7 @@ export const useDevices = (state, dispatch, selectedProject) => {
       const updated = await window.dbAPI.updateDevice(editingDevice.id, {
         name: editDeviceName.trim(),
       });
-      dispatch({ type: 'UPDATE_DEVICE', projectId: selectedProject.id, device: updated });
+      dispatch({ type: 'UPDATE_DEVICE', device: updated });
       setShowDeviceEditModal(false);
       setEditDeviceName('');
       setEditingDevice(null);
@@ -79,7 +98,6 @@ export const useDevices = (state, dispatch, selectedProject) => {
       await window.dbAPI.deleteDevice(deleteDevice.id);
       dispatch({
         type: 'REMOVE_DEVICE',
-        projectId: selectedProject.id,
         deviceId: deleteDevice.id,
       });
       setShowDeviceDeleteModal(false);
@@ -93,7 +111,23 @@ export const useDevices = (state, dispatch, selectedProject) => {
     }
   };
 
+  const handleCreateClick = () => {
+    setShowDeviceModal(true);
+  };
+
+  const handleEditClick = (device) => {
+    setEditingDevice(device);
+    setEditDeviceName(device.name);
+    setShowDeviceEditModal(true);
+  };
+
+  const handleDeleteClick = (device) => {
+    setDeleteDevice(device);
+    setShowDeviceDeleteModal(true);
+  };
+
   return {
+    devices, // Now using memoized devices
     showDeviceModal,
     setShowDeviceModal,
     showDeviceEditModal,
@@ -117,5 +151,8 @@ export const useDevices = (state, dispatch, selectedProject) => {
     handleCreateDevice,
     handleEditDevice,
     handleDeleteDevice,
+    handleCreateClick,
+    handleEditClick,
+    handleDeleteClick,
   };
 };

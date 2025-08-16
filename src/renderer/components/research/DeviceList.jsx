@@ -1,4 +1,5 @@
 import React from 'react';
+import ActionMenu from '../ActionMenu.jsx';
 
 const DeviceList = ({
   selectedProject,
@@ -12,54 +13,99 @@ const DeviceList = ({
   if (!selectedProject) return null;
 
   return (
-    <div style={{ marginTop: 32 }}>
-      <h3 style={{ color: '#2c5aa0', fontWeight: 700, fontSize: 22, marginBottom: 18 }}>
-        Devices for {selectedProject}
-      </h3>
+    <div style={{ marginTop: 0 }}>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        marginBottom: 16 
+      }}>
+        <div style={{ color: '#666', fontSize: '14px' }}>
+          Devices for <strong>{selectedProject.name}</strong>
+        </div>
+        <button
+          onClick={onCreate}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '4px',
+            backgroundColor: '#2c5aa0',
+            color: 'white',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '14px',
+          }}
+        >
+          <span>+</span>
+          Add a Device
+        </button>
+      </div>
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {devices && devices.length > 0 ? (
           devices.map(device => (
-            <li key={device} style={{ marginBottom: 12, display: 'flex', alignItems: 'center' }}>
-              <span
+            <li key={device.id} style={{ marginBottom: 12 }}>
+              <div
                 style={{
-                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '12px 16px',
+                  border: '1px solid ' + (selectedDevice?.id === device.id ? '#2c5aa0' : '#e0e0e0'),
+                  borderRadius: '8px',
+                  backgroundColor: selectedDevice?.id === device.id ? '#f0f7ff' : '#fff',
                   cursor: 'pointer',
-                  textDecoration: selectedDevice === device ? 'underline' : 'none',
-                  padding: '8px',
-                  borderRadius: '4px',
-                  backgroundColor: selectedDevice === device ? '#f0f7ff' : 'transparent',
                   transition: 'all 0.2s ease',
                 }}
                 onClick={() => onSelect(device)}
-              >
-                {device}
-              </span>
-              <button
-                onClick={() => onEdit(device)}
-                style={{
-                  marginLeft: '8px',
-                  padding: '4px 12px',
-                  borderRadius: '4px',
-                  border: '1px solid #ccc',
-                  backgroundColor: 'transparent',
-                  cursor: 'pointer',
+                onMouseEnter={e => {
+                  if (selectedDevice?.id !== device.id) {
+                    e.target.style.backgroundColor = '#f8f9fa';
+                    e.target.style.borderColor = '#ccc';
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (selectedDevice?.id !== device.id) {
+                    e.target.style.backgroundColor = '#fff';
+                    e.target.style.borderColor = '#e0e0e0';
+                  }
                 }}
               >
-                Edit
-              </button>
-              <button
-                onClick={() => onDelete(device)}
-                style={{
-                  marginLeft: '8px',
-                  padding: '4px 12px',
-                  borderRadius: '4px',
-                  border: '1px solid #ccc',
-                  backgroundColor: 'transparent',
-                  cursor: 'pointer',
-                }}
-              >
-                Delete
-              </button>
+                <div style={{ flex: 1 }}>
+                  <div style={{ 
+                    fontWeight: '600', 
+                    fontSize: '16px', 
+                    color: '#2c5aa0',
+                    marginBottom: '4px'
+                  }}>
+                    {device.name}
+                  </div>
+                  <div style={{ 
+                    fontSize: '12px', 
+                    color: '#666'
+                  }}>
+                    Click to view versions
+                  </div>
+                </div>
+                
+                <ActionMenu
+                  actions={[
+                    {
+                      key: 'edit',
+                      label: 'Edit',
+                      icon: '✏️',
+                      onClick: () => onEdit(device)
+                    },
+                    {
+                      key: 'delete',
+                      label: 'Delete',
+                      icon: '🗑️',
+                      danger: true,
+                      onClick: () => onDelete(device)
+                    }
+                  ]}
+                />
+              </div>
             </li>
           ))
         ) : (

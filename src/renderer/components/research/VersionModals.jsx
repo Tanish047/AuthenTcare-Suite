@@ -2,12 +2,12 @@ import React from 'react';
 import Modal from '../Modal.jsx';
 
 const VersionModals = ({
-  showVersionModal,
-  setShowVersionModal,
-  showVersionEditModal,
-  setShowVersionEditModal,
-  showVersionDeleteModal,
-  setShowVersionDeleteModal,
+  showCreate: showVersionModal,
+  showEdit: showVersionEditModal,
+  showDelete: showVersionDeleteModal,
+  onCloseCreate,
+  onCloseEdit,
+  onCloseDelete,
   newVersionName,
   setNewVersionName,
   editVersionName,
@@ -25,10 +25,10 @@ const VersionModals = ({
     <>
       <Modal
         open={showVersionModal}
-        onClose={() => setShowVersionModal(false)}
+        onClose={onCloseCreate}
         title="Add Version"
         actions={[
-          <button key="cancel" onClick={() => setShowVersionModal(false)}>
+          <button key="cancel" onClick={onCloseCreate}>
             Cancel
           </button>,
           <button key="save" onClick={handleCreateVersion} disabled={!newVersionName.trim()}>
@@ -51,16 +51,16 @@ const VersionModals = ({
 
       <Modal
         open={showVersionEditModal}
-        onClose={() => setShowVersionEditModal(false)}
+        onClose={onCloseEdit}
         title="Edit Version"
         actions={[
-          <button key="cancel" onClick={() => setShowVersionEditModal(false)}>
+          <button key="cancel" onClick={onCloseEdit}>
             Cancel
           </button>,
           <button
             key="save"
             onClick={handleEditVersion}
-            disabled={!editVersionName.trim() || editVersionName.trim() === editingVersion}
+            disabled={!editVersionName.trim() || editVersionName.trim() === editingVersion?.version_number}
           >
             Save
           </button>,
@@ -82,7 +82,7 @@ const VersionModals = ({
       <Modal
         open={showVersionDeleteModal}
         onClose={() => {
-          setShowVersionDeleteModal(false);
+          onCloseDelete();
           setVersionDeletePassword('');
         }}
         title="Delete Version"
@@ -90,7 +90,7 @@ const VersionModals = ({
           <button
             key="cancel"
             onClick={() => {
-              setShowVersionDeleteModal(false);
+              onCloseDelete();
               setVersionDeletePassword('');
             }}
           >
@@ -103,7 +103,7 @@ const VersionModals = ({
       >
         <form onSubmit={handleDeleteVersion} style={{ width: '100%' }}>
           <div style={{ marginBottom: 12 }}>
-            Enter password to delete <b>{deleteVersion}</b>:
+            Enter password to delete <b>{deleteVersion?.version_number}</b>:
           </div>
           <input
             type="password"

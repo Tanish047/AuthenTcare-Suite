@@ -1,18 +1,7 @@
 import React, { useState } from 'react';
+import ActionMenu from '../ActionMenu.jsx';
 
 const ProjectList = ({ projects, selectedProject, onSelect, onCreate, onEdit, onDelete }) => {
-  const [openMenu, setOpenMenu] = useState(null);
-
-  const handleMenuClick = (e, projectId) => {
-    e.stopPropagation();
-    setOpenMenu(openMenu === projectId ? null : projectId);
-  };
-
-  const handleDeleteClick = (e, project) => {
-    e.stopPropagation();
-    setOpenMenu(null);
-    onDelete(project);
-  };
 
   return (
     <div style={{ marginBottom: 24 }}>
@@ -99,53 +88,23 @@ const ProjectList = ({ projects, selectedProject, onSelect, onCreate, onEdit, on
                     Click project name to view details
                   </small>
                 </div>
-                <div style={{ position: 'relative' }}>
-                  <button
-                    onClick={e => handleMenuClick(e, project.id)}
-                    style={{
-                      padding: '4px 8px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                      backgroundColor: 'transparent',
-                      cursor: 'pointer',
-                      fontSize: '16px',
-                    }}
-                  >
-                    ⋯
-                  </button>
-                  {openMenu === project.id && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        right: 0,
-                        top: '100%',
-                        background: 'white',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                        zIndex: 1000,
-                        minWidth: '120px',
-                      }}
-                    >
-                      <button
-                        onClick={e => handleDeleteClick(e, project)}
-                        style={{
-                          width: '100%',
-                          padding: '8px 12px',
-                          border: 'none',
-                          background: 'transparent',
-                          cursor: 'pointer',
-                          textAlign: 'left',
-                          color: '#d63031',
-                        }}
-                        onMouseEnter={e => (e.target.style.background = '#f8f9fa')}
-                        onMouseLeave={e => (e.target.style.background = 'transparent')}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <ActionMenu
+                  actions={[
+                    {
+                      key: 'edit',
+                      label: 'Edit',
+                      icon: '✏️',
+                      onClick: () => onEdit(project)
+                    },
+                    {
+                      key: 'delete',
+                      label: 'Delete',
+                      icon: '🗑️',
+                      danger: true,
+                      onClick: () => onDelete(project)
+                    }
+                  ]}
+                />
               </div>
             </li>
           ))

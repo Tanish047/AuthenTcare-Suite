@@ -4,10 +4,10 @@ import { createContext, useReducer, useContext, useEffect } from 'react';
 const initialState = {
   darkMode: false,
   projects: [],
-  devices: {}, // { [projectId]: Device[] }
-  versions: {}, // { [deviceId]: Version[] }
+  devices: [], // Normalized: flat array with project_id references
+  versions: [], // Normalized: flat array with device_id references
   targetMarkets: [],
-  marketLicenses: {},
+  marketLicenses: [],
   users: [],
   page: 'dashboard',
   pageParent: null,
@@ -34,64 +34,58 @@ function appReducer(state, action) {
       return {
         ...state,
         projects: state.projects.filter(p => p.id !== action.id),
-        devices: { ...state.devices, [action.id]: undefined },
+        devices: state.devices.filter(d => d.project_id !== action.id),
+        versions: state.versions.filter(v => {
+          const device = state.devices.find(d => d.id === v.device_id);
+          return device && device.project_id !== action.id;
+        }),
       };
     case 'SET_DEVICES':
-      return { ...state, devices: { ...state.devices, [action.projectId]: action.devices } };
+      return { 
+        ...state, 
+        devices: [
+          ...state.devices.filter(d => d.project_id !== action.projectId),
+          ...action.devices
+        ]
+      };
     case 'ADD_DEVICE':
       return {
         ...state,
-        devices: {
-          ...state.devices,
-          [action.projectId]: [...(state.devices[action.projectId] || []), action.device],
-        },
+        devices: [...state.devices, action.device],
       };
     case 'UPDATE_DEVICE':
       return {
         ...state,
-        devices: {
-          ...state.devices,
-          [action.projectId]: state.devices[action.projectId].map(d =>
-            d.id === action.device.id ? action.device : d
-          ),
-        },
+        devices: state.devices.map(d => d.id === action.device.id ? action.device : d),
       };
     case 'REMOVE_DEVICE':
       return {
         ...state,
-        devices: {
-          ...state.devices,
-          [action.projectId]: state.devices[action.projectId].filter(d => d.id !== action.deviceId),
-        },
-        versions: { ...state.versions, [action.deviceId]: undefined },
+        devices: state.devices.filter(d => d.id !== action.deviceId),
+        versions: state.versions.filter(v => v.device_id !== action.deviceId),
       };
     case 'SET_VERSIONS':
-      return { ...state, versions: { ...state.versions, [action.deviceId]: action.versions } };
+      return { 
+        ...state, 
+        versions: [
+          ...state.versions.filter(v => v.device_id !== action.deviceId),
+          ...action.versions
+        ]
+      };
     case 'ADD_VERSION':
       return {
         ...state,
-        versions: {
-          ...state.versions,
-          [action.deviceId]: [...(state.versions[action.deviceId] || []), action.version],
-        },
+        versions: [...state.versions, action.version],
       };
     case 'UPDATE_VERSION':
       return {
         ...state,
-        versions: {
-          ...state.versions,
-          [action.deviceId]: state.versions[action.deviceId].map(v =>
-            v.id === action.version.id ? action.version : v
-          ),
-        },
+        versions: state.versions.map(v => v.id === action.version.id ? action.version : v),
       };
     case 'REMOVE_VERSION':
       return {
         ...state,
-        versions: {
-          ...state.versions,
-          [action.deviceId]: state.versions[action.deviceId].filter(v => v.id !== action.versionId),
-        },
+        versions: state.versions.filter(v => v.id !== action.versionId),
       };
     case 'SET_TARGET_MARKETS':
       return { ...state, targetMarkets: action.targetMarkets };
@@ -107,6 +101,12 @@ function appReducer(state, action) {
       return { ...state, loading: { ...state.loading, [action.key]: action.value } };
     case 'SET_ERROR':
       return { ...state, errors: { ...state.errors, [action.key]: action.message } };
+    case 'CLEAR_LOADING':
+      const { [action.key]: removed, ...remainingLoading } = state.loading;
+      return { ...state, loading: remainingLoading };
+    case 'CLEAR_ERROR':
+      const { [action.key]: removedError, ...remainingErrors } = state.errors;
+      return { ...state, errors: remainingErrors };
     default:
       return state;
   }

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { checkPassword } from '../utils/password.js';
 
 export const useProjects = (state, dispatch) => {
@@ -13,6 +13,17 @@ export const useProjects = (state, dispatch) => {
   const [deleteError, setDeleteError] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      // Clear any pending operations when component unmounts
+      setLoading(false);
+      setError(null);
+      dispatch({ type: 'CLEAR_LOADING', key: 'projects' });
+      dispatch({ type: 'CLEAR_ERROR', key: 'projects' });
+    };
+  }, [dispatch]);
 
   const loadProjects = useCallback(async () => {
     try {
@@ -121,7 +132,7 @@ export const useProjects = (state, dispatch) => {
     editingProject,
     setEditingProject,
     deleteProject,
-    setDeleteProject,
+    setDeleteProject, // This was missing!
     deletePassword,
     setDeletePassword,
     deleteError,

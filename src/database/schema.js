@@ -36,9 +36,11 @@ export const schema = {
       release_date DATE,
       changes TEXT,
       status TEXT DEFAULT 'active',
+      base_version_id INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE
+      FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE,
+      FOREIGN KEY (base_version_id) REFERENCES versions(id)
     )
   `,
 
