@@ -8,6 +8,7 @@ import ClientWorkspace from './components/ClientWorkspace.jsx';
 import ResearchLanding from './components/ResearchLanding.jsx';
 import ResearchWorkspace from './components/ResearchWorkspace.jsx';
 import UserDatabase from './components/UserDatabase.jsx';
+import SOPGenerator from './components/SOPGenerator.jsx';
 import Settings from './components/Settings.jsx';
 
 const menuData = [
@@ -251,6 +252,10 @@ function AppContent() {
         // Navigate back to research workspace, preserving the currentLevel state
         dispatch({ type: 'SET_PAGE', page: 'research-workspace', pageParent: 'research' });
         break;
+      case 'sop-generator':
+        // Navigate back to research workspace, preserving the currentLevel state
+        dispatch({ type: 'SET_PAGE', page: 'research-workspace', pageParent: 'research' });
+        break;
       case 'clients':
         dispatch({ type: 'SET_PAGE', page: 'dashboard', pageParent: null });
         break;
@@ -308,6 +313,19 @@ function AppContent() {
         )}
         {page === 'user-database' && (
           <UserDatabase
+            onBack={() => {
+              // Navigate back to research workspace (currentLevel is preserved in global state)
+              dispatch({ type: 'SET_PAGE', page: 'research-workspace', pageParent: 'research' });
+            }}
+          />
+        )}
+        {page === 'sop-generator' && (
+          <SOPGenerator
+            selectedProject={state.selectedProject}
+            selectedDevice={state.selectedDevice}
+            selectedVersion={state.selectedVersion}
+            selectedMarket={state.selectedMarket}
+            selectedLicense={state.selectedLicense}
             onBack={() => {
               // Navigate back to research workspace (currentLevel is preserved in global state)
               dispatch({ type: 'SET_PAGE', page: 'research-workspace', pageParent: 'research' });

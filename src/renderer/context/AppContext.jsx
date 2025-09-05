@@ -13,6 +13,15 @@ const initialState = {
   page: 'dashboard',
   pageParent: null,
   currentLevel: 'project', // For ResearchWorkspace navigation state
+  // Research workspace selections
+  selectedProject: null,
+  selectedDevice: null,
+  selectedVersion: null,
+  selectedMarket: null,
+  selectedLicense: null,
+  // Interactive checklist state
+  checklistItems: [],
+  checklistProgress: 0,
   openMenu: null,
   modals: {}, // { modalName: boolean }
   loading: {}, // { key: boolean }
@@ -128,6 +137,37 @@ function appReducer(state, action) {
       return { ...state, page: action.page, pageParent: action.pageParent };
     case 'SET_CURRENT_LEVEL':
       return { ...state, currentLevel: action.currentLevel };
+    case 'SET_SELECTED_PROJECT':
+      return { ...state, selectedProject: action.project };
+    case 'SET_SELECTED_DEVICE':
+      return { ...state, selectedDevice: action.device };
+    case 'SET_SELECTED_VERSION':
+      return { ...state, selectedVersion: action.version };
+    case 'SET_SELECTED_MARKET':
+      return { ...state, selectedMarket: action.market };
+    case 'SET_SELECTED_LICENSE':
+      return { ...state, selectedLicense: action.license };
+    case 'CLEAR_SELECTIONS':
+      return { 
+        ...state, 
+        selectedProject: null,
+        selectedDevice: null,
+        selectedVersion: null,
+        selectedMarket: null,
+        selectedLicense: null,
+        currentLevel: 'project'
+      };
+    case 'SET_CHECKLIST_ITEMS':
+      return { ...state, checklistItems: action.items };
+    case 'UPDATE_CHECKLIST_ITEM':
+      return { 
+        ...state, 
+        checklistItems: state.checklistItems.map(item => 
+          item.id === action.itemId ? { ...item, status: action.status } : item
+        )
+      };
+    case 'SET_CHECKLIST_PROGRESS':
+      return { ...state, checklistProgress: action.progress };
     case 'SET_OPEN_MENU':
       return { ...state, openMenu: action.openMenu };
     case 'SET_MODAL':

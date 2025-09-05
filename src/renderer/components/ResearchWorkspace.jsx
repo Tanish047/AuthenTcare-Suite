@@ -48,11 +48,19 @@ function ResearchWorkspace({
     }
   }, [initialLevel, state.currentLevel, dispatch]);
 
-  const [selectedProject, setSelectedProject] = useState(null);
-  const [selectedDevice, setSelectedDevice] = useState(null);
-  const [selectedVersion, setSelectedVersion] = useState(null);
-  const [selectedMarket, setSelectedMarket] = useState(null);
-  const [selectedLicense, setSelectedLicense] = useState(null);
+  // Use global state for selections to persist across navigation
+  const selectedProject = state.selectedProject;
+  const selectedDevice = state.selectedDevice;
+  const selectedVersion = state.selectedVersion;
+  const selectedMarket = state.selectedMarket;
+  const selectedLicense = state.selectedLicense;
+
+  // Helper functions to update selections in global state
+  const setSelectedProject = (project) => dispatch({ type: 'SET_SELECTED_PROJECT', project });
+  const setSelectedDevice = (device) => dispatch({ type: 'SET_SELECTED_DEVICE', device });
+  const setSelectedVersion = (version) => dispatch({ type: 'SET_SELECTED_VERSION', version });
+  const setSelectedMarket = (market) => dispatch({ type: 'SET_SELECTED_MARKET', market });
+  const setSelectedLicense = (license) => dispatch({ type: 'SET_SELECTED_LICENSE', license });
 
   // Navigation helper functions
   const navigateToLevel = (level, selection) => {
@@ -349,6 +357,23 @@ function ResearchWorkspace({
           setSelectedProject(lastProject);
           loadDevices();
         }
+
+        // Restore complete pathway if we're at completion level but selections are missing
+        if (currentLevel === 'completion' && !selectedProject) {
+          const lastPathway = getStorage('lastCompletedPathway');
+          if (lastPathway && lastPathway.project && lastPathway.license) {
+            console.log('Restoring completed pathway:', lastPathway);
+            setSelectedProject(lastPathway.project);
+            setSelectedDevice(lastPathway.device);
+            setSelectedVersion(lastPathway.version);
+            setSelectedMarket(lastPathway.market);
+            setSelectedLicense(lastPathway.license);
+          } else {
+            // If no valid pathway found, reset to project level
+            console.log('No valid completed pathway found, resetting to project level');
+            setCurrentLevel('project');
+          }
+        }
       } catch (error) {
         console.error('Error initializing data:', error);
       }
@@ -356,6 +381,18 @@ function ResearchWorkspace({
 
     initializeData();
   }, [loadProjects, currentLevel]);
+
+  // Debug effect to monitor state changes
+  useEffect(() => {
+    console.log('ResearchWorkspace state:', {
+      currentLevel,
+      selectedProject: selectedProject?.name,
+      selectedDevice: selectedDevice?.name,
+      selectedVersion: selectedVersion?.version_number,
+      selectedMarket: selectedMarket?.name,
+      selectedLicense: selectedLicense?.license_number || selectedLicense?.name
+    });
+  }, [currentLevel, selectedProject, selectedDevice, selectedVersion, selectedMarket, selectedLicense]);
 
   // Load devices when project is selected
   useEffect(() => {
@@ -624,6 +661,17 @@ function ResearchWorkspace({
                 console.log('Selected license:', license);
                 setSelectedLicense(license);
                 setCurrentLevel('completion');
+                
+                // Save the completed pathway for restoration
+                const completedPathway = {
+                  project: selectedProject,
+                  device: selectedDevice,
+                  version: selectedVersion,
+                  market: selectedMarket,
+                  license: license
+                };
+                setStorage('lastCompletedPathway', completedPathway);
+                console.log('Saved completed pathway:', completedPathway);
               }}
               dispatch={dispatch}
             />
@@ -653,17 +701,17 @@ function ResearchWorkspace({
               }}
               onStartNew={() => {
                 // Reset all selections and go back to project level
-                setSelectedProject(null);
-                setSelectedDevice(null);
-                setSelectedVersion(null);
-                setSelectedMarket(null);
-                setSelectedLicense(null);
-                setCurrentLevel('project');
+                dispatch({ type: 'CLEAR_SELECTIONS' });
               }}
               onUserDatabase={() => {
                 // Keep the completion level in global state before navigating
                 dispatch({ type: 'SET_CURRENT_LEVEL', currentLevel: 'completion' });
                 dispatch({ type: 'SET_PAGE', page: 'user-database', pageParent: 'research' });
+              }}
+              onSOPGenerator={() => {
+                // Navigate to SOP Generator page while preserving pathway context
+                dispatch({ type: 'SET_CURRENT_LEVEL', currentLevel: 'completion' });
+                dispatch({ type: 'SET_PAGE', page: 'sop-generator', pageParent: 'research' });
               }}
             />
           </div>
