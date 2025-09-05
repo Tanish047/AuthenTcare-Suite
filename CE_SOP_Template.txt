@@ -1,0 +1,47 @@
+
+EU CE Technical Documentation Template and SOP for Surgical Gloves
+================================================================
+
+This document outlines the structure of the technical documentation required for CE marking of medical gloves under the European Union Medical Device Regulation (MDR) 2017/745. It also provides a standard operating procedure (SOP) for preparing and maintaining conformity assessment documentation. Replace placeholders in brackets with your product‑specific data.
+
+## 1. Introduction
+
+**Purpose:** To provide a template and SOP for compiling the technical documentation and carrying out the conformity assessment procedure for `[DEVICE_NAME]` surgical gloves, project `[PROJECT_NAME]`, version `[VERSION_NUMBER]`, intended for the `[MARKET_NAME]` market, in compliance with EU MDR 2017/745.
+
+**Scope:** Applicable to regulatory, quality and design teams responsible for CE marking. It encompasses both self‑certification for Class I devices and notified body involvement for higher risk classes (IIa, IIb, III).
+
+## 2. Technical Documentation Template
+
+1. **Device Description & Specification:** Trade name and model, device category (e.g., sterile/non‑sterile surgical glove), classification (I sterile, IIa, IIb, III), Unique Device Identifier (UDI) information, and intended purpose. Include drawings and dimensions.
+2. **Design & Manufacturing Information:** Complete design dossier covering design inputs/outputs, design reviews, verifications, validations and changes. Describe the manufacturing process flow with critical steps and controls. Provide supplier and material qualification data.
+3. **General Safety and Performance Requirements (GSPR) Checklist:** Systematic review of each GSPR in Annex I of the MDR, identifying applicable requirements and the evidence demonstrating compliance (e.g., standards, test reports, risk analysis references). Include a matrix linking each requirement to specific documents.
+4. **Risk Management File:** Comprehensive risk analysis in accordance with ISO 14971, including hazard identification, risk estimation, risk control measures, residual risk evaluation and risk‑benefit analysis. Provide traceability to design inputs and GSPR.
+5. **Verification & Validation:** Test reports demonstrating mechanical strength, barrier integrity (water leak/air inflation), biocompatibility (ISO 10993), sterility validation (ISO 11135/11137), packaging validation, shelf‑life studies and usability evaluations (IEC 62366 if applicable).
+6. **Clinical Evaluation Report (CER):** Literature review or clinical investigation showing clinical performance and safety. Reference MEDDEV 2.7/1 and MDCG guidance. For established glove types, a well‑designed literature review may suffice.
+7. **Post‑Market Surveillance (PMS) Plan:** Describe methods and frequency of post‑market clinical follow‑up (if required), complaint handling, vigilance reporting and periodic safety update reports (PSURs).
+8. **Declaration of Conformity:** Draft EU Declaration of Conformity referencing the relevant regulations (MDR), device classification rule, standards applied (EN ISO 13485, EN ISO 14971, EN 455 series for gloves) and notified body identification (if applicable).
+9. **Labels & Instructions for Use:** Provide samples of all labels and instructions in official EU languages. Ensure they meet requirements of Annex I section 23 (information supplied with the device).
+10. **Certificates & Reports:** Include QMS certificates (EN ISO 13485), sterilisation validation certificates, notified body audit reports (if applicable) and previous CE certificates (if any).
+
+## 3. SOP for CE Conformity Assessment
+
+1. **Classify the Device:** Determine classification according to MDR Annex VIII. Surgical gloves are typically Class IIa (sterile measuring devices) or Class I sterile (depending on design). Select the appropriate conformity assessment route (Annex IX, Annex XI, etc.).
+2. **Establish Project Team:** Assign roles for Regulatory Affairs, Quality Assurance, Design & Development and Clinical Evaluation. Define timelines and deliverables.
+3. **Compile Technical Documentation:** Use the template above to collect design files, risk management documents, test reports and clinical evidence. Ensure traceability between GSPR checklist, risk management and test results.
+4. **Implement & Maintain QMS:** Ensure an ISO 13485:2016 compliant QMS is in place. Prepare for notified body audits if the device is above Class I. Document management reviews, internal audits, CAPA and training.
+5. **Engage Notified Body (if required):** For Class IIa/IIb/III devices, select and contract a notified body. Submit the technical documentation and QMS documents for review. Respond to technical queries and schedule onsite audits if necessary.
+6. **Draft and Sign Declaration of Conformity:** Once the technical documentation has been accepted (and QMS certified where applicable), draft the Declaration of Conformity. Ensure it is signed by an authorised representative.
+7. **Affix CE Marking:** After receiving notified body certificate (if applicable), affix the CE mark and notified body number on the product and packaging. Update labeling and Instructions for Use accordingly.
+8. **Post‑Market Surveillance & Vigilance:** Implement the PMS plan. Collect and analyse feedback, complaints and field safety data. Report incidents via the National Competent Authority (NCA) and update the clinical evaluation and risk management files regularly.
+9. **Maintain and Update Documentation:** Review technical documentation periodically and update it when design changes, new standards or new clinical data arise. Re‑certify devices at the end of certificate validity (typically every five years).
+
+## 4. Key Considerations
+
+• **GSPR Compliance:** The heart of the CE submission is demonstrating compliance with the GSPRs. Provide clear, cross‑referenced evidence for each requirement.
+• **Notified Body Selection:** Choose a notified body with scope for your product type. Early engagement can identify documentation gaps and streamline the review process.
+• **Language Requirements:** Labels and instructions must be translated into the official languages of all member states where the device will be marketed.
+• **Ongoing Monitoring:** CE marking is not a one‑time event; post‑market data must feed back into risk management and clinical evaluation. Keep documentation current.
+
+---
+
+This template and SOP offer a foundation for preparing CE technical documentation. Always consult the EU MDR, harmonised standards and current MDCG guidance for specific requirements.

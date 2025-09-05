@@ -1,0 +1,60 @@
+
+CDSCO Device Master File (DMF) & Plant Master File (PMF) Template and SOP
+=======================================================================
+
+This document provides a structured template and standard operating procedure (SOP) for preparing the **Device Master File (DMF)** and **Plant Master File (PMF)** required by the Central Drugs Standard Control Organisation (CDSCO) under India’s Medical Device Rules, 2017. It can be adapted to suit different projects and devices; text enclosed in brackets (e.g., `[DEVICE_NAME]`) should be replaced with project‑specific information.
+
+## 1. Introduction
+
+**Purpose:** To define the structure and content of the DMF and PMF and provide a step‑by‑step procedure for their preparation for the medical device project `[PROJECT_NAME]`, version `[VERSION_NUMBER]` of `[DEVICE_NAME]` intended for the `[MARKET_NAME]` market.
+
+**Scope:** Applies to all regulatory, quality and technical personnel involved in preparing documentation for CDSCO submissions. It reflects the requirements of Schedule IV, V and VI of the Medical Device Rules, 2017 and relevant international standards (ISO 13485, ISO 14971, ISO 10993, IS 15354).
+
+## 2. Device Master File (DMF) Template
+
+The DMF should be compiled as a single document with the following sections:
+
+1. **Device Description:** Generic name, GMDN or UMDNS code, intended purpose, classification (Class A/B/C/D), and brief description of design and function.
+2. **Design & Materials:** Design drawings and specifications; dimensions (length, width, wall thickness); bill of materials; material specifications (latex, nitrile, neoprene, accelerators, pigments); biocompatibility summary (ISO 10993 tests performed).
+3. **Manufacturing Process:** Flow chart from raw material sourcing → compounding → dipping → vulcanisation → leaching → beading → surface treatment (powdering/chlorination) → stripping → drying → packaging → sterilisation. Include in‑process controls and critical parameters.
+4. **Essential Principles of Safety & Performance:** List applicable principles and explain how compliance is achieved (mechanical integrity, barrier properties, freedom from holes, sterility assurance level, powder residue limits). Provide a summary of risk management (ISO 14971).
+5. **Product Verification & Validation:** Test reports for physical properties (tensile strength, elongation at break), chemical properties (residual accelerators, proteins, powder content), sterility validation (ISO 11737), shelf‑life studies (accelerated and real‑time stability) and packaging validation.
+6. **Labeling & Packaging:** Samples or drafts of primary and secondary packaging, including product name, size, batch/lot number, manufacture and expiry dates, sterilisation method, instructions for use, warnings, and symbols per ISO 15223‑1.
+7. **Clinical Evaluation & Market History:** Literature review demonstrating the clinical performance and safety of the glove; list of any markets where the device is already approved; copies of CE certificates/510(k) clearance if applicable.
+8. **Annexures:** Include full test reports, certificates (ISO 13485, CE, FDA clearances), copies of labels, instructions for use, and other supporting documents.
+
+## 3. Plant Master File (PMF) Template
+
+The PMF (or Site Master File) provides a comprehensive description of the manufacturing facility:
+
+1. **General Information:** Name and address of the manufacturer; contact details; manufacturing licences; organisation chart showing key departments (QA, RA, production, engineering).
+2. **Quality Management System:** Copy of the ISO 13485 certificate; summary of document control, management review, CAPA, change control and training procedures. Provide index of SOPs relevant to glove manufacturing.
+3. **Manufacturing Facility:** Description of premises and layout; clean‑room classifications (if any); environmental controls (temperature, humidity, particulate monitoring); utilities (water, steam, compressed air) and maintenance schedules.
+4. **Equipment & Processes:** List of major equipment (dipping lines, dryers, steriliser); calibration and validation status; in‑process testing equipment (thickness gauge, tensile tester, leak tester) and procedures.
+5. **Personnel:** Staffing levels and qualifications; training and hygiene programmes; medical examinations for operators handling latex.
+6. **Documentation & Records:** Batch Manufacturing Records (BMR), Device History Records (DHR), calibration and maintenance logs, product release procedures. Describe record retention policy and electronic systems used.
+7. **Outsourced Activities:** Details of outsourced processes (e.g., sterilisation) and supplier qualification; copies of contracts or quality agreements; validation of outsourced services.
+8. **Complaint Handling & Vigilance:** Procedures for receiving, investigating and responding to complaints, including adverse event reporting and field safety corrective action (FSCA).
+9. **Warehouse & Distribution:** Storage conditions (temperature, humidity controls), stock rotation (FIFO/FEFO), traceability system and distribution records.
+10. **Annexures:** Copies of facility layout, ISO certificates, validation reports, organograms and photographs.
+
+## 4. SOP for Preparing the DMF & PMF
+
+1. **Collect Regulatory References:** Obtain current versions of the Medical Device Rules, 2017 and applicable standards (ISO 13485, ISO 14971, IS 15354, ISO 10993). Create a checklist for required sections based on Schedule IV (site master file) and Schedule V/VI (device master file).
+2. **Establish Roles & Responsibilities:** Assign the Regulatory Affairs team to compile the DMF and PMF. Engage R&D and production teams for technical content, QA for quality system documentation and test reports.
+3. **Draft the DMF:** Use the template above to gather information on device description, design, manufacturing process and test data. Insert drawings, tables and flow charts as necessary. Ensure all data reflects the specific version `[VERSION_NUMBER]` of the device.
+4. **Draft the PMF:** Gather facility information (layout, utilities, equipment) and quality system documentation. Ensure the PMF reflects the current facility and any outsourced processes.
+5. **Review & Gap Analysis:** Cross‑check DMF and PMF against CDSCO guidelines. Verify that all required annexures (test reports, certificates, labels) are present. Identify and address any gaps.
+6. **Approval & Sign‑off:** Circulate drafts for review by QA and RA heads. Obtain final approvals and signatures from authorised signatories.
+7. **Document Control & Submission:** Assign controlled document numbers, issue revision history and maintain copies in the quality management system. Submit electronic and hard copies to CDSCO as part of the licence application. Maintain an update log to revise documents after design or process changes.
+
+## 5. Key Considerations
+
+• **Completeness:** Ensure that the DMF and PMF contain sufficient detail to allow the regulator to assess design, manufacturing and quality control. Omission of critical information can lead to queries or application rejection.
+• **Consistency:** Information in the DMF and PMF must be consistent with data in other submission documents (e.g., licence application forms, device labels, test reports).
+• **Confidentiality:** Proprietary information may be marked as confidential but should still be provided in enough detail for regulatory review.
+• **Updates:** Both DMF and PMF are living documents. Any change in design, materials, manufacturing process or facility must trigger a revision and resubmission to the regulatory authority.
+
+---
+
+This template and SOP are intended as a starting point for preparing your CDSCO documentation. Always consult the latest regulations and guidance documents issued by CDSCO for specific requirements.

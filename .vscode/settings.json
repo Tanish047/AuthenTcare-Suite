@@ -1,3 +1,4 @@
 {
-    "CodeGPT.apiKey": "CodeGPT Enterprise"
+    "CodeGPT.apiKey": "CodeGPT Enterprise",
+    "javascript.autoClosingTags": false
 }

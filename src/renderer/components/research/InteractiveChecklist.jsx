@@ -142,19 +142,23 @@ const InteractiveChecklist = ({
       const defaultItems = getDefaultChecklistItems();
       dispatch({ type: 'SET_CHECKLIST_ITEMS', items: defaultItems });
     }
-  }, [selectedMarket, selectedLicense, dispatch, state.checklistItems.length]);
+  }, [selectedMarket?.name, selectedLicense?.license_number, dispatch, state.checklistItems.length]);
 
   // Calculate progress
   useEffect(() => {
     if (state.checklistItems.length > 0) {
       const completedItems = state.checklistItems.filter(item => item.status === 'completed').length;
       const progress = Math.round((completedItems / state.checklistItems.length) * 100);
-      dispatch({ type: 'SET_CHECKLIST_PROGRESS', progress });
-      if (onProgressUpdate) {
-        onProgressUpdate(progress);
+      
+      // Only update if progress has actually changed
+      if (progress !== state.checklistProgress) {
+        dispatch({ type: 'SET_CHECKLIST_PROGRESS', progress });
+        if (onProgressUpdate) {
+          onProgressUpdate(progress);
+        }
       }
     }
-  }, [state.checklistItems, dispatch, onProgressUpdate]);
+  }, [state.checklistItems, state.checklistProgress, dispatch, onProgressUpdate]);
 
   const handleItemToggle = (itemId) => {
     const item = state.checklistItems.find(item => item.id === itemId);

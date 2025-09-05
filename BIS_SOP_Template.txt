@@ -1,0 +1,54 @@
+
+BIS Compliance Template and SOP for Surgical Gloves
+==================================================
+
+This document provides a structured template and standard operating procedure (SOP) to support compliance with the Bureau of Indian Standards (BIS) for medical gloves. It includes the documentation needed for the Compulsory Registration Scheme (CRS) or ISI mark certification and outlines the workflow for obtaining and maintaining BIS approval. Replace bracketed placeholders with your specific data.
+
+## 1. Introduction
+
+**Purpose:** To describe the technical and quality documentation required by BIS for `[DEVICE_NAME]` surgical gloves under project `[PROJECT_NAME]`, version `[VERSION_NUMBER]`, destined for the `[MARKET_NAME]` market and to provide a step‑wise SOP for BIS certification.
+
+**Scope:** Applies to regulatory affairs, quality assurance and production teams responsible for achieving and sustaining BIS certification. It addresses both ISI mark licensing and CRS registration, as applicable.
+
+## 2. Product Technical Documentation Template
+
+1. **Device Description & Classification:** Identify the product (e.g., sterile powdered latex surgical gloves), its Indian Standard (e.g., IS 15354), and classification. Provide drawings, dimensions (length, width, thickness) and functional description.
+2. **Bill of Materials:** List raw materials and additives with CAS numbers, supplier names and certificates of analysis. Include specifications for latex/nitrile, accelerators, pigments, powders and packaging materials.
+3. **Test Reports:** Include accredited laboratory reports showing compliance with all parameters of the relevant standard (tensile strength, elongation, water leak test, freedom from holes, powder content, protein content, sterility). Test reports should be issued by BIS‑recognised or NABL‑accredited labs.
+4. **Process Flow & Controls:** Describe manufacturing steps and process controls, including compounding, dipping, curing, leaching, finishing, sterilisation and packing. Provide in‑process acceptance criteria.
+5. **Labelling & Marking:** Provide artwork for product labels and packaging that meet BIS marking requirements, including Standard Mark (ISI), licence number, manufacturing licence number, batch number, Mfg/Exp dates and regulatory symbols.
+6. **Conformance with Standards:** Supply evidence of conformity to applicable Indian Standards and related IEC/ISO standards (e.g., ISO 11193, ISO 10993, ISO 11737). Include cross‑reference tables if necessary.
+7. **Quality Management System Documents:** Provide QMS certificates (ISO 13485), internal audit reports, calibration records, SOP index and key procedures.
+8. **Annexures:** Attach copies of test certificates, calibration certificates, purchase orders for raw materials, previous BIS licences, if any.
+
+## 3. Factory and Quality Documentation Template
+
+1. **Organisation & Infrastructure:** Organisation chart; responsibilities of management representative and quality team; facility layout diagrams; list of production equipment and their calibration status.
+2. **Quality Control Procedures:** SOPs for raw material inspection, in‑process inspection, final inspection and release. Include sampling plans and Acceptable Quality Level (AQL).
+3. **Calibration & Maintenance Records:** Equipment calibration certificates, maintenance schedules and logs.
+4. **Internal Audits & CAPA:** Recent internal audit reports, non‑conformance reports and corrective/preventive actions.
+5. **Training Records:** Training matrix and records of operator training on glove manufacturing, quality control and hygiene.
+6. **Traceability & Batch Records:** Format of Batch Manufacturing Record (BMR) and Device History Record (DHR); system for assigning batch/lot numbers; traceability of raw materials and finished goods.
+7. **Warehouse & Distribution Records:** Storage conditions (temperature, humidity), pest control, stock rotation (FIFO/FEFO), dispatch logs.
+
+## 4. SOP for BIS Certification
+
+1. **Determine Standard & Certification Type:** Identify the applicable Indian Standard (e.g., IS 15354) and determine whether the product falls under the Compulsory Registration Scheme (CRS) or requires an ISI mark licence.
+2. **Collect and Compile Technical Documents:** Gather product drawings, Bill of Materials, process flow charts, in‑house test reports and externally certified test reports as per the standard.
+3. **Assess QMS Compliance:** Ensure the manufacturing facility has a valid ISO 13485 certificate. Conduct internal audits and close any non‑conformities. Prepare SOPs for all manufacturing and quality activities.
+4. **Prepare Application Package:** Complete the BIS application form and accompanying documents (authorisation letter, legal manufacturing licence, company registration). Attach technical documents and test reports.
+5. **Submit to BIS:** Submit the application via the BIS portal or appropriate regional office along with applicable fees. Respond promptly to any queries from BIS.
+6. **Factory Audit:** Facilitate BIS inspectors during the factory audit. Provide access to production lines, quality control areas and documentation. Address any observations raised during the audit.
+7. **Certification Decision:** Upon satisfactory review and audit, receive the BIS licence or CRS registration. Ensure the Standard Mark (ISI) and licence number are incorporated into product labelling and packaging.
+8. **Surveillance and Renewal:** Maintain records of routine factory inspections and surveillance audits. Renew the licence as required and update documents when standards or manufacturing processes change.
+
+## 5. Key Considerations
+
+• **Testing:** Only use test reports from BIS‑recognised laboratories. Repeat testing whenever the product design or materials change.
+• **Labelling:** The ISI mark and licence number must be displayed prominently on the product and packaging. Any misuse of the mark can result in penalties.
+• **Quality System:** BIS inspectors place significant emphasis on the quality management system; keep SOPs, calibration and training records up to date.
+• **Ongoing Compliance:** BIS licences are subject to surveillance; maintain readiness for unannounced audits. Keep a log of non‑conformities and corrective actions.
+
+---
+
+Use this template and SOP to prepare your BIS documentation. Always check the latest BIS guidelines and relevant Indian Standards to ensure complete compliance.
