@@ -131,6 +131,19 @@ export const schema = {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `,
+
+  // Version Markets junction table
+  version_markets: `
+    CREATE TABLE IF NOT EXISTS version_markets (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      version_id INTEGER NOT NULL,
+      market_id INTEGER NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (version_id) REFERENCES versions(id) ON DELETE CASCADE,
+      FOREIGN KEY (market_id) REFERENCES markets(id) ON DELETE CASCADE,
+      UNIQUE(version_id, market_id)
+    )
+  `,
 };
 
 // Indexes for better performance
@@ -145,4 +158,7 @@ export const indexes = [
   'CREATE INDEX IF NOT EXISTS idx_news_category ON news(category)',
   'CREATE INDEX IF NOT EXISTS idx_events_start_date ON events(start_date)',
   'CREATE INDEX IF NOT EXISTS idx_notifications_read ON notifications(read)',
+  'CREATE INDEX IF NOT EXISTS idx_version_markets_version_id ON version_markets(version_id)',
+  'CREATE INDEX IF NOT EXISTS idx_version_markets_market_id ON version_markets(market_id)',
+  'CREATE INDEX IF NOT EXISTS idx_version_markets_composite ON version_markets(version_id, market_id)',
 ];

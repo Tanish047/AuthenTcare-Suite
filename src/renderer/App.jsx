@@ -7,6 +7,7 @@ import ClientsLanding from './components/ClientsLanding.jsx';
 import ClientWorkspace from './components/ClientWorkspace.jsx';
 import ResearchLanding from './components/ResearchLanding.jsx';
 import ResearchWorkspace from './components/ResearchWorkspace.jsx';
+import UserDatabase from './components/UserDatabase.jsx';
 import Settings from './components/Settings.jsx';
 
 const menuData = [
@@ -246,7 +247,24 @@ function AppContent() {
           dispatch({ type: 'SET_PAGE', page: 'research', pageParent: null });
         }
         break;
+      case 'user-database':
+        // Navigate back to research workspace, preserving the currentLevel state
+        dispatch({ type: 'SET_PAGE', page: 'research-workspace', pageParent: 'research' });
+        break;
+      case 'clients':
+        dispatch({ type: 'SET_PAGE', page: 'dashboard', pageParent: null });
+        break;
+      case 'research':
+        dispatch({ type: 'SET_PAGE', page: 'dashboard', pageParent: null });
+        break;
+      case 'settings':
+        dispatch({ type: 'SET_PAGE', page: 'dashboard', pageParent: null });
+        break;
+      case 'notifications':
+        dispatch({ type: 'SET_PAGE', page: 'dashboard', pageParent: null });
+        break;
       default:
+        // For any other page, go back to dashboard
         dispatch({ type: 'SET_PAGE', page: 'dashboard', pageParent: null });
     }
   };
@@ -280,12 +298,20 @@ function AppContent() {
         {(page === 'research-workspace' || page === 'device-workspace' || page === 'version-workspace' || page === 'market-workspace') && (
           <ResearchWorkspace
             currentLevel={
-              page === 'research-workspace' ? 'project' :
+              page === 'research-workspace' ? (state.currentLevel || 'project') :
               page === 'device-workspace' ? 'device' :
               page === 'version-workspace' ? 'version' :
               page === 'market-workspace' ? 'market' : 'project'
             }
             onBackNavigation={() => dispatch({ type: 'SET_PAGE', page: 'research', pageParent: null })}
+          />
+        )}
+        {page === 'user-database' && (
+          <UserDatabase
+            onBack={() => {
+              // Navigate back to research workspace (currentLevel is preserved in global state)
+              dispatch({ type: 'SET_PAGE', page: 'research-workspace', pageParent: 'research' });
+            }}
           />
         )}
         {page === 'settings' && <Settings menuData={menuData} />}

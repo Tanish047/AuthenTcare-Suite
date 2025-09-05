@@ -30,7 +30,24 @@ function ResearchWorkspace({
   onBackNavigation,
 }) {
   const { state, dispatch } = useAppContext();
-  const [currentLevel, setCurrentLevel] = useState(initialLevel);
+  const currentLevel = state.currentLevel || initialLevel;
+  
+  // Update global state when level changes
+  const setCurrentLevel = (level) => {
+    dispatch({ type: 'SET_CURRENT_LEVEL', currentLevel: level });
+  };
+
+  // Initialize currentLevel in global state only if it's not already set to a meaningful value
+  useEffect(() => {
+    // Only override if currentLevel is 'project' and we have a different initialLevel
+    // This preserves completion state when navigating back from UserDatabase
+    if (state.currentLevel === 'project' && initialLevel !== 'project') {
+      dispatch({ type: 'SET_CURRENT_LEVEL', currentLevel: initialLevel });
+    } else if (!state.currentLevel) {
+      dispatch({ type: 'SET_CURRENT_LEVEL', currentLevel: initialLevel });
+    }
+  }, [initialLevel, state.currentLevel, dispatch]);
+
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [selectedVersion, setSelectedVersion] = useState(null);
@@ -253,22 +270,36 @@ function ResearchWorkspace({
   } = useVersions(state, dispatch, selectedProject, selectedDevice);
 
   const {
-    markets: targetMarkets,
+    markets: versionMarkets,
     allMarkets,
-    showMarketModal,
+    loading: marketsLoading,
+    error: marketsError,
+    showMarketEditModal,
+    setShowMarketEditModal,
     showMarketDeleteModal,
-    handleCreateClick: handleMarketCreate,
-    handleEditClick: handleMarketEdit,
-    handleDeleteClick: handleMarketDelete,
-    setShowMarketModal,
     setShowMarketDeleteModal,
-    newMarket,
-    setNewMarket,
+    editMarket,
+    editMarketName,
+    setEditMarketName,
+    editMarketRegion,
+    setEditMarketRegion,
+    editMarketRegulatoryBody,
+    setEditMarketRegulatoryBody,
+    editMarketRequirements,
+    setEditMarketRequirements,
     deleteMarket,
     marketDeletePassword,
     setMarketDeletePassword,
     marketDeleteError,
-  } = useMarkets(state, dispatch);
+    handleCreateClick: handleMarketCreate,
+    handleEditClick: handleMarketEdit,
+    handleDeleteClick: handleMarketDelete,
+    handleAddMarketToVersion,
+    handleEditMarket,
+    handleDeleteMarket,
+    handleBulkDeleteMarkets,
+    loadVersionMarkets,
+  } = useMarkets(state, dispatch, selectedVersion);
 
   const {
     licenses: allLicenses,
@@ -340,18 +371,7 @@ function ResearchWorkspace({
     }
   }, [selectedDevice, loadVersions]);
 
-  // Load markets from database
-  useEffect(() => {
-    const loadMarkets = async () => {
-      try {
-        const result = await window.dbAPI.getMarkets();
-        dispatch({ type: 'SET_TARGET_MARKETS', targetMarkets: result.data });
-      } catch (error) {
-        console.error('Error loading markets:', error);
-      }
-    };
-    loadMarkets();
-  }, [dispatch]);
+  // Markets are now loaded by the useMarkets hook
 
   // Load licenses from database
   useEffect(() => {
@@ -546,33 +566,42 @@ function ResearchWorkspace({
             </h3>
 
             <MarketList
-              targetMarkets={state.targetMarkets}
+              selectedVersion={selectedVersion}
+              versionMarkets={versionMarkets}
+              allMarkets={allMarkets}
               selectedMarket={selectedMarket}
               onSelect={market => {
                 setSelectedMarket(market);
                 setCurrentLevel('license');
-                // Load licenses if needed
               }}
-              onCreate={handleMarketCreate}
+              onAddMarket={handleAddMarketToVersion}
               onEdit={handleMarketEdit}
               onDelete={handleMarketDelete}
-              dispatch={dispatch}
+              onBulkDelete={handleBulkDeleteMarkets}
+              loading={marketsLoading}
+              error={marketsError}
             />
             <MarketModals
-              showCreate={showMarketModal}
+              showEdit={showMarketEditModal}
+              onCloseEdit={() => setShowMarketEditModal(false)}
+              editMarket={editMarket}
+              editMarketName={editMarketName}
+              setEditMarketName={setEditMarketName}
+              editMarketRegion={editMarketRegion}
+              setEditMarketRegion={setEditMarketRegion}
+              editMarketRegulatoryBody={editMarketRegulatoryBody}
+              setEditMarketRegulatoryBody={setEditMarketRegulatoryBody}
+              editMarketRequirements={editMarketRequirements}
+              setEditMarketRequirements={setEditMarketRequirements}
+              onEditMarket={handleEditMarket}
               showDelete={showMarketDeleteModal}
-              onCloseCreate={() => setShowMarketModal(false)}
               onCloseDelete={() => setShowMarketDeleteModal(false)}
-              newMarket={newMarket}
-              setNewMarket={setNewMarket}
               deleteMarket={deleteMarket}
               marketDeletePassword={marketDeletePassword}
               setMarketDeletePassword={setMarketDeletePassword}
               marketDeleteError={marketDeleteError}
-              allMarkets={allMarkets}
-              targetMarkets={targetMarkets}
-              onAddMarket={handleMarketCreate}
-              onDeleteMarket={handleMarketDelete}
+              onDeleteMarket={handleDeleteMarket}
+              loading={marketsLoading}
             />
           </div>
         )}
@@ -630,6 +659,11 @@ function ResearchWorkspace({
                 setSelectedMarket(null);
                 setSelectedLicense(null);
                 setCurrentLevel('project');
+              }}
+              onUserDatabase={() => {
+                // Keep the completion level in global state before navigating
+                dispatch({ type: 'SET_CURRENT_LEVEL', currentLevel: 'completion' });
+                dispatch({ type: 'SET_PAGE', page: 'user-database', pageParent: 'research' });
               }}
             />
           </div>

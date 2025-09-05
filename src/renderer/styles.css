@@ -468,3 +468,43 @@ body.dark-mode .theme-toggle-text {
   outline: 2px solid var(--accent-color);
   outline-offset: 2px;
 }
+/*
+ ProAnalyzer Menu Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Smooth scrollbar for ProAnalyzer menu */
+.proanalyzer-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.proanalyzer-menu::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.proanalyzer-menu::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.proanalyzer-menu::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

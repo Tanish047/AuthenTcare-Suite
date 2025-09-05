@@ -49,6 +49,12 @@ contextBridge.exposeInMainWorld('dbAPI', {
   deleteLicense: id => ipcRenderer.invoke('db-delete-license', id),
   getLicensesByProject: projectId => ipcRenderer.invoke('db-get-licenses-by-project', projectId),
 
+  // Version Markets
+  getVersionMarkets: versionId => ipcRenderer.invoke('db-get-version-markets', versionId),
+  addVersionMarket: (versionId, marketId) => ipcRenderer.invoke('db-add-version-market', versionId, marketId),
+  removeVersionMarket: (versionId, marketId) => ipcRenderer.invoke('db-remove-version-market', versionId, marketId),
+  getAvailableMarketsForVersion: versionId => ipcRenderer.invoke('db-get-available-markets-for-version', versionId),
+
   // Clients
   getClients: options => ipcRenderer.invoke('db-get-clients', options),
   getClientById: id => ipcRenderer.invoke('db-get-client', id),
@@ -96,4 +102,28 @@ contextBridge.exposeInMainWorld('maintenanceAPI', {
   createBackup: () => ipcRenderer.invoke('create-backup'),
   listBackups: () => ipcRenderer.invoke('list-backups'),
   getBackupDirectory: () => ipcRenderer.invoke('get-backup-directory'),
+});
+
+// User Database API
+contextBridge.exposeInMainWorld('userDatabaseAPI', {
+  // File operations
+  getFiles: (path = '') => ipcRenderer.invoke('user-db-get-files', path),
+  uploadFiles: (filePaths, targetPath = '') => ipcRenderer.invoke('user-db-upload-files', filePaths, targetPath),
+  deleteItems: (itemPaths) => ipcRenderer.invoke('user-db-delete-items', itemPaths),
+  copyItems: (sourcePaths, targetPath) => ipcRenderer.invoke('user-db-copy-items', sourcePaths, targetPath),
+  cutItems: (sourcePaths, targetPath) => ipcRenderer.invoke('user-db-cut-items', sourcePaths, targetPath),
+  pasteItems: (targetPath) => ipcRenderer.invoke('user-db-paste-items', targetPath),
+  
+  // Folder operations
+  createFolder: (path, name) => ipcRenderer.invoke('user-db-create-folder', path, name),
+  renameItem: (oldPath, newName) => ipcRenderer.invoke('user-db-rename-item', oldPath, newName),
+  
+  // Dialog operations
+  openFileDialog: (options) => ipcRenderer.invoke('user-db-open-file-dialog', options),
+  
+  // Upload progress
+  onUploadProgress: (callback) => {
+    ipcRenderer.on('user-db-upload-progress', (_, data) => callback(data));
+    return () => ipcRenderer.removeAllListeners('user-db-upload-progress');
+  }
 });

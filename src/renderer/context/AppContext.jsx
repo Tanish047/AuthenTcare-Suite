@@ -6,11 +6,13 @@ const initialState = {
   projects: [],
   devices: [], // Normalized: flat array with project_id references
   versions: [], // Normalized: flat array with device_id references
-  targetMarkets: [],
+  allMarkets: [], // All available markets from database
+  versionMarkets: {}, // Version-specific markets: { [versionId]: Market[] }
   marketLicenses: [],
   users: [],
   page: 'dashboard',
   pageParent: null,
+  currentLevel: 'project', // For ResearchWorkspace navigation state
   openMenu: null,
   modals: {}, // { modalName: boolean }
   loading: {}, // { key: boolean }
@@ -87,12 +89,45 @@ function appReducer(state, action) {
         ...state,
         versions: state.versions.filter(v => v.id !== action.versionId),
       };
-    case 'SET_TARGET_MARKETS':
-      return { ...state, targetMarkets: action.targetMarkets };
+    case 'SET_ALL_MARKETS':
+      return { ...state, allMarkets: action.markets };
+    case 'SET_VERSION_MARKETS':
+      return {
+        ...state,
+        versionMarkets: {
+          ...state.versionMarkets,
+          [action.versionId]: action.markets
+        }
+      };
+    case 'ADD_VERSION_MARKET':
+      return {
+        ...state,
+        versionMarkets: {
+          ...state.versionMarkets,
+          [action.versionId]: [
+            ...(state.versionMarkets[action.versionId] || []),
+            action.market
+          ]
+        }
+      };
+    case 'REMOVE_VERSION_MARKET':
+      return {
+        ...state,
+        versionMarkets: {
+          ...state.versionMarkets,
+          [action.versionId]: (state.versionMarkets[action.versionId] || [])
+            .filter(m => m.id !== action.marketId)
+        }
+      };
+    case 'CLEAR_VERSION_MARKETS':
+      const { [action.versionId]: removedVersionMarkets, ...remainingVersionMarkets } = state.versionMarkets;
+      return { ...state, versionMarkets: remainingVersionMarkets };
     case 'SET_MARKET_LICENSES':
       return { ...state, marketLicenses: action.marketLicenses };
     case 'SET_PAGE':
       return { ...state, page: action.page, pageParent: action.pageParent };
+    case 'SET_CURRENT_LEVEL':
+      return { ...state, currentLevel: action.currentLevel };
     case 'SET_OPEN_MENU':
       return { ...state, openMenu: action.openMenu };
     case 'SET_MODAL':

@@ -32,20 +32,28 @@ async function insertDefaultData(db) {
     const marketCount = await db.get('SELECT COUNT(*) as count FROM markets');
     if (marketCount.count === 0) {
       const defaultMarkets = [
-        { name: 'United States (FDA)', region: 'North America', regulatory_body: 'FDA' },
-        { name: 'European Union (EMA)', region: 'Europe', regulatory_body: 'EMA' },
-        {
-          name: 'Canada (Health Canada)',
-          region: 'North America',
-          regulatory_body: 'Health Canada',
-        },
-        { name: 'Australia (TGA)', region: 'Oceania', regulatory_body: 'TGA' },
-        { name: 'Japan (PMDA)', region: 'Asia', regulatory_body: 'PMDA' },
-        { name: 'United Kingdom (MHRA)', region: 'Europe', regulatory_body: 'MHRA' },
-        { name: 'Brazil (ANVISA)', region: 'South America', regulatory_body: 'ANVISA' },
-        { name: 'India (CDSCO)', region: 'Asia', regulatory_body: 'CDSCO' },
-        { name: 'China (NMPA)', region: 'Asia', regulatory_body: 'NMPA' },
-        { name: 'South Korea (MFDS)', region: 'Asia', regulatory_body: 'MFDS' },
+        { name: 'India', region: 'Asia', regulatory_body: 'CDSCO' },
+        { name: 'Australia', region: 'Oceania', regulatory_body: 'TGA' },
+        { name: 'Cambodia', region: 'Asia', regulatory_body: 'DDF' },
+        { name: 'Europe', region: 'Europe', regulatory_body: 'EMA' },
+        { name: 'USA', region: 'North America', regulatory_body: 'FDA' },
+        { name: 'China', region: 'Asia', regulatory_body: 'NMPA' },
+        { name: 'New Zealand', region: 'Oceania', regulatory_body: 'Medsafe' },
+        { name: 'Indonesia', region: 'Asia', regulatory_body: 'BPOM' },
+        { name: 'Vietnam', region: 'Asia', regulatory_body: 'DAV' },
+        { name: 'Brunei', region: 'Asia', regulatory_body: 'PPKB' },
+        { name: 'Singapore', region: 'Asia', regulatory_body: 'HSA' },
+        { name: 'Japan', region: 'Asia', regulatory_body: 'PMDA' },
+        { name: 'Thailand', region: 'Asia', regulatory_body: 'FDA Thailand' },
+        { name: 'Myanmar', region: 'Asia', regulatory_body: 'FDA Myanmar' },
+        { name: 'UAE', region: 'Middle East', regulatory_body: 'MOHAP' },
+        { name: 'Canada', region: 'North America', regulatory_body: 'Health Canada' },
+        { name: 'Philippines', region: 'Asia', regulatory_body: 'FDA Philippines' },
+        { name: 'Hong Kong', region: 'Asia', regulatory_body: 'DH' },
+        { name: 'Lao', region: 'Asia', regulatory_body: 'FDA Lao' },
+        { name: 'Malaysia', region: 'Asia', regulatory_body: 'NPRA' },
+        { name: 'Sri Lanka', region: 'Asia', regulatory_body: 'NMRA' },
+        { name: 'Taiwan', region: 'Asia', regulatory_body: 'TFDA' },
       ];
 
       for (const market of defaultMarkets) {

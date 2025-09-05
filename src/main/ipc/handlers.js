@@ -1,9 +1,13 @@
-import { ipcMain } from 'electron';
+import { ipcMain, dialog, app } from 'electron';
+import fs from 'fs/promises';
+import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 import './webCrawler.js';
 
 export default class IPCHandler {
   constructor(db) {
     this.db = db;
+    this.clipboard = { items: [], operation: null }; // For cut/copy operations
     this.setupHandlers();
   }
 
@@ -47,6 +51,23 @@ export default class IPCHandler {
     ipcMain.handle('db-update-license', this.updateLicense.bind(this));
     ipcMain.handle('db-delete-license', this.deleteLicense.bind(this));
     ipcMain.handle('db-get-licenses-by-project', this.getLicensesByProject.bind(this));
+
+    // Version Markets
+    ipcMain.handle('db-get-version-markets', this.getVersionMarkets.bind(this));
+    ipcMain.handle('db-add-version-market', this.addVersionMarket.bind(this));
+    ipcMain.handle('db-remove-version-market', this.removeVersionMarket.bind(this));
+    ipcMain.handle('db-get-available-markets-for-version', this.getAvailableMarketsForVersion.bind(this));
+
+    // User Database
+    ipcMain.handle('user-db-get-files', this.getUserDatabaseFiles.bind(this));
+    ipcMain.handle('user-db-upload-files', this.uploadUserDatabaseFiles.bind(this));
+    ipcMain.handle('user-db-delete-items', this.deleteUserDatabaseItems.bind(this));
+    ipcMain.handle('user-db-copy-items', this.copyUserDatabaseItems.bind(this));
+    ipcMain.handle('user-db-cut-items', this.cutUserDatabaseItems.bind(this));
+    ipcMain.handle('user-db-paste-items', this.pasteUserDatabaseItems.bind(this));
+    ipcMain.handle('user-db-create-folder', this.createUserDatabaseFolder.bind(this));
+    ipcMain.handle('user-db-rename-item', this.renameUserDatabaseItem.bind(this));
+    ipcMain.handle('user-db-open-file-dialog', this.openUserDatabaseFileDialog.bind(this));
 
     // Existing handlers (clients, news, events, notifications)
     this.setupExistingHandlers();
@@ -586,5 +607,532 @@ export default class IPCHandler {
   }
   async deleteNotification(event, id) {
     return { success: true };
+  }
+
+  // Version Markets handlers
+  async getVersionMarkets(event, versionId) {
+    try {
+      const markets = await this.db.all(
+        `SELECT m.*, vm.id as version_market_id, vm.created_at as added_at
+         FROM version_markets vm
+         JOIN markets m ON vm.market_id = m.id
+         WHERE vm.version_id = ?
+         ORDER BY m.name ASC`,
+        [versionId]
+      );
+      return { data: markets };
+    } catch (error) {
+      console.error('Error getting version markets:', error);
+      throw error;
+    }
+  }
+
+  async addVersionMarket(event, versionId, marketId) {
+    try {
+      // Check if the relationship already exists
+      const existing = await this.db.get(
+        'SELECT id FROM version_markets WHERE version_id = ? AND market_id = ?',
+        [versionId, marketId]
+      );
+      
+      if (existing) {
+        throw new Error('Market is already added to this version');
+      }
+
+      const result = await this.db.run(
+        'INSERT INTO version_markets (version_id, market_id) VALUES (?, ?)',
+        [versionId, marketId]
+      );
+
+      // Return the market details
+      const market = await this.db.get(
+        `SELECT m.*, vm.id as version_market_id, vm.created_at as added_at
+         FROM version_markets vm
+         JOIN markets m ON vm.market_id = m.id
+         WHERE vm.id = ?`,
+        [result.lastID]
+      );
+
+      return market;
+    } catch (error) {
+      console.error('Error adding version market:', error);
+      throw error;
+    }
+  }
+
+  async removeVersionMarket(event, versionId, marketId) {
+    try {
+      await this.db.run(
+        'DELETE FROM version_markets WHERE version_id = ? AND market_id = ?',
+        [versionId, marketId]
+      );
+      return { success: true };
+    } catch (error) {
+      console.error('Error removing version market:', error);
+      throw error;
+    }
+  }
+
+  async getAvailableMarketsForVersion(event, versionId) {
+    try {
+      const markets = await this.db.all(
+        `SELECT m.*
+         FROM markets m
+         WHERE m.status = 'active'
+         AND m.id NOT IN (
+           SELECT vm.market_id 
+           FROM version_markets vm 
+           WHERE vm.version_id = ?
+         )
+         ORDER BY m.name ASC`,
+        [versionId]
+      );
+      return { data: markets };
+    } catch (error) {
+      console.error('Error getting available markets for version:', error);
+      throw error;
+    }
+  }
+
+  // User Database handlers
+
+  async getUserDatabaseFiles(event, relativePath = '') {
+    try {
+      const userDataPath = app.getPath('userData');
+      const userDbPath = path.join(userDataPath, 'user-database');
+      const targetPath = path.join(userDbPath, relativePath);
+      const metadataPath = path.join(userDbPath, 'metadata.json');
+
+      // Ensure directory exists
+      await fs.mkdir(targetPath, { recursive: true });
+
+      // Load metadata
+      let metadata = {};
+      try {
+        const metadataContent = await fs.readFile(metadataPath, 'utf8');
+        metadata = JSON.parse(metadataContent);
+      } catch (error) {
+        metadata = {};
+      }
+
+      // Get all files in directory
+      const files = [];
+      const dirEntries = await fs.readdir(targetPath, { withFileTypes: true });
+
+      for (const entry of dirEntries) {
+        if (entry.name === 'metadata.json') continue;
+
+        const fullPath = path.join(targetPath, entry.name);
+        const itemRelativePath = relativePath ? path.join(relativePath, entry.name) : entry.name;
+        const stats = await fs.stat(fullPath);
+        const fileMetadata = metadata[itemRelativePath] || {};
+
+        files.push({
+          id: itemRelativePath,
+          name: fileMetadata.originalName || entry.name,
+          type: entry.isDirectory() ? 'folder' : 'file',
+          size: entry.isDirectory() ? 0 : stats.size,
+          path: fullPath,
+          relativePath: itemRelativePath,
+          dateCreated: fileMetadata.dateCreated || stats.birthtime,
+          dateModified: stats.mtime,
+          extension: entry.isDirectory() ? null : path.extname(entry.name).slice(1)
+        });
+      }
+
+      return { data: files };
+    } catch (error) {
+      console.error('Error getting user database files:', error);
+      throw error;
+    }
+  }
+
+  async uploadUserDatabaseFiles(event, filePaths, targetPath = '') {
+    try {
+      const userDataPath = app.getPath('userData');
+      const userDbPath = path.join(userDataPath, 'user-database');
+      const destinationDir = path.join(userDbPath, targetPath);
+      const metadataPath = path.join(userDbPath, 'metadata.json');
+
+      // Ensure directory exists
+      await fs.mkdir(destinationDir, { recursive: true });
+
+      // Load existing metadata
+      let metadata = {};
+      try {
+        const metadataContent = await fs.readFile(metadataPath, 'utf8');
+        metadata = JSON.parse(metadataContent);
+      } catch (error) {
+        metadata = {};
+      }
+
+      const uploadedFiles = [];
+      const totalFiles = filePaths.length;
+
+      for (let i = 0; i < filePaths.length; i++) {
+        const filePath = filePaths[i];
+        
+        // Send progress update
+        event.sender.send('user-db-upload-progress', {
+          current: i + 1,
+          total: totalFiles,
+          percentage: Math.round(((i + 1) / totalFiles) * 100),
+          currentFile: path.basename(filePath)
+        });
+
+        try {
+          const stats = await fs.stat(filePath);
+          
+          // Skip directories as per requirement
+          if (stats.isDirectory()) {
+            continue;
+          }
+
+          const originalName = path.basename(filePath);
+          const fileId = uuidv4();
+          const extension = path.extname(originalName);
+          const newFileName = fileId + extension;
+          const relativePath = path.join(targetPath, newFileName);
+          const destinationPath = path.join(userDbPath, relativePath);
+
+          // Copy file
+          await fs.copyFile(filePath, destinationPath);
+
+          // Update metadata
+          metadata[relativePath] = {
+            originalName,
+            originalPath: filePath,
+            dateCreated: new Date().toISOString(),
+            uploadedAt: new Date().toISOString()
+          };
+
+          uploadedFiles.push({
+            id: relativePath,
+            name: originalName,
+            type: 'file',
+            size: stats.size,
+            path: destinationPath,
+            relativePath,
+            dateCreated: new Date(),
+            dateModified: stats.mtime,
+            extension: extension.slice(1)
+          });
+        } catch (fileError) {
+          console.error(`Error uploading file ${filePath}:`, fileError);
+          // Continue with other files
+        }
+      }
+
+      // Save updated metadata
+      await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
+
+      // Send completion
+      event.sender.send('user-db-upload-progress', {
+        current: totalFiles,
+        total: totalFiles,
+        percentage: 100,
+        completed: true
+      });
+
+      return { data: uploadedFiles };
+    } catch (error) {
+      console.error('Error uploading user database files:', error);
+      throw error;
+    }
+  }
+
+  async copyDirectory(src, dest) {
+    await fs.mkdir(dest, { recursive: true });
+    const entries = await fs.readdir(src, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const srcPath = path.join(src, entry.name);
+      const destPath = path.join(dest, entry.name);
+
+      if (entry.isDirectory()) {
+        await this.copyDirectory(srcPath, destPath);
+      } else {
+        await fs.copyFile(srcPath, destPath);
+      }
+    }
+  }
+
+
+
+  async deleteUserDatabaseItems(event, itemPaths) {
+    try {
+      const userDataPath = app.getPath('userData');
+      const userDbPath = path.join(userDataPath, 'user-database');
+      const metadataPath = path.join(userDbPath, 'metadata.json');
+
+      // Load metadata
+      let metadata = {};
+      try {
+        const metadataContent = await fs.readFile(metadataPath, 'utf8');
+        metadata = JSON.parse(metadataContent);
+      } catch (error) {
+        metadata = {};
+      }
+
+      const deletedItems = [];
+
+      for (const itemPath of itemPaths) {
+        try {
+          const fullPath = path.join(userDbPath, itemPath);
+          const stats = await fs.stat(fullPath);
+
+          // Delete file or directory
+          if (stats.isDirectory()) {
+            await fs.rmdir(fullPath, { recursive: true });
+          } else {
+            await fs.unlink(fullPath);
+          }
+
+          // Remove from metadata
+          const itemMetadata = metadata[itemPath];
+          delete metadata[itemPath];
+
+          deletedItems.push({
+            id: itemPath,
+            name: itemMetadata?.originalName || path.basename(itemPath)
+          });
+        } catch (fileError) {
+          console.error(`Error deleting item ${itemPath}:`, fileError);
+        }
+      }
+
+      // Save updated metadata
+      await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
+
+      return { data: deletedItems };
+    } catch (error) {
+      console.error('Error deleting user database items:', error);
+      throw error;
+    }
+  }
+
+  async copyUserDatabaseItems(event, sourcePaths, targetPath) {
+    try {
+      this.clipboard = {
+        items: sourcePaths,
+        operation: 'copy'
+      };
+      return { success: true };
+    } catch (error) {
+      console.error('Error copying items:', error);
+      throw error;
+    }
+  }
+
+  async cutUserDatabaseItems(event, sourcePaths, targetPath) {
+    try {
+      this.clipboard = {
+        items: sourcePaths,
+        operation: 'cut'
+      };
+      return { success: true };
+    } catch (error) {
+      console.error('Error cutting items:', error);
+      throw error;
+    }
+  }
+
+  async pasteUserDatabaseItems(event, targetPath) {
+    try {
+      if (!this.clipboard.items || this.clipboard.items.length === 0) {
+        throw new Error('No items in clipboard');
+      }
+
+      const userDataPath = app.getPath('userData');
+      const userDbPath = path.join(userDataPath, 'user-database');
+      const targetDir = path.join(userDbPath, targetPath);
+      const metadataPath = path.join(userDbPath, 'metadata.json');
+
+      // Ensure target directory exists
+      await fs.mkdir(targetDir, { recursive: true });
+
+      // Load metadata
+      let metadata = {};
+      try {
+        const metadataContent = await fs.readFile(metadataPath, 'utf8');
+        metadata = JSON.parse(metadataContent);
+      } catch (error) {
+        metadata = {};
+      }
+
+      const pastedItems = [];
+
+      for (const sourcePath of this.clipboard.items) {
+        try {
+          const sourceFullPath = path.join(userDbPath, sourcePath);
+          const sourceName = path.basename(sourcePath);
+          const newId = uuidv4();
+          const extension = path.extname(sourceName);
+          const newName = newId + extension;
+          const newRelativePath = path.join(targetPath, newName);
+          const newFullPath = path.join(userDbPath, newRelativePath);
+
+          const stats = await fs.stat(sourceFullPath);
+
+          if (this.clipboard.operation === 'copy') {
+            // Copy operation
+            if (stats.isDirectory()) {
+              await this.copyDirectory(sourceFullPath, newFullPath);
+            } else {
+              await fs.copyFile(sourceFullPath, newFullPath);
+            }
+          } else if (this.clipboard.operation === 'cut') {
+            // Move operation
+            await fs.rename(sourceFullPath, newFullPath);
+            // Update metadata key
+            if (metadata[sourcePath]) {
+              metadata[newRelativePath] = metadata[sourcePath];
+              delete metadata[sourcePath];
+            }
+          }
+
+          // Add/update metadata for new location
+          if (!metadata[newRelativePath]) {
+            metadata[newRelativePath] = {
+              originalName: metadata[sourcePath]?.originalName || sourceName,
+              dateCreated: new Date().toISOString(),
+              pastedAt: new Date().toISOString()
+            };
+          }
+
+          pastedItems.push({
+            id: newRelativePath,
+            name: metadata[newRelativePath].originalName,
+            type: stats.isDirectory() ? 'folder' : 'file',
+            size: stats.isDirectory() ? 0 : stats.size,
+            path: newFullPath,
+            relativePath: newRelativePath
+          });
+        } catch (itemError) {
+          console.error(`Error pasting item ${sourcePath}:`, itemError);
+        }
+      }
+
+      // Save updated metadata
+      await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
+
+      // Clear clipboard after cut operation
+      if (this.clipboard.operation === 'cut') {
+        this.clipboard = { items: [], operation: null };
+      }
+
+      return { data: pastedItems };
+    } catch (error) {
+      console.error('Error pasting items:', error);
+      throw error;
+    }
+  }
+
+  async createUserDatabaseFolder(event, targetPath, folderName) {
+    try {
+      const userDataPath = app.getPath('userData');
+      const userDbPath = path.join(userDataPath, 'user-database');
+      
+      // Create a safe folder name (no UUID, use actual name but sanitized)
+      const safeFolderName = folderName.replace(/[<>:"/\\|?*]/g, '_');
+      const folderRelativePath = targetPath ? path.join(targetPath, safeFolderName) : safeFolderName;
+      const folderFullPath = path.join(userDbPath, folderRelativePath);
+      const metadataPath = path.join(userDbPath, 'metadata.json');
+
+      // Check if folder already exists
+      try {
+        await fs.access(folderFullPath);
+        throw new Error('Folder with this name already exists');
+      } catch (err) {
+        if (err.code !== 'ENOENT') {
+          throw err;
+        }
+      }
+
+      // Create folder
+      await fs.mkdir(folderFullPath, { recursive: true });
+
+      // Load and update metadata
+      let metadata = {};
+      try {
+        const metadataContent = await fs.readFile(metadataPath, 'utf8');
+        metadata = JSON.parse(metadataContent);
+      } catch (error) {
+        metadata = {};
+      }
+
+      metadata[folderRelativePath] = {
+        originalName: folderName,
+        dateCreated: new Date().toISOString(),
+        type: 'folder'
+      };
+
+      await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
+
+      return {
+        id: folderRelativePath,
+        name: folderName,
+        type: 'folder',
+        size: 0,
+        path: folderFullPath,
+        relativePath: folderRelativePath,
+        dateCreated: new Date(),
+        dateModified: new Date()
+      };
+    } catch (error) {
+      console.error('Error creating folder:', error);
+      throw error;
+    }
+  }
+
+  async renameUserDatabaseItem(event, itemPath, newName) {
+    try {
+      const userDataPath = app.getPath('userData');
+      const userDbPath = path.join(userDataPath, 'user-database');
+      const metadataPath = path.join(userDbPath, 'metadata.json');
+
+      // Load metadata
+      let metadata = {};
+      try {
+        const metadataContent = await fs.readFile(metadataPath, 'utf8');
+        metadata = JSON.parse(metadataContent);
+      } catch (error) {
+        metadata = {};
+      }
+
+      // Update metadata
+      if (metadata[itemPath]) {
+        metadata[itemPath].originalName = newName;
+        metadata[itemPath].renamedAt = new Date().toISOString();
+      }
+
+      await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error renaming item:', error);
+      throw error;
+    }
+  }
+
+  async openUserDatabaseFileDialog(event, options = {}) {
+    try {
+      const { properties = ['openFile', 'multiSelections'] } = options;
+      
+      const result = await dialog.showOpenDialog({
+        properties,
+        filters: [
+          { name: 'All Files', extensions: ['*'] }
+        ]
+      });
+
+      return {
+        canceled: result.canceled,
+        filePaths: result.filePaths || []
+      };
+    } catch (error) {
+      console.error('Error opening file dialog:', error);
+      throw error;
+    }
   }
 }
