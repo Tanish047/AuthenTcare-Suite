@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import ActionMenu from '../ActionMenu.jsx';
 
 const ProjectList = ({ projects, selectedProject, onSelect, onCreate, onEdit, onDelete }) => {
-
   return (
     <div style={{ marginBottom: 24 }}>
       <div
@@ -94,15 +93,15 @@ const ProjectList = ({ projects, selectedProject, onSelect, onCreate, onEdit, on
                       key: 'edit',
                       label: 'Edit',
                       icon: '✏️',
-                      onClick: () => onEdit(project)
+                      onClick: () => onEdit(project),
                     },
                     {
                       key: 'delete',
                       label: 'Delete',
                       icon: '🗑️',
                       danger: true,
-                      onClick: () => onDelete(project)
-                    }
+                      onClick: () => onDelete(project),
+                    },
                   ]}
                 />
               </div>

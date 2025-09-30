@@ -1,16 +1,11 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 
-const ActionMenu = ({
-  actions = [],
-  disabled = false,
-  buttonStyle = {},
-  dropdownStyle = {},
-}) => {
+const ActionMenu = ({ actions = [], disabled = false, buttonStyle = {}, dropdownStyle = {} }) => {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
 
   // Memoized event handler for clicking outside
-  const handleClickOutside = useCallback((event) => {
+  const handleClickOutside = useCallback(event => {
     if (menuRef.current && !menuRef.current.contains(event.target)) {
       setShowMenu(false);
     }
@@ -18,7 +13,7 @@ const ActionMenu = ({
 
   // Close menu when clicking outside or on escape key
   useEffect(() => {
-    const handleKeyDown = (event) => {
+    const handleKeyDown = event => {
       if (event.key === 'Escape') {
         setShowMenu(false);
       }
@@ -35,7 +30,7 @@ const ActionMenu = ({
     };
   }, [handleClickOutside, showMenu]);
 
-  const handleActionClick = useCallback((action) => {
+  const handleActionClick = useCallback(action => {
     setShowMenu(false);
     if (action.onClick) {
       action.onClick();
@@ -75,7 +70,7 @@ const ActionMenu = ({
   return (
     <div style={{ position: 'relative' }} ref={menuRef}>
       <button
-        onClick={(e) => {
+        onClick={e => {
           e.stopPropagation();
           if (!disabled) setShowMenu(!showMenu);
         }}
@@ -85,13 +80,13 @@ const ActionMenu = ({
       >
         ⋮
       </button>
-      
+
       {showMenu && !disabled && (
         <div style={defaultDropdownStyle}>
           {actions.map((action, index) => (
             <button
               key={action.key || index}
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 handleActionClick(action);
               }}
@@ -106,8 +101,10 @@ const ActionMenu = ({
                 borderBottom: index < actions.length - 1 ? '1px solid #eee' : 'none',
                 color: action.danger ? '#d63031' : 'inherit',
               }}
-              onMouseEnter={e => e.target.style.backgroundColor = action.danger ? '#ffeaea' : '#f8f9fa'}
-              onMouseLeave={e => e.target.style.backgroundColor = 'transparent'}
+              onMouseEnter={e =>
+                (e.target.style.backgroundColor = action.danger ? '#ffeaea' : '#f8f9fa')
+              }
+              onMouseLeave={e => (e.target.style.backgroundColor = 'transparent')}
             >
               {action.icon && <span style={{ marginRight: '8px' }}>{action.icon}</span>}
               {action.label}

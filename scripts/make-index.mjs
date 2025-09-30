@@ -88,8 +88,7 @@ AuthenTcareSuite/
 - \`docs/adr/\` - Architecture Decision Records
 
 ### Testing
-- \`test/migrate.test.js\` - Database migration tests
-- \`test/webCrawler.test.js\` - Web crawler tests
+- Testing files have been removed to streamline the application
 
 ### CI/CD
 - \`.github/workflows/test.yml\` - Test workflow

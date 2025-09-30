@@ -1,6 +1,41 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { app } from 'electron';
+
+// Safe electron import that works in tests too
+let app = null;
+
+async function getElectronApp() {
+  if (app) return app;
+
+  try {
+    if (typeof process !== 'undefined' && process.versions?.electron) {
+      const { app: electronApp } = await import('electron');
+      app = electronApp;
+    } else {
+      // Running outside electron context (like in tests) - use mock
+      app = {
+        getPath: name => {
+          if (name === 'userData') return './test-data';
+          return './';
+        },
+        getName: () => 'AuthenTcare Suite',
+        getVersion: () => '1.0.0',
+      };
+    }
+  } catch (error) {
+    // Fallback mock
+    app = {
+      getPath: name => {
+        if (name === 'userData') return './test-data';
+        return './';
+      },
+      getName: () => 'AuthenTcare Suite',
+      getVersion: () => '1.0.0',
+    };
+  }
+
+  return app;
+}
 
 /**
  * Simple telemetry service for logging application events
@@ -15,7 +50,8 @@ export class TelemetryService {
     if (this.initialized) return;
 
     try {
-      const userDataPath = app.getPath('userData');
+      const electronApp = await getElectronApp();
+      const userDataPath = electronApp.getPath('userData');
       const logsDir = path.join(userDataPath, 'logs');
 
       // Ensure logs directory exists

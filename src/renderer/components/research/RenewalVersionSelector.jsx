@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import Modal from '../Modal.jsx';
 
-const RenewalVersionSelector = ({
-  show,
-  onClose,
-  versions,
-  onSelectVersion,
-}) => {
+const RenewalVersionSelector = ({ show, onClose, versions, onSelectVersion }) => {
   const [selectedBaseVersion, setSelectedBaseVersion] = useState(null);
 
   // Filter only new versions (not renewals) for base selection
@@ -37,9 +32,9 @@ const RenewalVersionSelector = ({
         <button key="cancel" onClick={handleCancel}>
           Cancel
         </button>,
-        <button 
-          key="confirm" 
-          onClick={handleConfirm} 
+        <button
+          key="confirm"
+          onClick={handleConfirm}
           disabled={!selectedBaseVersion}
           style={{
             backgroundColor: selectedBaseVersion ? '#2c5aa0' : '#ccc',
@@ -47,7 +42,7 @@ const RenewalVersionSelector = ({
             border: 'none',
             padding: '8px 16px',
             borderRadius: '4px',
-            cursor: selectedBaseVersion ? 'pointer' : 'not-allowed'
+            cursor: selectedBaseVersion ? 'pointer' : 'not-allowed',
           }}
         >
           Create Renewal
@@ -58,7 +53,7 @@ const RenewalVersionSelector = ({
         <p style={{ marginBottom: '16px', color: '#666' }}>
           Select which version you want to create a renewal for:
         </p>
-        
+
         {baseVersions.length > 0 ? (
           <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
             {baseVersions.map(version => (
@@ -67,12 +62,13 @@ const RenewalVersionSelector = ({
                 onClick={() => setSelectedBaseVersion(version)}
                 style={{
                   padding: '12px',
-                  border: '1px solid ' + (selectedBaseVersion?.id === version.id ? '#2c5aa0' : '#e0e0e0'),
+                  border:
+                    '1px solid ' + (selectedBaseVersion?.id === version.id ? '#2c5aa0' : '#e0e0e0'),
                   borderRadius: '6px',
                   marginBottom: '8px',
                   cursor: 'pointer',
                   backgroundColor: selectedBaseVersion?.id === version.id ? '#f0f7ff' : '#fff',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={e => {
                   if (selectedBaseVersion?.id !== version.id) {

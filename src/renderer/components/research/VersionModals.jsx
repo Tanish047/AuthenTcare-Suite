@@ -60,7 +60,9 @@ const VersionModals = ({
           <button
             key="save"
             onClick={handleEditVersion}
-            disabled={!editVersionName.trim() || editVersionName.trim() === editingVersion?.version_number}
+            disabled={
+              !editVersionName.trim() || editVersionName.trim() === editingVersion?.version_number
+            }
           >
             Save
           </button>,

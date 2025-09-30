@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useMCP } from '../hooks/useMCP.js';
 
 /**
  * Enhanced SOP Generator component
- * 
+ *
  * This component extends a basic SOP generator by adding built-in
  * templates for several regulatory bodies (CDSCO, BIS, FDA and CE).
  * Users can select their license type and choose a tailored SOP
@@ -19,10 +20,12 @@ import React, { useState } from 'react';
 // square brackets will be replaced at runtime with project-
 // specific details.
 const templatesByLicense = {
-  CDSCO: [{
-    name: 'CDSCO Device Master File (DMF) & Plant Master File (PMF) SOP',
-    description: 'Comprehensive template for preparing Device Master File and Plant Master File for CDSCO submissions under Medical Device Rules 2017.',
-    content: `CDSCO Device Master File (DMF) & Plant Master File (PMF) Template and SOP
+  CDSCO: [
+    {
+      name: 'CDSCO Device Master File (DMF) & Plant Master File (PMF) SOP',
+      description:
+        'Comprehensive template for preparing Device Master File and Plant Master File for CDSCO submissions under Medical Device Rules 2017.',
+      content: `CDSCO Device Master File (DMF) & Plant Master File (PMF) Template and SOP
 =======================================================================
 
 This document provides a structured template and standard operating procedure (SOP) for preparing the **Device Master File (DMF)** and **Plant Master File (PMF)** required by the Central Drugs Standard Control Organisation (CDSCO) under India's Medical Device Rules, 2017.
@@ -164,13 +167,16 @@ The PMF (or Site Master File) provides a comprehensive description of the manufa
 
 ---
 
-This template and SOP are intended as a starting point for preparing your CDSCO documentation. Always consult the latest regulations and guidance documents issued by CDSCO for specific requirements.`
-  }],
+This template and SOP are intended as a starting point for preparing your CDSCO documentation. Always consult the latest regulations and guidance documents issued by CDSCO for specific requirements.`,
+    },
+  ],
 
-  BIS: [{
-    name: 'BIS Compliance Template and SOP for Surgical Gloves',
-    description: 'Comprehensive documentation for Bureau of Indian Standards (BIS) certification including ISI mark licensing and CRS registration.',
-    content: `BIS Compliance Template and SOP for Surgical Gloves
+  BIS: [
+    {
+      name: 'BIS Compliance Template and SOP for Surgical Gloves',
+      description:
+        'Comprehensive documentation for Bureau of Indian Standards (BIS) certification including ISI mark licensing and CRS registration.',
+      content: `BIS Compliance Template and SOP for Surgical Gloves
 ==================================================
 
 This document provides a structured template and standard operating procedure (SOP) to support compliance with the Bureau of Indian Standards (BIS) for medical gloves. It includes the documentation needed for the Compulsory Registration Scheme (CRS) or ISI mark certification.
@@ -291,13 +297,16 @@ This document provides a structured template and standard operating procedure (S
 
 ---
 
-Use this template and SOP to prepare your BIS documentation. Always check the latest BIS guidelines and relevant Indian Standards to ensure complete compliance.`
-  }],
+Use this template and SOP to prepare your BIS documentation. Always check the latest BIS guidelines and relevant Indian Standards to ensure complete compliance.`,
+    },
+  ],
 
-  FDA: [{
-    name: 'US FDA 510(k) Submission Template and SOP for Surgical Gloves',
-    description: 'Comprehensive framework for preparing 510(k) Premarket Notification submission to US Food & Drug Administration with detailed SOP for managing the process.',
-    content: `US FDA 510(k) Submission Template and SOP for Surgical Gloves
+  FDA: [
+    {
+      name: 'US FDA 510(k) Submission Template and SOP for Surgical Gloves',
+      description:
+        'Comprehensive framework for preparing 510(k) Premarket Notification submission to US Food & Drug Administration with detailed SOP for managing the process.',
+      content: `US FDA 510(k) Submission Template and SOP for Surgical Gloves
 =============================================================
 
 This document provides a framework for preparing a **510(k) Premarket Notification** submission to the US Food & Drug Administration (FDA) for medical gloves. It also includes a standard operating procedure (SOP) for managing the 510(k) process.
@@ -420,13 +429,16 @@ This document provides a framework for preparing a **510(k) Premarket Notificati
 
 ---
 
-This template and SOP serve as a starting point for your 510(k) submission. Always consult the most recent FDA guidance documents and relevant standards for up-to-date requirements.`
-  }],
+This template and SOP serve as a starting point for your 510(k) submission. Always consult the most recent FDA guidance documents and relevant standards for up-to-date requirements.`,
+    },
+  ],
 
-  CE: [{
-    name: 'EU CE Technical Documentation Template and SOP for Surgical Gloves',
-    description: 'Comprehensive technical documentation structure for CE marking under EU Medical Device Regulation (MDR) 2017/745 with detailed conformity assessment procedure.',
-    content: `EU CE Technical Documentation Template and SOP for Surgical Gloves
+  CE: [
+    {
+      name: 'EU CE Technical Documentation Template and SOP for Surgical Gloves',
+      description:
+        'Comprehensive technical documentation structure for CE marking under EU Medical Device Regulation (MDR) 2017/745 with detailed conformity assessment procedure.',
+      content: `EU CE Technical Documentation Template and SOP for Surgical Gloves
 ================================================================
 
 This document outlines the structure of the technical documentation required for CE marking of medical gloves under the European Union Medical Device Regulation (MDR) 2017/745. It also provides a standard operating procedure (SOP) for preparing and maintaining conformity assessment documentation.
@@ -537,8 +549,9 @@ This document outlines the structure of the technical documentation required for
 
 ---
 
-This template and SOP offer a foundation for preparing CE technical documentation. Always consult the EU MDR, harmonised standards and current MDCG guidance for specific requirements.`
-  }]
+This template and SOP offer a foundation for preparing CE technical documentation. Always consult the EU MDR, harmonised standards and current MDCG guidance for specific requirements.`,
+    },
+  ],
 };
 
 // Determine which set of templates to display based on the license
@@ -560,60 +573,265 @@ const SOPFlowchart = ({ licenseType, selectedTemplate }) => {
   const [showDetails, setShowDetails] = useState({});
 
   // Define flowchart steps based on license type
-  const getFlowchartSteps = (license) => {
+  const getFlowchartSteps = license => {
     const flowcharts = {
       CDSCO: [
-        { id: 1, title: 'Collect Regulatory References', icon: '📚', color: '#3b82f6', description: 'Obtain current versions of Medical Device Rules, 2017 and applicable standards' },
-        { id: 2, title: 'Establish Roles & Responsibilities', icon: '👥', color: '#10b981', description: 'Assign Regulatory Affairs team to compile DMF and PMF' },
-        { id: 3, title: 'Draft the DMF', icon: '📋', color: '#f59e0b', description: 'Use template to gather device information and technical content' },
-        { id: 4, title: 'Draft the PMF', icon: '🏭', color: '#ef4444', description: 'Gather facility information and quality system documentation' },
-        { id: 5, title: 'Review & Gap Analysis', icon: '🔍', color: '#8b5cf6', description: 'Cross-check DMF and PMF against CDSCO guidelines' },
-        { id: 6, title: 'Approval & Sign-off', icon: '✅', color: '#06b6d4', description: 'Circulate drafts for review and obtain final approvals' },
-        { id: 7, title: 'Document Control & Submission', icon: '📤', color: '#84cc16', description: 'Submit electronic and hard copies to CDSCO' }
+        {
+          id: 1,
+          title: 'Collect Regulatory References',
+          icon: '📚',
+          color: '#3b82f6',
+          description:
+            'Obtain current versions of Medical Device Rules, 2017 and applicable standards',
+        },
+        {
+          id: 2,
+          title: 'Establish Roles & Responsibilities',
+          icon: '👥',
+          color: '#10b981',
+          description: 'Assign Regulatory Affairs team to compile DMF and PMF',
+        },
+        {
+          id: 3,
+          title: 'Draft the DMF',
+          icon: '📋',
+          color: '#f59e0b',
+          description: 'Use template to gather device information and technical content',
+        },
+        {
+          id: 4,
+          title: 'Draft the PMF',
+          icon: '🏭',
+          color: '#ef4444',
+          description: 'Gather facility information and quality system documentation',
+        },
+        {
+          id: 5,
+          title: 'Review & Gap Analysis',
+          icon: '🔍',
+          color: '#8b5cf6',
+          description: 'Cross-check DMF and PMF against CDSCO guidelines',
+        },
+        {
+          id: 6,
+          title: 'Approval & Sign-off',
+          icon: '✅',
+          color: '#06b6d4',
+          description: 'Circulate drafts for review and obtain final approvals',
+        },
+        {
+          id: 7,
+          title: 'Document Control & Submission',
+          icon: '📤',
+          color: '#84cc16',
+          description: 'Submit electronic and hard copies to CDSCO',
+        },
       ],
       BIS: [
-        { id: 1, title: 'Determine Standard & Certification', icon: '📊', color: '#3b82f6', description: 'Identify applicable Indian Standard and certification type' },
-        { id: 2, title: 'Collect Technical Documents', icon: '📁', color: '#10b981', description: 'Gather product drawings, Bill of Materials, process flow charts' },
-        { id: 3, title: 'Assess QMS Compliance', icon: '⚙️', color: '#f59e0b', description: 'Ensure ISO 13485 certificate and conduct internal audits' },
-        { id: 4, title: 'Prepare Application Package', icon: '📝', color: '#ef4444', description: 'Complete BIS application form and accompanying documents' },
-        { id: 5, title: 'Submit to BIS', icon: '📤', color: '#8b5cf6', description: 'Submit via BIS portal with applicable fees' },
-        { id: 6, title: 'Factory Audit', icon: '🏭', color: '#06b6d4', description: 'Facilitate BIS inspectors during factory audit' },
-        { id: 7, title: 'Certification Decision', icon: '🏆', color: '#84cc16', description: 'Receive BIS licence or CRS registration' },
-        { id: 8, title: 'Surveillance & Renewal', icon: '🔄', color: '#f97316', description: 'Maintain records and renew licence as required' }
+        {
+          id: 1,
+          title: 'Determine Standard & Certification',
+          icon: '📊',
+          color: '#3b82f6',
+          description: 'Identify applicable Indian Standard and certification type',
+        },
+        {
+          id: 2,
+          title: 'Collect Technical Documents',
+          icon: '📁',
+          color: '#10b981',
+          description: 'Gather product drawings, Bill of Materials, process flow charts',
+        },
+        {
+          id: 3,
+          title: 'Assess QMS Compliance',
+          icon: '⚙️',
+          color: '#f59e0b',
+          description: 'Ensure ISO 13485 certificate and conduct internal audits',
+        },
+        {
+          id: 4,
+          title: 'Prepare Application Package',
+          icon: '📝',
+          color: '#ef4444',
+          description: 'Complete BIS application form and accompanying documents',
+        },
+        {
+          id: 5,
+          title: 'Submit to BIS',
+          icon: '📤',
+          color: '#8b5cf6',
+          description: 'Submit via BIS portal with applicable fees',
+        },
+        {
+          id: 6,
+          title: 'Factory Audit',
+          icon: '🏭',
+          color: '#06b6d4',
+          description: 'Facilitate BIS inspectors during factory audit',
+        },
+        {
+          id: 7,
+          title: 'Certification Decision',
+          icon: '🏆',
+          color: '#84cc16',
+          description: 'Receive BIS licence or CRS registration',
+        },
+        {
+          id: 8,
+          title: 'Surveillance & Renewal',
+          icon: '🔄',
+          color: '#f97316',
+          description: 'Maintain records and renew licence as required',
+        },
       ],
       FDA: [
-        { id: 1, title: 'Determine Submission Strategy', icon: '🎯', color: '#3b82f6', description: 'Decide on Traditional, Special or Abbreviated 510(k)' },
-        { id: 2, title: 'Identify Predicate Device', icon: '🔍', color: '#10b981', description: 'Research legally marketed gloves with similar indications' },
-        { id: 3, title: 'Compile Device Information', icon: '📋', color: '#f59e0b', description: 'Gather design drawings, materials specifications' },
-        { id: 4, title: 'Conduct Testing', icon: '🧪', color: '#ef4444', description: 'Execute performance and biocompatibility testing' },
-        { id: 5, title: 'Prepare Submission Documents', icon: '📝', color: '#8b5cf6', description: 'Draft each section of the submission template' },
-        { id: 6, title: 'Internal Review', icon: '👀', color: '#06b6d4', description: 'Review by quality assurance and senior regulatory staff' },
-        { id: 7, title: 'eSubmitter Packaging', icon: '📦', color: '#84cc16', description: 'Use FDA eSubmitter tool for electronic format' },
-        { id: 8, title: 'Submit to FDA', icon: '📤', color: '#f97316', description: 'Send electronically via CDRH Customer Portal' },
-        { id: 9, title: 'Respond to FDA Inquiries', icon: '💬', color: '#ec4899', description: 'Monitor and respond to Additional Information requests' },
-        { id: 10, title: 'Clearance & Post-Market', icon: '🎉', color: '#14b8a6', description: 'Maintain design controls and post-market surveillance' }
+        {
+          id: 1,
+          title: 'Determine Submission Strategy',
+          icon: '🎯',
+          color: '#3b82f6',
+          description: 'Decide on Traditional, Special or Abbreviated 510(k)',
+        },
+        {
+          id: 2,
+          title: 'Identify Predicate Device',
+          icon: '🔍',
+          color: '#10b981',
+          description: 'Research legally marketed gloves with similar indications',
+        },
+        {
+          id: 3,
+          title: 'Compile Device Information',
+          icon: '📋',
+          color: '#f59e0b',
+          description: 'Gather design drawings, materials specifications',
+        },
+        {
+          id: 4,
+          title: 'Conduct Testing',
+          icon: '🧪',
+          color: '#ef4444',
+          description: 'Execute performance and biocompatibility testing',
+        },
+        {
+          id: 5,
+          title: 'Prepare Submission Documents',
+          icon: '📝',
+          color: '#8b5cf6',
+          description: 'Draft each section of the submission template',
+        },
+        {
+          id: 6,
+          title: 'Internal Review',
+          icon: '👀',
+          color: '#06b6d4',
+          description: 'Review by quality assurance and senior regulatory staff',
+        },
+        {
+          id: 7,
+          title: 'eSubmitter Packaging',
+          icon: '📦',
+          color: '#84cc16',
+          description: 'Use FDA eSubmitter tool for electronic format',
+        },
+        {
+          id: 8,
+          title: 'Submit to FDA',
+          icon: '📤',
+          color: '#f97316',
+          description: 'Send electronically via CDRH Customer Portal',
+        },
+        {
+          id: 9,
+          title: 'Respond to FDA Inquiries',
+          icon: '💬',
+          color: '#ec4899',
+          description: 'Monitor and respond to Additional Information requests',
+        },
+        {
+          id: 10,
+          title: 'Clearance & Post-Market',
+          icon: '🎉',
+          color: '#14b8a6',
+          description: 'Maintain design controls and post-market surveillance',
+        },
       ],
       CE: [
-        { id: 1, title: 'Classify the Device', icon: '🏷️', color: '#3b82f6', description: 'Determine classification according to MDR Annex VIII' },
-        { id: 2, title: 'Establish Project Team', icon: '👥', color: '#10b981', description: 'Assign roles and define timelines and deliverables' },
-        { id: 3, title: 'Compile Technical Documentation', icon: '📚', color: '#f59e0b', description: 'Collect design files, risk management, test reports' },
-        { id: 4, title: 'Implement QMS', icon: '⚙️', color: '#ef4444', description: 'Ensure ISO 13485:2016 compliant QMS is in place' },
-        { id: 5, title: 'Engage Notified Body', icon: '🏢', color: '#8b5cf6', description: 'Select and contract notified body for review' },
-        { id: 6, title: 'Draft Declaration of Conformity', icon: '📜', color: '#06b6d4', description: 'Prepare and sign Declaration of Conformity' },
-        { id: 7, title: 'Affix CE Marking', icon: '🏷️', color: '#84cc16', description: 'Apply CE mark and notified body number' },
-        { id: 8, title: 'Post-Market Surveillance', icon: '📊', color: '#f97316', description: 'Implement PMS plan and vigilance reporting' },
-        { id: 9, title: 'Maintain Documentation', icon: '🔄', color: '#ec4899', description: 'Review and update technical documentation' }
-      ]
+        {
+          id: 1,
+          title: 'Classify the Device',
+          icon: '🏷️',
+          color: '#3b82f6',
+          description: 'Determine classification according to MDR Annex VIII',
+        },
+        {
+          id: 2,
+          title: 'Establish Project Team',
+          icon: '👥',
+          color: '#10b981',
+          description: 'Assign roles and define timelines and deliverables',
+        },
+        {
+          id: 3,
+          title: 'Compile Technical Documentation',
+          icon: '📚',
+          color: '#f59e0b',
+          description: 'Collect design files, risk management, test reports',
+        },
+        {
+          id: 4,
+          title: 'Implement QMS',
+          icon: '⚙️',
+          color: '#ef4444',
+          description: 'Ensure ISO 13485:2016 compliant QMS is in place',
+        },
+        {
+          id: 5,
+          title: 'Engage Notified Body',
+          icon: '🏢',
+          color: '#8b5cf6',
+          description: 'Select and contract notified body for review',
+        },
+        {
+          id: 6,
+          title: 'Draft Declaration of Conformity',
+          icon: '📜',
+          color: '#06b6d4',
+          description: 'Prepare and sign Declaration of Conformity',
+        },
+        {
+          id: 7,
+          title: 'Affix CE Marking',
+          icon: '🏷️',
+          color: '#84cc16',
+          description: 'Apply CE mark and notified body number',
+        },
+        {
+          id: 8,
+          title: 'Post-Market Surveillance',
+          icon: '📊',
+          color: '#f97316',
+          description: 'Implement PMS plan and vigilance reporting',
+        },
+        {
+          id: 9,
+          title: 'Maintain Documentation',
+          icon: '🔄',
+          color: '#ec4899',
+          description: 'Review and update technical documentation',
+        },
+      ],
     };
     return flowcharts[license] || [];
   };
 
   const steps = getFlowchartSteps(licenseType);
 
-  const toggleDetails = (stepId) => {
+  const toggleDetails = stepId => {
     setShowDetails(prev => ({
       ...prev,
-      [stepId]: !prev[stepId]
+      [stepId]: !prev[stepId],
     }));
   };
 
@@ -629,44 +847,53 @@ const SOPFlowchart = ({ licenseType, selectedTemplate }) => {
         borderRadius: '16px',
         padding: '24px',
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-        marginBottom: '24px'
-      }}>
-      <h3 style={{
-        color: '#1f2937',
-        fontWeight: '600',
-        fontSize: '20px',
-        margin: '0 0 24px 0',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px'
-      }}>
+        marginBottom: '24px',
+      }}
+    >
+      <h3
+        style={{
+          color: '#1f2937',
+          fontWeight: '600',
+          fontSize: '20px',
+          margin: '0 0 24px 0',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+        }}
+      >
         🔄 SOP Process Flowchart - {licenseType}
-        <span style={{
-          fontSize: '12px',
-          backgroundColor: '#f3f4f6',
-          color: '#6b7280',
-          padding: '4px 8px',
-          borderRadius: '12px',
-          fontWeight: '500'
-        }}>
+        <span
+          style={{
+            fontSize: '12px',
+            backgroundColor: '#f3f4f6',
+            color: '#6b7280',
+            padding: '4px 8px',
+            borderRadius: '12px',
+            fontWeight: '500',
+          }}
+        >
           {steps.length} Steps
         </span>
       </h3>
 
       {/* Progress Bar */}
-      <div style={{
-        marginBottom: '32px',
-        padding: '16px',
-        backgroundColor: '#f8fafc',
-        borderRadius: '12px',
-        border: '1px solid #e2e8f0'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '8px'
-        }}>
+      <div
+        style={{
+          marginBottom: '32px',
+          padding: '16px',
+          backgroundColor: '#f8fafc',
+          borderRadius: '12px',
+          border: '1px solid #e2e8f0',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '8px',
+          }}
+        >
           <span style={{ fontSize: '14px', fontWeight: '500', color: '#475569' }}>
             Progress: Step {activeStep + 1} of {steps.length}
           </span>
@@ -674,13 +901,15 @@ const SOPFlowchart = ({ licenseType, selectedTemplate }) => {
             {Math.round(((activeStep + 1) / steps.length) * 100)}%
           </span>
         </div>
-        <div style={{
-          width: '100%',
-          height: '8px',
-          backgroundColor: '#e2e8f0',
-          borderRadius: '4px',
-          overflow: 'hidden'
-        }}>
+        <div
+          style={{
+            width: '100%',
+            height: '8px',
+            backgroundColor: '#e2e8f0',
+            borderRadius: '4px',
+            overflow: 'hidden',
+          }}
+        >
           <div
             className="flowchart-progress-bar"
             style={{
@@ -689,17 +918,20 @@ const SOPFlowchart = ({ licenseType, selectedTemplate }) => {
               background: 'linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%)',
               borderRadius: '4px',
               transition: 'width 0.5s ease',
-              '--progress-width': `${((activeStep + 1) / steps.length) * 100}%`
-            }} />
+              '--progress-width': `${((activeStep + 1) / steps.length) * 100}%`,
+            }}
+          />
         </div>
       </div>
 
       {/* Flowchart Steps */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+        }}
+      >
         {steps.map((step, index) => {
           const isActive = index === activeStep;
           const isCompleted = index < activeStep;
@@ -713,8 +945,9 @@ const SOPFlowchart = ({ licenseType, selectedTemplate }) => {
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: '16px',
-                position: 'relative'
-              }}>
+                position: 'relative',
+              }}
+            >
               {/* Connection Line */}
               {index < steps.length - 1 && (
                 <div
@@ -725,12 +958,13 @@ const SOPFlowchart = ({ licenseType, selectedTemplate }) => {
                     top: '48px',
                     width: '2px',
                     height: '32px',
-                    background: isCompleted ?
-                      'linear-gradient(180deg, #10b981 0%, #059669 100%)' :
-                      'linear-gradient(180deg, #e5e7eb 0%, #d1d5db 100%)',
+                    background: isCompleted
+                      ? 'linear-gradient(180deg, #10b981 0%, #059669 100%)'
+                      : 'linear-gradient(180deg, #e5e7eb 0%, #d1d5db 100%)',
                     zIndex: 1,
-                    animationDelay: `${index * 0.1}s`
-                  }} />
+                    animationDelay: `${index * 0.1}s`,
+                  }}
+                />
               )}
 
               {/* Step Circle */}
@@ -752,15 +986,15 @@ const SOPFlowchart = ({ licenseType, selectedTemplate }) => {
                   zIndex: 2,
                   position: 'relative',
                   boxShadow: isActive ? `0 0 0 4px ${step.color}20` : 'none',
-                  transform: isActive ? 'scale(1.1)' : 'scale(1)'
+                  transform: isActive ? 'scale(1.1)' : 'scale(1)',
                 }}
-                onMouseEnter={(e) => {
+                onMouseEnter={e => {
                   if (!isActive) {
                     e.target.style.transform = 'scale(1.05)';
                     e.target.style.boxShadow = `0 4px 12px ${step.color}30`;
                   }
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={e => {
                   if (!isActive) {
                     e.target.style.transform = 'scale(1)';
                     e.target.style.boxShadow = 'none';
@@ -782,106 +1016,133 @@ const SOPFlowchart = ({ licenseType, selectedTemplate }) => {
                     borderRadius: '12px',
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
-                    boxShadow: isActive ? `0 4px 16px ${step.color}20` : '0 2px 8px rgba(0, 0, 0, 0.04)'
+                    boxShadow: isActive
+                      ? `0 4px 16px ${step.color}20`
+                      : '0 2px 8px rgba(0, 0, 0, 0.04)',
                   }}
                 >
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '8px'
-                  }}>
-                    <h4 style={{
-                      color: isActive ? step.color : '#1f2937',
-                      fontWeight: '600',
-                      fontSize: '16px',
-                      margin: 0
-                    }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    <h4
+                      style={{
+                        color: isActive ? step.color : '#1f2937',
+                        fontWeight: '600',
+                        fontSize: '16px',
+                        margin: 0,
+                      }}
+                    >
                       Step {step.id}: {step.title}
                     </h4>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                      }}
+                    >
                       {isCompleted && (
-                        <span style={{
-                          backgroundColor: '#10b981',
-                          color: 'white',
-                          fontSize: '10px',
-                          fontWeight: '600',
-                          padding: '2px 6px',
-                          borderRadius: '8px'
-                        }}>
+                        <span
+                          style={{
+                            backgroundColor: '#10b981',
+                            color: 'white',
+                            fontSize: '10px',
+                            fontWeight: '600',
+                            padding: '2px 6px',
+                            borderRadius: '8px',
+                          }}
+                        >
                           COMPLETED
                         </span>
                       )}
                       {isActive && (
-                        <span style={{
-                          backgroundColor: step.color,
-                          color: 'white',
-                          fontSize: '10px',
-                          fontWeight: '600',
-                          padding: '2px 6px',
-                          borderRadius: '8px'
-                        }}>
+                        <span
+                          style={{
+                            backgroundColor: step.color,
+                            color: 'white',
+                            fontSize: '10px',
+                            fontWeight: '600',
+                            padding: '2px 6px',
+                            borderRadius: '8px',
+                          }}
+                        >
                           ACTIVE
                         </span>
                       )}
-                      <span style={{
-                        fontSize: '12px',
-                        color: '#6b7280',
-                        transform: showDetails[step.id] ? 'rotate(180deg)' : 'rotate(0deg)',
-                        transition: 'transform 0.2s ease'
-                      }}>
+                      <span
+                        style={{
+                          fontSize: '12px',
+                          color: '#6b7280',
+                          transform: showDetails[step.id] ? 'rotate(180deg)' : 'rotate(0deg)',
+                          transition: 'transform 0.2s ease',
+                        }}
+                      >
                         ▼
                       </span>
                     </div>
                   </div>
 
-                  <p style={{
-                    color: '#6b7280',
-                    fontSize: '14px',
-                    margin: 0,
-                    lineHeight: '1.5'
-                  }}>
+                  <p
+                    style={{
+                      color: '#6b7280',
+                      fontSize: '14px',
+                      margin: 0,
+                      lineHeight: '1.5',
+                    }}
+                  >
                     {step.description}
                   </p>
 
                   {/* Expanded Details */}
                   {showDetails[step.id] && (
-                    <div style={{
-                      marginTop: '12px',
-                      padding: '12px',
-                      backgroundColor: '#f8fafc',
-                      borderRadius: '8px',
-                      border: '1px solid #e2e8f0'
-                    }}>
-                      <div style={{
-                        fontSize: '12px',
-                        color: '#475569',
-                        fontWeight: '500',
-                        marginBottom: '8px'
-                      }}>
+                    <div
+                      style={{
+                        marginTop: '12px',
+                        padding: '12px',
+                        backgroundColor: '#f8fafc',
+                        borderRadius: '8px',
+                        border: '1px solid #e2e8f0',
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          color: '#475569',
+                          fontWeight: '500',
+                          marginBottom: '8px',
+                        }}
+                      >
                         📋 Key Activities:
                       </div>
-                      <div style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: '6px'
-                      }}>
-                        {['Documentation', 'Review', 'Approval', 'Submission'].map((activity, i) => (
-                          <span key={i} style={{
-                            backgroundColor: step.color,
-                            color: 'white',
-                            fontSize: '10px',
-                            fontWeight: '500',
-                            padding: '3px 8px',
-                            borderRadius: '12px'
-                          }}>
-                            {activity}
-                          </span>
-                        ))}
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: '6px',
+                        }}
+                      >
+                        {['Documentation', 'Review', 'Approval', 'Submission'].map(
+                          (activity, i) => (
+                            <span
+                              key={i}
+                              style={{
+                                backgroundColor: step.color,
+                                color: 'white',
+                                fontSize: '10px',
+                                fontWeight: '500',
+                                padding: '3px 8px',
+                                borderRadius: '12px',
+                              }}
+                            >
+                              {activity}
+                            </span>
+                          )
+                        )}
                       </div>
                     </div>
                   )}
@@ -893,15 +1154,17 @@ const SOPFlowchart = ({ licenseType, selectedTemplate }) => {
       </div>
 
       {/* Navigation Controls */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        gap: '12px',
-        marginTop: '24px',
-        padding: '16px',
-        backgroundColor: '#f8fafc',
-        borderRadius: '12px'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '12px',
+          marginTop: '24px',
+          padding: '16px',
+          backgroundColor: '#f8fafc',
+          borderRadius: '12px',
+        }}
+      >
         <button
           onClick={() => setActiveStep(Math.max(0, activeStep - 1))}
           disabled={activeStep === 0}
@@ -914,7 +1177,7 @@ const SOPFlowchart = ({ licenseType, selectedTemplate }) => {
             fontSize: '14px',
             fontWeight: '500',
             cursor: activeStep === 0 ? 'not-allowed' : 'pointer',
-            transition: 'all 0.2s ease'
+            transition: 'all 0.2s ease',
           }}
         >
           ← Previous
@@ -931,7 +1194,7 @@ const SOPFlowchart = ({ licenseType, selectedTemplate }) => {
             fontSize: '14px',
             fontWeight: '500',
             cursor: 'pointer',
-            transition: 'all 0.2s ease'
+            transition: 'all 0.2s ease',
           }}
         >
           🔄 Reset
@@ -949,7 +1212,7 @@ const SOPFlowchart = ({ licenseType, selectedTemplate }) => {
             fontSize: '14px',
             fontWeight: '500',
             cursor: activeStep === steps.length - 1 ? 'not-allowed' : 'pointer',
-            transition: 'all 0.2s ease'
+            transition: 'all 0.2s ease',
           }}
         >
           Next →
@@ -986,11 +1249,20 @@ function formatTemplateContent(content) {
     .replace(/^---$/gm, '<hr class="template-divider">')
 
     // Purpose/Scope sections
-    .replace(/^\*\*Purpose:\*\* (.+)$/gm, '<div class="template-purpose">🎯 <strong>Purpose:</strong> $1</div>')
-    .replace(/^\*\*Scope:\*\* (.+)$/gm, '<div class="template-scope">🎯 <strong>Scope:</strong> $1</div>')
+    .replace(
+      /^\*\*Purpose:\*\* (.+)$/gm,
+      '<div class="template-purpose">🎯 <strong>Purpose:</strong> $1</div>'
+    )
+    .replace(
+      /^\*\*Scope:\*\* (.+)$/gm,
+      '<div class="template-scope">🎯 <strong>Scope:</strong> $1</div>'
+    )
 
     // Key considerations
-    .replace(/^• \*\*(.+?):\*\* (.+)$/gm, '<div class="template-key-point">⚠️ <strong>$1:</strong> $2</div>')
+    .replace(
+      /^• \*\*(.+?):\*\* (.+)$/gm,
+      '<div class="template-key-point">⚠️ <strong>$1:</strong> $2</div>'
+    )
 
     // Line breaks
     .replace(/\n/g, '<br>');
@@ -1120,17 +1392,26 @@ const SOPGenerator = ({
   selectedVersion,
   selectedMarket,
   selectedLicense,
-  onBack
+  onBack,
 }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [sopContent, setSOPContent] = useState('');
   const [showTemplates, setShowTemplates] = useState(false);
 
+  // MCP Integration
+  const { initialized: mcpInitialized, callTool, getRecommendations, isServerHealthy } = useMCP();
+
+  const [mcpGeneratedContent, setMcpGeneratedContent] = useState('');
+  const [isGeneratingWithMCP, setIsGeneratingWithMCP] = useState(false);
+  const [mcpRecommendations, setMcpRecommendations] = useState([]);
+  const [showMCPOptions, setShowMCPOptions] = useState(false);
+
   // Normalise license name for display; if selectedLicense is an
   // object, derive from its fields, else use the string directly.
-  const licenseName = typeof selectedLicense === 'string'
-    ? selectedLicense
-    : selectedLicense?.license_number || selectedLicense?.name || 'Unknown License';
+  const licenseName =
+    typeof selectedLicense === 'string'
+      ? selectedLicense
+      : selectedLicense?.license_number || selectedLicense?.name || 'Unknown License';
 
   const licenseKey = deriveLicenseKey(licenseName);
   const availableTemplates = templatesByLicense[licenseKey] || [];
@@ -1138,7 +1419,7 @@ const SOPGenerator = ({
   // When the user chooses a template, generate the filled SOP
   // content and hide the template list. Store the template name
   // separately for display in the UI.
-  const handleTemplateSelect = (template) => {
+  const handleTemplateSelect = template => {
     setSelectedTemplate(template.name);
     const filled = autoFillContent(
       template.content,
@@ -1193,12 +1474,115 @@ const SOPGenerator = ({
     }
   };
 
+  // MCP-Powered SOP Generation
+  const generateWithMCP = async () => {
+    if (!mcpInitialized || !isServerHealthy('document-genius')) {
+      console.warn('MCP not available or document-genius server not healthy');
+      return;
+    }
+
+    setIsGeneratingWithMCP(true);
+    try {
+      console.log('🤖 Generating SOP with MCP AI...');
+
+      const projectData = {
+        project: selectedProject,
+        device: selectedDevice,
+        version: selectedVersion,
+        market: selectedMarket,
+        license: selectedLicense,
+        regulatoryBody: selectedMarket?.regulatory_body,
+        deviceType: selectedDevice?.type,
+      };
+
+      const result = await callTool(
+        'document-genius',
+        'generate-sop-documents',
+        {
+          template_type: licenseKey,
+          project_data: projectData,
+          requirements: {
+            include_compliance_checklist: true,
+            include_risk_assessment: true,
+            include_validation_procedures: true,
+            format: 'comprehensive',
+          },
+        },
+        { workflow: 'document-generation' }
+      );
+
+      if (result && result.document) {
+        setMcpGeneratedContent(result.document.content);
+        setSelectedTemplate(`AI-Generated ${licenseKey} SOP`);
+        setSOPContent(result.document.content);
+        console.log('✅ MCP SOP generation completed');
+      }
+    } catch (error) {
+      console.error('❌ MCP SOP generation failed:', error);
+      // Fallback to template-based generation
+      if (availableTemplates.length > 0) {
+        handleTemplateSelect(availableTemplates[0]);
+      }
+    } finally {
+      setIsGeneratingWithMCP(false);
+    }
+  };
+
+  // Get MCP-powered recommendations for SOP improvement
+  const getMCPRecommendations = async () => {
+    if (!mcpInitialized || !sopContent) return;
+
+    try {
+      const recommendations = await getRecommendations({
+        currentPage: 'sop-generator',
+        sopContent,
+        regulatoryBody: selectedMarket?.regulatory_body,
+        deviceType: selectedDevice?.type,
+      });
+
+      setMcpRecommendations(recommendations);
+    } catch (error) {
+      console.error('❌ Failed to get MCP recommendations:', error);
+    }
+  };
+
+  // Validate SOP compliance using MCP
+  const validateCompliance = async () => {
+    if (!mcpInitialized || !sopContent || !isServerHealthy('document-genius')) {
+      return;
+    }
+
+    try {
+      const result = await callTool('document-genius', 'validate-document-compliance', {
+        document_content: sopContent,
+        regulatory_framework: licenseKey,
+        market: selectedMarket?.name,
+        device_type: selectedDevice?.type,
+      });
+
+      if (result) {
+        console.log('📋 Compliance validation result:', result);
+        // You could show this in a modal or notification
+        return result;
+      }
+    } catch (error) {
+      console.error('❌ Compliance validation failed:', error);
+    }
+  };
+
+  // Load MCP recommendations when component mounts or context changes
+  useEffect(() => {
+    if (mcpInitialized && selectedMarket && selectedDevice) {
+      getMCPRecommendations();
+    }
+  }, [mcpInitialized, selectedMarket, selectedDevice, sopContent]);
+
   return (
     <div
       style={{
         padding: '32px',
         minHeight: '100vh',
-        backgroundColor: '#f8fafc'
+        backgroundColor: '#f8fafc',
       }}
     >
       {/* Header Section */}
@@ -1211,7 +1595,7 @@ const SOPGenerator = ({
           backgroundColor: 'white',
           padding: '24px',
           borderRadius: '12px',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
         }}
       >
         <div>
@@ -1223,7 +1607,7 @@ const SOPGenerator = ({
               margin: '0 0 8px 0',
               display: 'flex',
               alignItems: 'center',
-              gap: '12px'
+              gap: '12px',
             }}
           >
             📄 SOP Generator
@@ -1232,7 +1616,7 @@ const SOPGenerator = ({
             style={{
               color: '#6b7280',
               fontSize: '16px',
-              margin: 0
+              margin: 0,
             }}
           >
             Generate standard operating procedures from templates
@@ -1250,13 +1634,13 @@ const SOPGenerator = ({
             fontSize: '16px',
             fontWeight: '600',
             cursor: 'pointer',
-            transition: 'all 0.2s ease'
+            transition: 'all 0.2s ease',
           }}
-          onMouseEnter={(e) => {
+          onMouseEnter={e => {
             e.target.style.backgroundColor = '#4b5563';
             e.target.style.transform = 'translateY(-1px)';
           }}
-          onMouseLeave={(e) => {
+          onMouseLeave={e => {
             e.target.style.backgroundColor = '#6b7280';
             e.target.style.transform = 'translateY(0)';
           }}
@@ -1272,7 +1656,7 @@ const SOPGenerator = ({
           borderRadius: '12px',
           padding: '24px',
           marginBottom: '24px',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
         }}
       >
         <h2
@@ -1280,7 +1664,7 @@ const SOPGenerator = ({
             color: '#1f2937',
             fontWeight: '600',
             fontSize: '20px',
-            margin: '0 0 16px 0'
+            margin: '0 0 16px 0',
           }}
         >
           📋 {licenseName} – Standard Operating Procedure
@@ -1294,24 +1678,32 @@ const SOPGenerator = ({
             padding: '16px',
             backgroundColor: '#f9fafb',
             borderRadius: '8px',
-            border: '1px solid #e5e7eb'
+            border: '1px solid #e5e7eb',
           }}
         >
           <div>
             <span style={{ color: '#6b7280', fontSize: '14px', fontWeight: '500' }}>Project:</span>
-            <div style={{ color: '#1f2937', fontWeight: '600' }}>{selectedProject?.name || 'N/A'}</div>
+            <div style={{ color: '#1f2937', fontWeight: '600' }}>
+              {selectedProject?.name || 'N/A'}
+            </div>
           </div>
           <div>
             <span style={{ color: '#6b7280', fontSize: '14px', fontWeight: '500' }}>Device:</span>
-            <div style={{ color: '#1f2937', fontWeight: '600' }}>{selectedDevice?.name || 'N/A'}</div>
+            <div style={{ color: '#1f2937', fontWeight: '600' }}>
+              {selectedDevice?.name || 'N/A'}
+            </div>
           </div>
           <div>
             <span style={{ color: '#6b7280', fontSize: '14px', fontWeight: '500' }}>Version:</span>
-            <div style={{ color: '#1f2937', fontWeight: '600' }}>v{selectedVersion?.version_number || 'N/A'}</div>
+            <div style={{ color: '#1f2937', fontWeight: '600' }}>
+              v{selectedVersion?.version_number || 'N/A'}
+            </div>
           </div>
           <div>
             <span style={{ color: '#6b7280', fontSize: '14px', fontWeight: '500' }}>Market:</span>
-            <div style={{ color: '#1f2937', fontWeight: '600' }}>{selectedMarket?.name || 'N/A'}</div>
+            <div style={{ color: '#1f2937', fontWeight: '600' }}>
+              {selectedMarket?.name || 'N/A'}
+            </div>
           </div>
           <div>
             <span style={{ color: '#6b7280', fontSize: '14px', fontWeight: '500' }}>License:</span>
@@ -1327,7 +1719,7 @@ const SOPGenerator = ({
           borderRadius: '12px',
           padding: '24px',
           marginBottom: '24px',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
         }}
       >
         <h3
@@ -1338,7 +1730,7 @@ const SOPGenerator = ({
             margin: '0 0 16px 0',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '8px',
           }}
         >
           📁 Template Selection
@@ -1348,7 +1740,7 @@ const SOPGenerator = ({
           style={{
             display: 'flex',
             gap: '16px',
-            marginBottom: '16px'
+            marginBottom: '16px',
           }}
         >
           <button
@@ -1361,10 +1753,10 @@ const SOPGenerator = ({
               fontSize: '14px',
               fontWeight: '500',
               cursor: 'pointer',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
             }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = '#2563eb')}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = '#3b82f6')}
+            onMouseEnter={e => (e.target.style.backgroundColor = '#2563eb')}
+            onMouseLeave={e => (e.target.style.backgroundColor = '#3b82f6')}
             onClick={() => {
               // Browse user database for templates – reserved for future use
               // This button currently has no implementation because
@@ -1384,10 +1776,10 @@ const SOPGenerator = ({
               fontSize: '14px',
               fontWeight: '500',
               cursor: 'pointer',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
             }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = '#059669')}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = '#10b981')}
+            onMouseEnter={e => (e.target.style.backgroundColor = '#059669')}
+            onMouseLeave={e => (e.target.style.backgroundColor = '#10b981')}
             onClick={() => setShowTemplates(!showTemplates)}
           >
             📄 Default Templates
@@ -1408,7 +1800,7 @@ const SOPGenerator = ({
                   { bg: '#f0f9ff', border: '#0ea5e9', icon: '📋' },
                   { bg: '#f0fdf4', border: '#10b981', icon: '📊' },
                   { bg: '#fef3c7', border: '#f59e0b', icon: '📑' },
-                  { bg: '#fdf2f8', border: '#ec4899', icon: '📝' }
+                  { bg: '#fdf2f8', border: '#ec4899', icon: '📝' },
                 ];
                 const colorScheme = colors[index % colors.length];
 
@@ -1429,16 +1821,16 @@ const SOPGenerator = ({
                       boxShadow: isSelected
                         ? `0 8px 25px ${colorScheme.border}20`
                         : '0 2px 8px rgba(0, 0, 0, 0.08)',
-                      transform: isSelected ? 'translateY(-2px)' : 'translateY(0)'
+                      transform: isSelected ? 'translateY(-2px)' : 'translateY(0)',
                     }}
-                    onMouseEnter={(e) => {
+                    onMouseEnter={e => {
                       if (!isSelected) {
                         e.target.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.12)';
                         e.target.style.transform = 'translateY(-1px)';
                         e.target.style.borderColor = colorScheme.border;
                       }
                     }}
-                    onMouseLeave={(e) => {
+                    onMouseLeave={e => {
                       if (!isSelected) {
                         e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
                         e.target.style.transform = 'translateY(0)';
@@ -1446,52 +1838,64 @@ const SOPGenerator = ({
                       }
                     }}
                   >
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '16px'
-                    }}>
-                      <div style={{
-                        fontSize: '32px',
-                        flexShrink: 0,
-                        marginTop: '4px'
-                      }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '16px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: '32px',
+                          flexShrink: 0,
+                          marginTop: '4px',
+                        }}
+                      >
                         {colorScheme.icon}
                       </div>
                       <div style={{ flex: 1 }}>
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          marginBottom: '8px'
-                        }}>
-                          <strong style={{
-                            color: '#1f2937',
-                            fontSize: '16px',
-                            fontWeight: '600'
-                          }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            marginBottom: '8px',
+                          }}
+                        >
+                          <strong
+                            style={{
+                              color: '#1f2937',
+                              fontSize: '16px',
+                              fontWeight: '600',
+                            }}
+                          >
                             {tpl.name}
                           </strong>
                           {isSelected && (
-                            <span style={{
-                              backgroundColor: colorScheme.border,
-                              color: 'white',
-                              fontSize: '10px',
-                              fontWeight: '600',
-                              padding: '2px 8px',
-                              borderRadius: '12px',
-                              textTransform: 'uppercase'
-                            }}>
+                            <span
+                              style={{
+                                backgroundColor: colorScheme.border,
+                                color: 'white',
+                                fontSize: '10px',
+                                fontWeight: '600',
+                                padding: '2px 8px',
+                                borderRadius: '12px',
+                                textTransform: 'uppercase',
+                              }}
+                            >
                               Selected
                             </span>
                           )}
                         </div>
-                        <p style={{
-                          color: '#6b7280',
-                          fontSize: '14px',
-                          margin: 0,
-                          lineHeight: '1.5'
-                        }}>
+                        <p
+                          style={{
+                            color: '#6b7280',
+                            fontSize: '14px',
+                            margin: 0,
+                            lineHeight: '1.5',
+                          }}
+                        >
                           {tpl.description}
                         </p>
                       </div>
@@ -1511,7 +1915,7 @@ const SOPGenerator = ({
               backgroundColor: '#f0f9ff',
               borderRadius: '8px',
               border: '1px solid #0ea5e9',
-              marginTop: '8px'
+              marginTop: '8px',
             }}
           >
             <span
@@ -1520,7 +1924,7 @@ const SOPGenerator = ({
                 alignItems: 'center',
                 gap: '8px',
                 color: '#0c4a6e',
-                fontWeight: '500'
+                fontWeight: '500',
               }}
             >
               ✅ Selected: {selectedTemplate}
@@ -1536,7 +1940,7 @@ const SOPGenerator = ({
               color: '#6b7280',
               backgroundColor: '#f9fafb',
               borderRadius: '8px',
-              border: '2px dashed #d1d5db'
+              border: '2px dashed #d1d5db',
             }}
           >
             <p style={{ margin: 0, fontSize: '16px' }}>
@@ -1547,10 +1951,7 @@ const SOPGenerator = ({
       </div>
 
       {/* SOP Process Flowchart */}
-      <SOPFlowchart
-        licenseType={licenseKey}
-        selectedTemplate={selectedTemplate}
-      />
+      <SOPFlowchart licenseType={licenseKey} selectedTemplate={selectedTemplate} />
 
       {/* Template Editor Section */}
       <div
@@ -1558,7 +1959,7 @@ const SOPGenerator = ({
           backgroundColor: 'white',
           borderRadius: '12px',
           padding: '24px',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
         }}
       >
         <h3
@@ -1569,7 +1970,7 @@ const SOPGenerator = ({
             margin: '0 0 16px 0',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '8px',
           }}
         >
           ✏️ Template Editor
@@ -1589,7 +1990,7 @@ const SOPGenerator = ({
             color: '#374151',
             boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.1)',
             maxHeight: '600px',
-            overflowY: 'auto'
+            overflowY: 'auto',
           }}
         >
           {!selectedTemplate ? (
@@ -1602,7 +2003,7 @@ const SOPGenerator = ({
                 height: '100%',
                 color: '#9ca3af',
                 fontSize: '16px',
-                textAlign: 'center'
+                textAlign: 'center',
               }}
             >
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>📄</div>
@@ -1610,7 +2011,11 @@ const SOPGenerator = ({
                 Select a template to start editing
               </div>
               <div style={{ fontSize: '14px', color: '#6b7280' }}>
-                Choose from {availableTemplates.length > 0 ? `${availableTemplates.length} available templates` : 'default templates'} for {licenseName}
+                Choose from{' '}
+                {availableTemplates.length > 0
+                  ? `${availableTemplates.length} available templates`
+                  : 'default templates'}{' '}
+                for {licenseName}
               </div>
             </div>
           ) : (
@@ -1618,7 +2023,7 @@ const SOPGenerator = ({
               className="sop-template-content"
               style={{
                 wordWrap: 'break-word',
-                overflowWrap: 'break-word'
+                overflowWrap: 'break-word',
               }}
               dangerouslySetInnerHTML={{ __html: formatTemplateContent(sopContent) }}
             />
@@ -1629,9 +2034,77 @@ const SOPGenerator = ({
           style={{
             display: 'flex',
             gap: '12px',
-            marginTop: '16px'
+            marginTop: '16px',
           }}
         >
+          {/* MCP-Powered AI Generation Button */}
+          {mcpInitialized && isServerHealthy('document-genius') && (
+            <button
+              style={{
+                padding: '12px 24px',
+                backgroundColor: isGeneratingWithMCP ? '#9ca3af' : '#8b5cf6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: isGeneratingWithMCP ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+              onMouseEnter={e =>
+                !isGeneratingWithMCP && (e.target.style.backgroundColor = '#7c3aed')
+              }
+              onMouseLeave={e =>
+                !isGeneratingWithMCP && (e.target.style.backgroundColor = '#8b5cf6')
+              }
+              onClick={generateWithMCP}
+              disabled={isGeneratingWithMCP}
+            >
+              {isGeneratingWithMCP ? (
+                <>
+                  <div
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      border: '2px solid #ffffff',
+                      borderTop: '2px solid transparent',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite',
+                    }}
+                  />
+                  Generating...
+                </>
+              ) : (
+                <>🤖 AI Generate SOP</>
+              )}
+            </button>
+          )}
+
+          {/* Compliance Validation Button */}
+          {mcpInitialized && sopContent && isServerHealthy('document-genius') && (
+            <button
+              style={{
+                padding: '12px 24px',
+                backgroundColor: '#ec4899',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={e => (e.target.style.backgroundColor = '#db2777')}
+              onMouseLeave={e => (e.target.style.backgroundColor = '#ec4899')}
+              onClick={validateCompliance}
+            >
+              📋 Validate Compliance
+            </button>
+          )}
+
           <button
             style={{
               padding: '12px 24px',
@@ -1642,10 +2115,10 @@ const SOPGenerator = ({
               fontSize: '14px',
               fontWeight: '500',
               cursor: 'pointer',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
             }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = '#059669')}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = '#10b981')}
+            onMouseEnter={e => (e.target.style.backgroundColor = '#059669')}
+            onMouseLeave={e => (e.target.style.backgroundColor = '#10b981')}
             onClick={handleSave}
           >
             💾 Save to User Database
@@ -1661,10 +2134,10 @@ const SOPGenerator = ({
               fontSize: '14px',
               fontWeight: '500',
               cursor: 'pointer',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
             }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = '#2563eb')}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = '#3b82f6')}
+            onMouseEnter={e => (e.target.style.backgroundColor = '#2563eb')}
+            onMouseLeave={e => (e.target.style.backgroundColor = '#3b82f6')}
             onClick={handleDownload}
           >
             📥 Download
@@ -1680,16 +2153,134 @@ const SOPGenerator = ({
               fontSize: '14px',
               fontWeight: '500',
               cursor: 'pointer',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
             }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = '#d97706')}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = '#f59e0b')}
+            onMouseEnter={e => (e.target.style.backgroundColor = '#d97706')}
+            onMouseLeave={e => (e.target.style.backgroundColor = '#f59e0b')}
             onClick={handleReset}
           >
             🔄 Reset
           </button>
         </div>
       </div>
+
+      {/* MCP Recommendations Panel */}
+      {mcpInitialized && mcpRecommendations.length > 0 && (
+        <div
+          style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '24px',
+            marginTop: '24px',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+          }}
+        >
+          <h3
+            style={{
+              color: '#1f2937',
+              fontWeight: '600',
+              fontSize: '20px',
+              margin: '0 0 16px 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            🤖 AI Recommendations
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {mcpRecommendations.map((rec, index) => (
+              <div
+                key={index}
+                style={{
+                  padding: '16px',
+                  backgroundColor: '#f8fafc',
+                  borderRadius: '8px',
+                  borderLeft: `4px solid ${
+                    rec.priority === 'high'
+                      ? '#ef4444'
+                      : rec.priority === 'medium'
+                        ? '#f59e0b'
+                        : '#10b981'
+                  }`,
+                }}
+              >
+                <div
+                  style={{
+                    fontWeight: '500',
+                    color: '#1f2937',
+                    marginBottom: '4px',
+                  }}
+                >
+                  {rec.title}
+                </div>
+                <div
+                  style={{
+                    color: '#6b7280',
+                    fontSize: '14px',
+                    marginBottom: '8px',
+                  }}
+                >
+                  {rec.description}
+                </div>
+                {rec.estimatedBenefit && (
+                  <div
+                    style={{
+                      color: '#059669',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                    }}
+                  >
+                    💡 {rec.estimatedBenefit}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* MCP Status Indicator */}
+      {mcpInitialized && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '14px',
+            color: '#374151',
+          }}
+        >
+          <div
+            style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: isServerHealthy('document-genius') ? '#10b981' : '#ef4444',
+            }}
+          />
+          MCP {isServerHealthy('document-genius') ? 'Connected' : 'Disconnected'}
+        </div>
+      )}
+
+      {/* Add CSS for spinner animation */}
+      <style jsx>{`
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+      `}</style>
     </div>
   );
 };

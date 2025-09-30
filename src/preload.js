@@ -51,9 +51,12 @@ contextBridge.exposeInMainWorld('dbAPI', {
 
   // Version Markets
   getVersionMarkets: versionId => ipcRenderer.invoke('db-get-version-markets', versionId),
-  addVersionMarket: (versionId, marketId) => ipcRenderer.invoke('db-add-version-market', versionId, marketId),
-  removeVersionMarket: (versionId, marketId) => ipcRenderer.invoke('db-remove-version-market', versionId, marketId),
-  getAvailableMarketsForVersion: versionId => ipcRenderer.invoke('db-get-available-markets-for-version', versionId),
+  addVersionMarket: (versionId, marketId) =>
+    ipcRenderer.invoke('db-add-version-market', versionId, marketId),
+  removeVersionMarket: (versionId, marketId) =>
+    ipcRenderer.invoke('db-remove-version-market', versionId, marketId),
+  getAvailableMarketsForVersion: versionId =>
+    ipcRenderer.invoke('db-get-available-markets-for-version', versionId),
 
   // Clients
   getClients: options => ipcRenderer.invoke('db-get-clients', options),
@@ -104,26 +107,174 @@ contextBridge.exposeInMainWorld('maintenanceAPI', {
   getBackupDirectory: () => ipcRenderer.invoke('get-backup-directory'),
 });
 
+// Telemetry API
+contextBridge.exposeInMainWorld('telemetryAPI', {
+  logError: (category, data) => ipcRenderer.invoke('telemetry-log-error', category, data),
+  logEvent: (category, event, data) => ipcRenderer.invoke('telemetry-log-event', category, event, data),
+  logPerformance: (operation, duration, metadata) => ipcRenderer.invoke('telemetry-log-performance', operation, duration, metadata),
+});
+
 // User Database API
 contextBridge.exposeInMainWorld('userDatabaseAPI', {
   // File operations
   getFiles: (path = '') => ipcRenderer.invoke('user-db-get-files', path),
-  uploadFiles: (filePaths, targetPath = '') => ipcRenderer.invoke('user-db-upload-files', filePaths, targetPath),
-  deleteItems: (itemPaths) => ipcRenderer.invoke('user-db-delete-items', itemPaths),
-  copyItems: (sourcePaths, targetPath) => ipcRenderer.invoke('user-db-copy-items', sourcePaths, targetPath),
-  cutItems: (sourcePaths, targetPath) => ipcRenderer.invoke('user-db-cut-items', sourcePaths, targetPath),
-  pasteItems: (targetPath) => ipcRenderer.invoke('user-db-paste-items', targetPath),
-  
+  uploadFiles: (filePaths, targetPath = '') =>
+    ipcRenderer.invoke('user-db-upload-files', filePaths, targetPath),
+  deleteItems: itemPaths => ipcRenderer.invoke('user-db-delete-items', itemPaths),
+  copyItems: (sourcePaths, targetPath) =>
+    ipcRenderer.invoke('user-db-copy-items', sourcePaths, targetPath),
+  cutItems: (sourcePaths, targetPath) =>
+    ipcRenderer.invoke('user-db-cut-items', sourcePaths, targetPath),
+  pasteItems: targetPath => ipcRenderer.invoke('user-db-paste-items', targetPath),
+
   // Folder operations
   createFolder: (path, name) => ipcRenderer.invoke('user-db-create-folder', path, name),
   renameItem: (oldPath, newName) => ipcRenderer.invoke('user-db-rename-item', oldPath, newName),
-  
+
   // Dialog operations
-  openFileDialog: (options) => ipcRenderer.invoke('user-db-open-file-dialog', options),
-  
+  openFileDialog: options => ipcRenderer.invoke('user-db-open-file-dialog', options),
+
   // Upload progress
-  onUploadProgress: (callback) => {
+  onUploadProgress: callback => {
     ipcRenderer.on('user-db-upload-progress', (_, data) => callback(data));
     return () => ipcRenderer.removeAllListeners('user-db-upload-progress');
-  }
+  },
+});
+
+// Multi-Modal RAG API - Advanced Retrieval-Augmented Generation
+contextBridge.exposeInMainWorld('ragAPI', {
+  // Core RAG operations
+  initialize: config => ipcRenderer.invoke('rag-initialize', config),
+  indexDocument: (filePath, metadata) =>
+    ipcRenderer.invoke('rag-index-document', filePath, metadata),
+  indexFolder: (folderPath, options) => ipcRenderer.invoke('rag-index-folder', folderPath, options),
+  query: (queryText, options) => ipcRenderer.invoke('rag-query', queryText, options),
+  getStatus: () => ipcRenderer.invoke('rag-get-status'),
+
+  // Document management
+  listDocuments: options => ipcRenderer.invoke('rag-list-documents', options),
+  removeDocument: documentId => ipcRenderer.invoke('rag-remove-document', documentId),
+  updateDocument: (documentId, metadata) =>
+    ipcRenderer.invoke('rag-update-document', documentId, metadata),
+
+  // Search and retrieval
+  semanticSearch: (query, options) => ipcRenderer.invoke('rag-semantic-search', query, options),
+  hybridSearch: (query, options) => ipcRenderer.invoke('rag-hybrid-search', query, options),
+  crossModalSearch: (query, options) =>
+    ipcRenderer.invoke('rag-cross-modal-search', query, options),
+
+  // Analytics and insights
+  getAnalytics: timeRange => ipcRenderer.invoke('rag-get-analytics', timeRange),
+  getSimilarDocuments: (documentId, options) =>
+    ipcRenderer.invoke('rag-get-similar-documents', documentId, options),
+  getDocumentClusters: options => ipcRenderer.invoke('rag-get-document-clusters', options),
+
+  // Configuration
+  updateConfig: config => ipcRenderer.invoke('rag-update-config', config),
+  getConfig: () => ipcRenderer.invoke('rag-get-config'),
+
+  // File operations
+  selectFiles: options => ipcRenderer.invoke('rag-select-files', options),
+  selectFolder: options => ipcRenderer.invoke('rag-select-folder', options),
+
+  // Event listeners for real-time updates
+  onInitialized: callback => {
+    ipcRenderer.on('rag-initialized', callback);
+    return () => ipcRenderer.removeAllListeners('rag-initialized');
+  },
+
+  onDocumentIndexed: callback => {
+    ipcRenderer.on('rag-document-indexed', (_, data) => callback(data));
+    return () => ipcRenderer.removeAllListeners('rag-document-indexed');
+  },
+
+  onQueryProcessed: callback => {
+    ipcRenderer.on('rag-query-processed', (_, data) => callback(data));
+    return () => ipcRenderer.removeAllListeners('rag-query-processed');
+  },
+
+  onIndexingProgress: callback => {
+    ipcRenderer.on('rag-indexing-progress', (_, data) => callback(data));
+    return () => ipcRenderer.removeAllListeners('rag-indexing-progress');
+  },
+
+  onMetricsUpdated: callback => {
+    ipcRenderer.on('rag-metrics-updated', (_, data) => callback(data));
+    return () => ipcRenderer.removeAllListeners('rag-metrics-updated');
+  },
+
+  onError: callback => {
+    ipcRenderer.on('rag-error', (_, data) => callback(data));
+    return () => ipcRenderer.removeAllListeners('rag-error');
+  },
+});
+
+// Revolutionary MCP API - The most advanced MCP interface ever
+contextBridge.exposeInMainWorld('mcpAPI', {
+  // Core MCP operations
+  initialize: () => ipcRenderer.invoke('mcp-initialize'),
+  callTool: (server, tool, params, context) =>
+    ipcRenderer.invoke('mcp-call-tool', server, tool, params, context),
+  orchestrate: (tasks, options) => ipcRenderer.invoke('mcp-orchestrate', tasks, options),
+
+  // Status and discovery
+  getStatus: () => ipcRenderer.invoke('mcp-get-status'),
+  getServers: () => ipcRenderer.invoke('mcp-get-servers'),
+  getTools: serverName => ipcRenderer.invoke('mcp-get-tools', serverName),
+
+  // AI-powered features
+  predictNextActions: context => ipcRenderer.invoke('mcp-predict-next-actions', context),
+  getRecommendations: context => ipcRenderer.invoke('mcp-get-recommendations', context),
+  analyzeWorkflow: workflowData => ipcRenderer.invoke('mcp-analyze-workflow', workflowData),
+
+  // Autonomous agents
+  getAutonomousAgents: () => ipcRenderer.invoke('mcp-get-agents'),
+  controlAgent: (agentName, action) => ipcRenderer.invoke('mcp-control-agent', agentName, action),
+
+  // Configuration
+  updateConfig: config => ipcRenderer.invoke('mcp-update-config', config),
+  reloadConfig: () => ipcRenderer.invoke('mcp-reload-config'),
+
+  // Analytics and monitoring
+  getAnalytics: timeRange => ipcRenderer.invoke('mcp-get-analytics', timeRange),
+  getPerformanceMetrics: () => ipcRenderer.invoke('mcp-get-performance-metrics'),
+
+  // Event listeners for real-time updates
+  onInitialized: callback => {
+    ipcRenderer.on('mcp-initialized', callback);
+    return () => ipcRenderer.removeAllListeners('mcp-initialized');
+  },
+
+  onToolSuccess: callback => {
+    ipcRenderer.on('mcp-tool-success', (_, data) => callback(data));
+    return () => ipcRenderer.removeAllListeners('mcp-tool-success');
+  },
+
+  onToolError: callback => {
+    ipcRenderer.on('mcp-tool-error', (_, data) => callback(data));
+    return () => ipcRenderer.removeAllListeners('mcp-tool-error');
+  },
+
+  onServerHealthChange: callback => {
+    const healthHandler = (_, data) => callback({ ...data, type: 'unhealthy' });
+    const recoveryHandler = (_, data) => callback({ ...data, type: 'recovered' });
+
+    ipcRenderer.on('mcp-server-unhealthy', healthHandler);
+    ipcRenderer.on('mcp-server-recovered', recoveryHandler);
+
+    return () => {
+      ipcRenderer.removeAllListeners('mcp-server-unhealthy');
+      ipcRenderer.removeAllListeners('mcp-server-recovered');
+    };
+  },
+
+  onAgentExecution: callback => {
+    ipcRenderer.on('mcp-agent-executed', (_, data) => callback(data));
+    return () => ipcRenderer.removeAllListeners('mcp-agent-executed');
+  },
+
+  onOrchestrationComplete: callback => {
+    ipcRenderer.on('mcp-orchestration-complete', (_, data) => callback(data));
+    return () => ipcRenderer.removeAllListeners('mcp-orchestration-complete');
+  },
 });

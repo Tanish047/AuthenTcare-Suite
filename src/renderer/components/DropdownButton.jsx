@@ -13,7 +13,7 @@ const DropdownButton = ({
   const dropdownRef = useRef(null);
 
   // Memoized event handler for clicking outside
-  const handleClickOutside = useCallback((event) => {
+  const handleClickOutside = useCallback(event => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setShowDropdown(false);
     }
@@ -21,7 +21,7 @@ const DropdownButton = ({
 
   // Close dropdown when clicking outside or on escape key
   useEffect(() => {
-    const handleKeyDown = (event) => {
+    const handleKeyDown = event => {
       if (event.key === 'Escape') {
         setShowDropdown(false);
       }
@@ -38,10 +38,13 @@ const DropdownButton = ({
     };
   }, [handleClickOutside, showDropdown]);
 
-  const handleOptionClick = useCallback((option) => {
-    setShowDropdown(false);
-    onOptionSelect(option);
-  }, [onOptionSelect]);
+  const handleOptionClick = useCallback(
+    option => {
+      setShowDropdown(false);
+      onOptionSelect(option);
+    },
+    [onOptionSelect]
+  );
 
   const defaultButtonStyle = {
     padding: '8px 16px',
@@ -83,7 +86,7 @@ const DropdownButton = ({
         {buttonText}
         <span style={{ marginLeft: '4px' }}>▼</span>
       </button>
-      
+
       {showDropdown && !disabled && (
         <div style={defaultDropdownStyle}>
           {options.map((option, index) => (
@@ -100,8 +103,8 @@ const DropdownButton = ({
                 fontSize: '14px',
                 borderBottom: index < options.length - 1 ? '1px solid #eee' : 'none',
               }}
-              onMouseEnter={e => e.target.style.backgroundColor = '#f8f9fa'}
-              onMouseLeave={e => e.target.style.backgroundColor = 'transparent'}
+              onMouseEnter={e => (e.target.style.backgroundColor = '#f8f9fa')}
+              onMouseLeave={e => (e.target.style.backgroundColor = 'transparent')}
             >
               {option.label}
             </button>

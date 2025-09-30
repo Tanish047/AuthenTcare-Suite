@@ -31,9 +31,9 @@ function ResearchWorkspace({
 }) {
   const { state, dispatch } = useAppContext();
   const currentLevel = state.currentLevel || initialLevel;
-  
+
   // Update global state when level changes
-  const setCurrentLevel = (level) => {
+  const setCurrentLevel = level => {
     dispatch({ type: 'SET_CURRENT_LEVEL', currentLevel: level });
   };
 
@@ -56,11 +56,11 @@ function ResearchWorkspace({
   const selectedLicense = state.selectedLicense;
 
   // Helper functions to update selections in global state
-  const setSelectedProject = (project) => dispatch({ type: 'SET_SELECTED_PROJECT', project });
-  const setSelectedDevice = (device) => dispatch({ type: 'SET_SELECTED_DEVICE', device });
-  const setSelectedVersion = (version) => dispatch({ type: 'SET_SELECTED_VERSION', version });
-  const setSelectedMarket = (market) => dispatch({ type: 'SET_SELECTED_MARKET', market });
-  const setSelectedLicense = (license) => dispatch({ type: 'SET_SELECTED_LICENSE', license });
+  const setSelectedProject = project => dispatch({ type: 'SET_SELECTED_PROJECT', project });
+  const setSelectedDevice = device => dispatch({ type: 'SET_SELECTED_DEVICE', device });
+  const setSelectedVersion = version => dispatch({ type: 'SET_SELECTED_VERSION', version });
+  const setSelectedMarket = market => dispatch({ type: 'SET_SELECTED_MARKET', market });
+  const setSelectedLicense = license => dispatch({ type: 'SET_SELECTED_LICENSE', license });
 
   // Navigation helper functions
   const navigateToLevel = (level, selection) => {
@@ -186,11 +186,18 @@ function ResearchWorkspace({
     } else {
       window.researchWorkspaceBackHandler = handleBackNavigation;
     }
-    
+
     return () => {
       window.researchWorkspaceBackHandler = null;
     };
-  }, [currentLevel, selectedProject, selectedDevice, selectedVersion, selectedMarket, selectedLicense]);
+  }, [
+    currentLevel,
+    selectedProject,
+    selectedDevice,
+    selectedVersion,
+    selectedMarket,
+    selectedLicense,
+  ]);
 
   const {
     projects,
@@ -324,16 +331,17 @@ function ResearchWorkspace({
     if (!selectedProject || !selectedVersion || !selectedMarket || !state.marketLicenses) {
       return [];
     }
-    
+
     // If marketLicenses is an array (from database), filter it
     if (Array.isArray(state.marketLicenses)) {
-      return state.marketLicenses.filter(license => 
-        license.project_id === selectedProject.id &&
-        license.version_id === selectedVersion.id &&
-        license.market_id === selectedMarket.id
+      return state.marketLicenses.filter(
+        license =>
+          license.project_id === selectedProject.id &&
+          license.version_id === selectedVersion.id &&
+          license.market_id === selectedMarket.id
       );
     }
-    
+
     // If marketLicenses is organized by market (old format), use it
     return state.marketLicenses[selectedMarket.id] || [];
   }, [state.marketLicenses, selectedProject, selectedVersion, selectedMarket]);
@@ -390,9 +398,16 @@ function ResearchWorkspace({
       selectedDevice: selectedDevice?.name,
       selectedVersion: selectedVersion?.version_number,
       selectedMarket: selectedMarket?.name,
-      selectedLicense: selectedLicense?.license_number || selectedLicense?.name
+      selectedLicense: selectedLicense?.license_number || selectedLicense?.name,
     });
-  }, [currentLevel, selectedProject, selectedDevice, selectedVersion, selectedMarket, selectedLicense]);
+  }, [
+    currentLevel,
+    selectedProject,
+    selectedDevice,
+    selectedVersion,
+    selectedMarket,
+    selectedLicense,
+  ]);
 
   // Load devices when project is selected
   useEffect(() => {
@@ -423,8 +438,6 @@ function ResearchWorkspace({
     loadLicenses();
   }, [dispatch]);
 
-
-
   // Get dynamic title based on current level and selections
   const getPageTitle = () => {
     switch (currentLevel) {
@@ -435,7 +448,9 @@ function ResearchWorkspace({
       case 'version':
         return selectedDevice ? `${selectedDevice.name} - Versions` : 'Research Workspace';
       case 'market':
-        return selectedVersion ? `Version ${selectedVersion.version_number} - Markets` : 'Research Workspace';
+        return selectedVersion
+          ? `Version ${selectedVersion.version_number} - Markets`
+          : 'Research Workspace';
       case 'license':
         return selectedMarket ? `${selectedMarket.name} - Licenses` : 'Research Workspace';
       case 'completion':
@@ -661,14 +676,14 @@ function ResearchWorkspace({
                 console.log('Selected license:', license);
                 setSelectedLicense(license);
                 setCurrentLevel('completion');
-                
+
                 // Save the completed pathway for restoration
                 const completedPathway = {
                   project: selectedProject,
                   device: selectedDevice,
                   version: selectedVersion,
                   market: selectedMarket,
-                  license: license
+                  license: license,
                 };
                 setStorage('lastCompletedPathway', completedPathway);
                 console.log('Saved completed pathway:', completedPathway);

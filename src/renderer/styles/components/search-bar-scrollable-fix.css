@@ -1,0 +1,221 @@
+/* Search Bar and Scrollable Query Reply Fix */
+/* This file contains specific fixes for search bar layout and scrollable replies */
+
+/* SEARCH BAR LAYOUT FIX */
+.message-input-container {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  background: white !important;
+  border-top: 1px solid #e5e7eb !important;
+  padding: 1rem 1.5rem !important;
+  flex-shrink: 0 !important;
+  height: 70px !important;
+  min-height: 70px !important;
+  max-height: 70px !important;
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 320px !important;
+  right: 0 !important;
+  z-index: 1000 !important;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1) !important;
+  gap: 1rem !important;
+}
+
+/* Input area layout */
+.input-area {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  width: 100% !important;
+  flex: 1 !important;
+}
+
+/* Input wrapper styling */
+.input-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  flex: 1 !important;
+  gap: 0.5rem !important;
+  padding: 0.75rem 1rem !important;
+  background: #f8fafc !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 0.75rem !important;
+  transition: all 0.2s !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+}
+
+.input-wrapper:focus-within {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+  background: #ffffff !important;
+}
+
+.input-wrapper:hover {
+  border-color: #9ca3af !important;
+  background: #ffffff !important;
+}
+
+/* Text input styling */
+.message-textarea {
+  display: block !important;
+  flex: 1 !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  max-height: 22px !important;
+  border: none !important;
+  background: transparent !important;
+  resize: none !important;
+  outline: none !important;
+  font-size: 0.9rem !important;
+  line-height: 22px !important;
+  color: #1f2937 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Send button styling */
+.send-btn {
+  background: #3b82f6 !important;
+  color: white !important;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 0.75rem !important;
+  font-size: 1.1rem !important;
+  flex-shrink: 0 !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+}
+
+.send-btn:hover:not(:disabled) {
+  background: #2563eb !important;
+  transform: scale(1.02) !important;
+}
+
+.send-btn:disabled {
+  background: #9ca3af !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* MESSAGES CONTAINER FIX FOR PROFESSIONAL INPUT */
+.messages-container {
+  display: flex !important;
+  flex: 1 !important;
+  flex-direction: column !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 1rem 1.5rem !important;
+  padding-bottom: 120px !important;
+  background: #f8fafc !important;
+  height: calc(100vh - 60px) !important;
+  min-height: calc(100vh - 60px) !important;
+  max-height: calc(100vh - 60px) !important;
+}
+
+/* SCROLLABLE QUERY REPLIES */
+.message-content {
+  display: block !important;
+  color: #1f2937 !important;
+  line-height: 1.6 !important;
+  font-size: 0.875rem !important;
+  max-height: 400px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  word-wrap: break-word !important;
+  white-space: pre-wrap !important;
+  padding-right: 8px !important;
+}
+
+/* Custom scrollbar for message content */
+.message-content::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.message-content::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+  border-radius: 3px !important;
+}
+
+.message-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1 !important;
+  border-radius: 3px !important;
+}
+
+.message-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8 !important;
+}
+
+/* Custom scrollbar for messages container */
+.messages-container::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+.messages-container::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+  border-radius: 4px !important;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1 !important;
+  border-radius: 4px !important;
+}
+
+.messages-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8 !important;
+}
+
+/* Hide old message input components - be more specific */
+.message-input-container:not(.professional-message-input) {
+  display: none !important;
+}
+
+/* Ensure professional message input is not affected by old styles */
+.professional-message-input,
+.professional-message-input *,
+.professional-message-input .professional-textarea {
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+.input-footer {
+  display: none !important;
+}
+
+.input-info {
+  display: none !important;
+}
+
+.input-shortcuts {
+  display: none !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .message-input-container {
+    left: 0 !important;
+    padding: 0.75rem 1rem !important;
+  }
+}
+
+/* Force visibility and proper behavior */
+.message-input-container,
+.input-area,
+.input-wrapper,
+.message-textarea,
+.send-btn,
+.messages-container,
+.message-content {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}

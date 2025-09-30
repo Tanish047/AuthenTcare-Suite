@@ -40,12 +40,14 @@ const MarketModals = ({
           <button
             key="save"
             onClick={onEditMarket}
-            disabled={loading || !editMarketName || (
-              editMarketName === editMarket?.name &&
-              editMarketRegion === (editMarket?.region || '') &&
-              editMarketRegulatoryBody === (editMarket?.regulatory_body || '') &&
-              editMarketRequirements === (editMarket?.requirements || '')
-            )}
+            disabled={
+              loading ||
+              !editMarketName ||
+              (editMarketName === editMarket?.name &&
+                editMarketRegion === (editMarket?.region || '') &&
+                editMarketRegulatoryBody === (editMarket?.regulatory_body || '') &&
+                editMarketRequirements === (editMarket?.requirements || ''))
+            }
           >
             {loading ? 'Saving...' : 'Save'}
           </button>,
@@ -67,24 +69,32 @@ const MarketModals = ({
               value={editMarketName}
               onChange={e => setEditMarketName(e.target.value)}
               placeholder="Enter market name"
-              style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+              style={{
+                width: '100%',
+                padding: '8px',
+                borderRadius: '4px',
+                border: '1px solid #ccc',
+              }}
               required
             />
           </div>
-          
+
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', marginBottom: 4, fontWeight: '600' }}>
-              Region
-            </label>
+            <label style={{ display: 'block', marginBottom: 4, fontWeight: '600' }}>Region</label>
             <input
               type="text"
               value={editMarketRegion}
               onChange={e => setEditMarketRegion(e.target.value)}
               placeholder="Enter region (e.g., Asia-Pacific, Europe)"
-              style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+              style={{
+                width: '100%',
+                padding: '8px',
+                borderRadius: '4px',
+                border: '1px solid #ccc',
+              }}
             />
           </div>
-          
+
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', marginBottom: 4, fontWeight: '600' }}>
               Regulatory Body
@@ -94,10 +104,15 @@ const MarketModals = ({
               value={editMarketRegulatoryBody}
               onChange={e => setEditMarketRegulatoryBody(e.target.value)}
               placeholder="Enter regulatory body (e.g., FDA, EMA, TGA)"
-              style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+              style={{
+                width: '100%',
+                padding: '8px',
+                borderRadius: '4px',
+                border: '1px solid #ccc',
+              }}
             />
           </div>
-          
+
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', marginBottom: 4, fontWeight: '600' }}>
               Requirements
@@ -106,13 +121,13 @@ const MarketModals = ({
               value={editMarketRequirements}
               onChange={e => setEditMarketRequirements(e.target.value)}
               placeholder="Enter specific regulatory requirements"
-              style={{ 
-                width: '100%', 
-                padding: '8px', 
-                borderRadius: '4px', 
+              style={{
+                width: '100%',
+                padding: '8px',
+                borderRadius: '4px',
                 border: '1px solid #ccc',
                 minHeight: '80px',
-                resize: 'vertical'
+                resize: 'vertical',
               }}
             />
           </div>
@@ -131,9 +146,9 @@ const MarketModals = ({
           <button key="cancel" onClick={onCloseDelete} disabled={loading}>
             Cancel
           </button>,
-          <button 
-            key="delete" 
-            onClick={onDeleteMarket} 
+          <button
+            key="delete"
+            onClick={onDeleteMarket}
             disabled={loading || !marketDeletePassword}
             style={{ backgroundColor: '#dc3545', color: 'white' }}
           >
@@ -149,21 +164,26 @@ const MarketModals = ({
           style={{ width: '100%' }}
         >
           <p style={{ marginBottom: 16 }}>
-            Are you sure you want to remove <strong>{deleteMarket?.name}</strong> from this version? 
-            This will not delete the market from the database, only remove it from this specific version.
+            Are you sure you want to remove <strong>{deleteMarket?.name}</strong> from this version?
+            This will not delete the market from the database, only remove it from this specific
+            version.
           </p>
           <input
             type="password"
             value={marketDeletePassword}
             onChange={e => setMarketDeletePassword(e.target.value)}
             placeholder="Enter password to confirm"
-            style={{ width: '100%', marginBottom: 8, padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+            style={{
+              width: '100%',
+              marginBottom: 8,
+              padding: '8px',
+              borderRadius: '4px',
+              border: '1px solid #ccc',
+            }}
             required
           />
           {marketDeleteError && (
-            <p style={{ color: '#dc3545', marginTop: 8, fontSize: '14px' }}>
-              {marketDeleteError}
-            </p>
+            <p style={{ color: '#dc3545', marginTop: 8, fontSize: '14px' }}>{marketDeleteError}</p>
           )}
         </form>
       </Modal>

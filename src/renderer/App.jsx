@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useAppContext, AppProvider } from './context/AppContext.jsx';
+import ErrorBoundary, { withErrorBoundary } from './components/ErrorBoundary.jsx';
 import NavBar from './components/NavBar.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import Notifications from './components/Notifications.jsx';
@@ -10,6 +11,8 @@ import ResearchWorkspace from './components/ResearchWorkspace.jsx';
 import UserDatabase from './components/UserDatabase.jsx';
 import SOPGenerator from './components/SOPGenerator.jsx';
 import Settings from './components/Settings.jsx';
+import ModernRAGWorkspace from './components/ModernRAGWorkspace_Clean.jsx';
+import AIKnowledgeBase from './components/ai-knowledge-base/index.jsx';
 
 const menuData = [
   {
@@ -96,6 +99,18 @@ const menuData = [
     ),
     key: 'research',
     children: null, // No dropdown - direct page transition
+  },
+  {
+    label: (
+      <>
+        <span role="img" aria-label="AI Knowledge Base" style={{ marginRight: 6 }}>
+          🤖
+        </span>
+        AI Knowledge Base
+      </>
+    ),
+    key: 'ai-knowledge-base',
+    children: null, // Direct navigation - no dropdown needed
   },
   {
     label: (
@@ -187,9 +202,11 @@ const menuData = [
 
 function App() {
   return (
-    <AppProvider>
-      <AppWrapper />
-    </AppProvider>
+    <ErrorBoundary>
+      <AppProvider>
+        <AppWrapper />
+      </AppProvider>
+    </ErrorBoundary>
   );
 }
 
@@ -268,6 +285,15 @@ function AppContent() {
       case 'notifications':
         dispatch({ type: 'SET_PAGE', page: 'dashboard', pageParent: null });
         break;
+      case 'ai-knowledge-base':
+        dispatch({ type: 'SET_PAGE', page: 'ai-knowledge-base', pageParent: null });
+        break;
+      case 'rag-workspace':
+      case 'rag-chat':
+      case 'knowledge-base':
+        // Legacy routes - redirect to new AI Knowledge Base
+        dispatch({ type: 'SET_PAGE', page: 'ai-knowledge-base', pageParent: null });
+        break;
       default:
         // For any other page, go back to dashboard
         dispatch({ type: 'SET_PAGE', page: 'dashboard', pageParent: null });
@@ -279,61 +305,80 @@ function AppContent() {
       <div className="background-blur-blob blob-magenta" />
       <div className="background-blur-blob blob-blue" />
       <div className="background-blur-blob blob-orange" />
-      <NavBar
-        menuData={menuData}
-        handleNavClick={handleNavClick}
-        handleDropdownItemClick={handleDropdownItemClick}
-        handleBackClick={handleBackClick}
-        closeTimer={closeTimer}
-        handleAnyMouseEnter={handleAnyMouseEnter}
-        handleAnyMouseLeave={handleAnyMouseLeave}
-      />
+      <ErrorBoundary>
+        <NavBar
+          menuData={menuData}
+          handleNavClick={handleNavClick}
+          handleDropdownItemClick={handleDropdownItemClick}
+          handleBackClick={handleBackClick}
+          closeTimer={closeTimer}
+          handleAnyMouseEnter={handleAnyMouseEnter}
+          handleAnyMouseLeave={handleAnyMouseLeave}
+        />
+      </ErrorBoundary>
       <main className="main-content">
-        {page === 'dashboard' && <Dashboard />}
-        {page === 'notifications' && <Notifications />}
-        {page === 'clients' && <ClientsLanding />}
-        {page === 'client-workspace' && <ClientWorkspace />}
-        {page === 'research' && (
-          <ResearchLanding
-            onWorkspace={nextPage =>
-              dispatch({ type: 'SET_PAGE', page: nextPage, pageParent: 'research' })
-            }
-          />
-        )}
-        {(page === 'research-workspace' || page === 'device-workspace' || page === 'version-workspace' || page === 'market-workspace') && (
-          <ResearchWorkspace
-            currentLevel={
-              page === 'research-workspace' ? (state.currentLevel || 'project') :
-              page === 'device-workspace' ? 'device' :
-              page === 'version-workspace' ? 'version' :
-              page === 'market-workspace' ? 'market' : 'project'
-            }
-            onBackNavigation={() => dispatch({ type: 'SET_PAGE', page: 'research', pageParent: null })}
-          />
-        )}
-        {page === 'user-database' && (
-          <UserDatabase
-            onBack={() => {
-              // Navigate back to research workspace (currentLevel is preserved in global state)
-              dispatch({ type: 'SET_PAGE', page: 'research-workspace', pageParent: 'research' });
-            }}
-          />
-        )}
-        {page === 'sop-generator' && (
-          <SOPGenerator
-            selectedProject={state.selectedProject}
-            selectedDevice={state.selectedDevice}
-            selectedVersion={state.selectedVersion}
-            selectedMarket={state.selectedMarket}
-            selectedLicense={state.selectedLicense}
-            onBack={() => {
-              // Navigate back to research workspace (currentLevel is preserved in global state)
-              dispatch({ type: 'SET_PAGE', page: 'research-workspace', pageParent: 'research' });
-            }}
-          />
-        )}
-        {page === 'settings' && <Settings menuData={menuData} />}
-        {/* Add more page components as needed */}
+        <ErrorBoundary>
+          {page === 'dashboard' && <Dashboard />}
+          {page === 'notifications' && <Notifications />}
+          {page === 'clients' && <ClientsLanding />}
+          {page === 'client-workspace' && <ClientWorkspace />}
+          {page === 'research' && (
+            <ResearchLanding
+              onWorkspace={nextPage =>
+                dispatch({ type: 'SET_PAGE', page: nextPage, pageParent: 'research' })
+              }
+            />
+          )}
+          {(page === 'research-workspace' ||
+            page === 'device-workspace' ||
+            page === 'version-workspace' ||
+            page === 'market-workspace') && (
+            <ResearchWorkspace
+              currentLevel={
+                page === 'research-workspace'
+                  ? state.currentLevel || 'project'
+                  : page === 'device-workspace'
+                    ? 'device'
+                    : page === 'version-workspace'
+                      ? 'version'
+                      : page === 'market-workspace'
+                        ? 'market'
+                        : 'project'
+              }
+              onBackNavigation={() =>
+                dispatch({ type: 'SET_PAGE', page: 'research', pageParent: null })
+              }
+            />
+          )}
+          {page === 'user-database' && (
+            <UserDatabase
+              onBack={() => {
+                // Navigate back to research workspace (currentLevel is preserved in global state)
+                dispatch({ type: 'SET_PAGE', page: 'research-workspace', pageParent: 'research' });
+              }}
+            />
+          )}
+          {page === 'sop-generator' && (
+            <SOPGenerator
+              selectedProject={state.selectedProject}
+              selectedDevice={state.selectedDevice}
+              selectedVersion={state.selectedVersion}
+              selectedMarket={state.selectedMarket}
+              selectedLicense={state.selectedLicense}
+              onBack={() => {
+                // Navigate back to research workspace (currentLevel is preserved in global state)
+                dispatch({ type: 'SET_PAGE', page: 'research-workspace', pageParent: 'research' });
+              }}
+            />
+          )}
+          {page === 'settings' && <Settings menuData={menuData} />}
+          {page === 'ai-knowledge-base' && <AIKnowledgeBase />}
+          {/* Legacy routes - redirect to new AI Knowledge Base */}
+          {page === 'rag-workspace' && <AIKnowledgeBase />}
+          {page === 'rag-chat' && <AIKnowledgeBase />}
+          {page === 'knowledge-base' && <AIKnowledgeBase />}
+          {/* Add more page components as needed */}
+        </ErrorBoundary>
       </main>
     </>
   );

@@ -56,7 +56,10 @@ export default class IPCHandler {
     ipcMain.handle('db-get-version-markets', this.getVersionMarkets.bind(this));
     ipcMain.handle('db-add-version-market', this.addVersionMarket.bind(this));
     ipcMain.handle('db-remove-version-market', this.removeVersionMarket.bind(this));
-    ipcMain.handle('db-get-available-markets-for-version', this.getAvailableMarketsForVersion.bind(this));
+    ipcMain.handle(
+      'db-get-available-markets-for-version',
+      this.getAvailableMarketsForVersion.bind(this)
+    );
 
     // User Database
     ipcMain.handle('user-db-get-files', this.getUserDatabaseFiles.bind(this));
@@ -634,7 +637,7 @@ export default class IPCHandler {
         'SELECT id FROM version_markets WHERE version_id = ? AND market_id = ?',
         [versionId, marketId]
       );
-      
+
       if (existing) {
         throw new Error('Market is already added to this version');
       }
@@ -662,10 +665,10 @@ export default class IPCHandler {
 
   async removeVersionMarket(event, versionId, marketId) {
     try {
-      await this.db.run(
-        'DELETE FROM version_markets WHERE version_id = ? AND market_id = ?',
-        [versionId, marketId]
-      );
+      await this.db.run('DELETE FROM version_markets WHERE version_id = ? AND market_id = ?', [
+        versionId,
+        marketId,
+      ]);
       return { success: true };
     } catch (error) {
       console.error('Error removing version market:', error);
@@ -736,7 +739,7 @@ export default class IPCHandler {
           relativePath: itemRelativePath,
           dateCreated: fileMetadata.dateCreated || stats.birthtime,
           dateModified: stats.mtime,
-          extension: entry.isDirectory() ? null : path.extname(entry.name).slice(1)
+          extension: entry.isDirectory() ? null : path.extname(entry.name).slice(1),
         });
       }
 
@@ -771,18 +774,18 @@ export default class IPCHandler {
 
       for (let i = 0; i < filePaths.length; i++) {
         const filePath = filePaths[i];
-        
+
         // Send progress update
         event.sender.send('user-db-upload-progress', {
           current: i + 1,
           total: totalFiles,
           percentage: Math.round(((i + 1) / totalFiles) * 100),
-          currentFile: path.basename(filePath)
+          currentFile: path.basename(filePath),
         });
 
         try {
           const stats = await fs.stat(filePath);
-          
+
           // Skip directories as per requirement
           if (stats.isDirectory()) {
             continue;
@@ -803,7 +806,7 @@ export default class IPCHandler {
             originalName,
             originalPath: filePath,
             dateCreated: new Date().toISOString(),
-            uploadedAt: new Date().toISOString()
+            uploadedAt: new Date().toISOString(),
           };
 
           uploadedFiles.push({
@@ -815,7 +818,7 @@ export default class IPCHandler {
             relativePath,
             dateCreated: new Date(),
             dateModified: stats.mtime,
-            extension: extension.slice(1)
+            extension: extension.slice(1),
           });
         } catch (fileError) {
           console.error(`Error uploading file ${filePath}:`, fileError);
@@ -831,7 +834,7 @@ export default class IPCHandler {
         current: totalFiles,
         total: totalFiles,
         percentage: 100,
-        completed: true
+        completed: true,
       });
 
       return { data: uploadedFiles };
@@ -856,8 +859,6 @@ export default class IPCHandler {
       }
     }
   }
-
-
 
   async deleteUserDatabaseItems(event, itemPaths) {
     try {
@@ -894,7 +895,7 @@ export default class IPCHandler {
 
           deletedItems.push({
             id: itemPath,
-            name: itemMetadata?.originalName || path.basename(itemPath)
+            name: itemMetadata?.originalName || path.basename(itemPath),
           });
         } catch (fileError) {
           console.error(`Error deleting item ${itemPath}:`, fileError);
@@ -915,7 +916,7 @@ export default class IPCHandler {
     try {
       this.clipboard = {
         items: sourcePaths,
-        operation: 'copy'
+        operation: 'copy',
       };
       return { success: true };
     } catch (error) {
@@ -928,7 +929,7 @@ export default class IPCHandler {
     try {
       this.clipboard = {
         items: sourcePaths,
-        operation: 'cut'
+        operation: 'cut',
       };
       return { success: true };
     } catch (error) {
@@ -996,7 +997,7 @@ export default class IPCHandler {
             metadata[newRelativePath] = {
               originalName: metadata[sourcePath]?.originalName || sourceName,
               dateCreated: new Date().toISOString(),
-              pastedAt: new Date().toISOString()
+              pastedAt: new Date().toISOString(),
             };
           }
 
@@ -1006,7 +1007,7 @@ export default class IPCHandler {
             type: stats.isDirectory() ? 'folder' : 'file',
             size: stats.isDirectory() ? 0 : stats.size,
             path: newFullPath,
-            relativePath: newRelativePath
+            relativePath: newRelativePath,
           });
         } catch (itemError) {
           console.error(`Error pasting item ${sourcePath}:`, itemError);
@@ -1032,10 +1033,12 @@ export default class IPCHandler {
     try {
       const userDataPath = app.getPath('userData');
       const userDbPath = path.join(userDataPath, 'user-database');
-      
+
       // Create a safe folder name (no UUID, use actual name but sanitized)
       const safeFolderName = folderName.replace(/[<>:"/\\|?*]/g, '_');
-      const folderRelativePath = targetPath ? path.join(targetPath, safeFolderName) : safeFolderName;
+      const folderRelativePath = targetPath
+        ? path.join(targetPath, safeFolderName)
+        : safeFolderName;
       const folderFullPath = path.join(userDbPath, folderRelativePath);
       const metadataPath = path.join(userDbPath, 'metadata.json');
 
@@ -1064,7 +1067,7 @@ export default class IPCHandler {
       metadata[folderRelativePath] = {
         originalName: folderName,
         dateCreated: new Date().toISOString(),
-        type: 'folder'
+        type: 'folder',
       };
 
       await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
@@ -1077,7 +1080,7 @@ export default class IPCHandler {
         path: folderFullPath,
         relativePath: folderRelativePath,
         dateCreated: new Date(),
-        dateModified: new Date()
+        dateModified: new Date(),
       };
     } catch (error) {
       console.error('Error creating folder:', error);
@@ -1118,17 +1121,15 @@ export default class IPCHandler {
   async openUserDatabaseFileDialog(event, options = {}) {
     try {
       const { properties = ['openFile', 'multiSelections'] } = options;
-      
+
       const result = await dialog.showOpenDialog({
         properties,
-        filters: [
-          { name: 'All Files', extensions: ['*'] }
-        ]
+        filters: [{ name: 'All Files', extensions: ['*'] }],
       });
 
       return {
         canceled: result.canceled,
-        filePaths: result.filePaths || []
+        filePaths: result.filePaths || [],
       };
     } catch (error) {
       console.error('Error opening file dialog:', error);

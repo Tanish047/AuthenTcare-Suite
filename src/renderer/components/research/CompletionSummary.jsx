@@ -10,13 +10,13 @@ const CompletionSummary = ({
   onBack,
   onStartNew,
   onUserDatabase,
-  onSOPGenerator
+  onSOPGenerator,
 }) => {
   const [isProAnalyzerExpanded, setIsProAnalyzerExpanded] = useState(false);
 
   // Keyboard shortcut for ProAnalyzer sidebar
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = e => {
       // Ctrl+P to toggle ProAnalyzer sidebar
       if (e.ctrlKey && e.key === 'p') {
         e.preventDefault();
@@ -33,22 +33,42 @@ const CompletionSummary = ({
   }, [isProAnalyzerExpanded]);
 
   const proAnalyzerTools = [
-    { name: 'Competitor Analyser', icon: '🏢', description: 'Analyze market competitors and positioning' },
-    { name: 'Cost Estimation Tool', icon: '💰', description: 'Estimate regulatory and development costs' },
+    {
+      name: 'Competitor Analyser',
+      icon: '🏢',
+      description: 'Analyze market competitors and positioning',
+    },
+    {
+      name: 'Cost Estimation Tool',
+      icon: '💰',
+      description: 'Estimate regulatory and development costs',
+    },
     { name: 'Gap Analyser', icon: '🔍', description: 'Identify regulatory gaps and requirements' },
-    { name: 'Master File Maker', icon: '📋', description: 'Generate comprehensive regulatory files' },
+    {
+      name: 'Master File Maker',
+      icon: '📋',
+      description: 'Generate comprehensive regulatory files',
+    },
     { name: 'Pathway To Market', icon: '🛣️', description: 'Map optimal market entry strategies' },
     { name: 'PMS Advisor Pro', icon: '📊', description: 'Post-market surveillance guidance' },
     { name: 'PPT Generator', icon: '📑', description: 'Create presentation materials' },
-    { name: 'Predicate Finder', icon: '🔎', description: 'Find regulatory predicates and precedents' },
+    {
+      name: 'Predicate Finder',
+      icon: '🔎',
+      description: 'Find regulatory predicates and precedents',
+    },
     { name: 'QMS Advisor Pro', icon: '⚙️', description: 'Quality management system guidance' },
     { name: 'Regulatory Advisor', icon: '📜', description: 'Expert regulatory consultation' },
-    { name: 'SOP Generator', icon: '📝', description: 'Generate standard operating procedures from templates' },
+    {
+      name: 'SOP Generator',
+      icon: '📝',
+      description: 'Generate standard operating procedures from templates',
+    },
     { name: 'Strategy Maker', icon: '🎯', description: 'Develop regulatory strategies' },
     { name: 'Timeline Pro', icon: '⏱️', description: 'Create detailed project timelines' },
   ];
 
-  const handleToolClick = (toolName) => {
+  const handleToolClick = toolName => {
     console.log(`Opening ${toolName} tool...`);
 
     if (toolName === 'SOP Generator') {
@@ -61,20 +81,31 @@ const CompletionSummary = ({
     // TODO: Implement other tool navigation/opening logic
     // Keep sidebar open for easy access to multiple tools
   };
-  if (!selectedProject || !selectedDevice || !selectedVersion || !selectedMarket || !selectedLicense) {
+  if (
+    !selectedProject ||
+    !selectedDevice ||
+    !selectedVersion ||
+    !selectedMarket ||
+    !selectedLicense
+  ) {
     return null;
   }
 
-  const licenseName = typeof selectedLicense === 'string' ? selectedLicense : selectedLicense?.license_number || selectedLicense?.name;
+  const licenseName =
+    typeof selectedLicense === 'string'
+      ? selectedLicense
+      : selectedLicense?.license_number || selectedLicense?.name;
   const countryName = selectedMarket?.selectedCountry || selectedMarket?.name;
 
   return (
-    <div style={{
-      position: 'relative',
-      marginTop: 0,
-      display: 'flex',
-      minHeight: '100vh'
-    }}>
+    <div
+      style={{
+        position: 'relative',
+        marginTop: 0,
+        display: 'flex',
+        minHeight: '100vh',
+      }}
+    >
       {/* ProAnalyzer Sidebar */}
       <div
         className="proanalyzer-sidebar-container"
@@ -89,33 +120,43 @@ const CompletionSummary = ({
           zIndex: 1000,
           borderRight: '1px solid #e0e0e0',
           overflow: 'hidden',
-        }}>
+        }}
+      >
         {/* Sidebar Content */}
-        <div style={{
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-        }}>
+        <div
+          style={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
           {/* Sidebar Header */}
-          <div style={{
-            padding: '20px',
-            borderBottom: '2px solid #f0f0f0',
-            backgroundColor: '#f8f9fa',
-          }}>
-            <h3 style={{
-              color: '#2c5aa0',
-              fontWeight: '700',
-              fontSize: '18px',
-              margin: '0 0 8px 0',
-            }}>
+          <div
+            style={{
+              padding: '20px',
+              borderBottom: '2px solid #f0f0f0',
+              backgroundColor: '#f8f9fa',
+            }}
+          >
+            <h3
+              style={{
+                color: '#2c5aa0',
+                fontWeight: '700',
+                fontSize: '18px',
+                margin: '0 0 8px 0',
+              }}
+            >
               🔧 ProAnalyzer Tools
             </h3>
-            <div style={{
-              color: '#666',
-              fontSize: '12px',
-              lineHeight: '1.4',
-            }}>
-              <strong>Pathway:</strong> {selectedProject?.name} → {selectedDevice?.name} → v{selectedVersion?.version_number}
+            <div
+              style={{
+                color: '#666',
+                fontSize: '12px',
+                lineHeight: '1.4',
+              }}
+            >
+              <strong>Pathway:</strong> {selectedProject?.name} → {selectedDevice?.name} → v
+              {selectedVersion?.version_number}
             </div>
           </div>
 
@@ -126,39 +167,48 @@ const CompletionSummary = ({
               flex: 1,
               overflowY: 'auto',
               padding: '16px',
-            }}>
+            }}
+          >
             {proAnalyzerTools.map((tool, index) => (
               <div
                 key={index}
                 className="proanalyzer-tool-card"
                 onClick={() => handleToolClick(tool.name)}
               >
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '12px',
-                }}>
-                  <div style={{
-                    fontSize: '20px',
-                    flexShrink: 0,
-                  }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '12px',
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: '20px',
+                      flexShrink: 0,
+                    }}
+                  >
                     {tool.icon}
                   </div>
                   <div>
-                    <h4 style={{
-                      color: '#2c5aa0',
-                      fontWeight: '600',
-                      fontSize: '14px',
-                      margin: '0 0 4px 0',
-                    }}>
+                    <h4
+                      style={{
+                        color: '#2c5aa0',
+                        fontWeight: '600',
+                        fontSize: '14px',
+                        margin: '0 0 4px 0',
+                      }}
+                    >
                       {tool.name}
                     </h4>
-                    <p style={{
-                      color: '#666',
-                      fontSize: '12px',
-                      margin: 0,
-                      lineHeight: '1.3',
-                    }}>
+                    <p
+                      style={{
+                        color: '#666',
+                        fontSize: '12px',
+                        margin: 0,
+                        lineHeight: '1.3',
+                      }}
+                    >
                       {tool.description}
                     </p>
                   </div>
@@ -168,14 +218,16 @@ const CompletionSummary = ({
           </div>
 
           {/* Sidebar Footer */}
-          <div style={{
-            padding: '16px',
-            borderTop: '1px solid #f0f0f0',
-            backgroundColor: '#f8f9fa',
-            textAlign: 'center',
-            color: '#666',
-            fontSize: '12px',
-          }}>
+          <div
+            style={{
+              padding: '16px',
+              borderTop: '1px solid #f0f0f0',
+              backgroundColor: '#f8f9fa',
+              textAlign: 'center',
+              color: '#666',
+              fontSize: '12px',
+            }}
+          >
             Press <kbd>Ctrl+P</kbd> or click arrow to toggle
           </div>
         </div>
@@ -190,17 +242,19 @@ const CompletionSummary = ({
           left: isProAnalyzerExpanded ? '350px' : '0px',
         }}
       >
-        <div style={{
-          color: 'white',
-          fontSize: '16px',
-          fontWeight: 'bold',
-          transform: isProAnalyzerExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-          transition: 'transform 0.3s ease',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '2px',
-        }}>
+        <div
+          style={{
+            color: 'white',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            transform: isProAnalyzerExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 0.3s ease',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '2px',
+          }}
+        >
           <div style={{ fontSize: '12px' }}>🔧</div>
           <div>▶</div>
         </div>
@@ -227,20 +281,25 @@ const CompletionSummary = ({
 
       {/* Main Content */}
       <div
-        className={isProAnalyzerExpanded ? 'completion-content-blurred' : 'completion-content-normal'}
+        className={
+          isProAnalyzerExpanded ? 'completion-content-blurred' : 'completion-content-normal'
+        }
         style={{
           flex: 1,
           marginTop: 0,
           transition: 'margin-left 0.3s ease-in-out',
           marginLeft: isProAnalyzerExpanded ? '0px' : '0px',
-        }}>
+        }}
+      >
         {/* Header */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 24
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 24,
+          }}
+        >
           <div>
             <h3 style={{ color: '#2c5aa0', fontWeight: 700, fontSize: 22, marginBottom: 8 }}>
               ✅ Regulatory Pathway Complete
@@ -284,122 +343,143 @@ const CompletionSummary = ({
         </div>
 
         {/* Success Card */}
-        <div style={{
-          background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
-          borderRadius: '12px',
-          padding: '24px',
-          color: 'white',
-          marginBottom: '24px',
-          boxShadow: '0 4px 12px rgba(40, 167, 69, 0.3)'
-        }}>
-          <div style={{ fontSize: '48px', textAlign: 'center', marginBottom: '16px' }}>
-            🎉
-          </div>
-          <h2 style={{
-            textAlign: 'center',
-            margin: '0 0 16px 0',
-            fontSize: '24px',
-            fontWeight: '700'
-          }}>
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+            borderRadius: '12px',
+            padding: '24px',
+            color: 'white',
+            marginBottom: '24px',
+            boxShadow: '0 4px 12px rgba(40, 167, 69, 0.3)',
+          }}
+        >
+          <div style={{ fontSize: '48px', textAlign: 'center', marginBottom: '16px' }}>🎉</div>
+          <h2
+            style={{
+              textAlign: 'center',
+              margin: '0 0 16px 0',
+              fontSize: '24px',
+              fontWeight: '700',
+            }}
+          >
             Pathway Configuration Complete!
           </h2>
-          <p style={{
-            textAlign: 'center',
-            margin: 0,
-            fontSize: '16px',
-            opacity: 0.9
-          }}>
+          <p
+            style={{
+              textAlign: 'center',
+              margin: 0,
+              fontSize: '16px',
+              opacity: 0.9,
+            }}
+          >
             You can now proceed with license application and documentation for your medical device.
           </p>
         </div>
 
         {/* Pathway Summary */}
-        <div style={{
-          border: '1px solid #e0e0e0',
-          borderRadius: '8px',
-          backgroundColor: '#fff',
-          overflow: 'hidden',
-          marginBottom: '24px'
-        }}>
-          <div style={{
-            padding: '16px 20px',
-            backgroundColor: '#f8f9fa',
-            borderBottom: '1px solid #e0e0e0',
-            fontWeight: '600',
-            color: '#2c5aa0'
-          }}>
+        <div
+          style={{
+            border: '1px solid #e0e0e0',
+            borderRadius: '8px',
+            backgroundColor: '#fff',
+            overflow: 'hidden',
+            marginBottom: '24px',
+          }}
+        >
+          <div
+            style={{
+              padding: '16px 20px',
+              backgroundColor: '#f8f9fa',
+              borderBottom: '1px solid #e0e0e0',
+              fontWeight: '600',
+              color: '#2c5aa0',
+            }}
+          >
             Regulatory Pathway Summary
           </div>
 
           <div style={{ padding: '20px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
               {/* Project */}
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{
-                  width: '120px',
-                  fontWeight: '600',
-                  color: '#666',
-                  fontSize: '14px'
-                }}>
+                <div
+                  style={{
+                    width: '120px',
+                    fontWeight: '600',
+                    color: '#666',
+                    fontSize: '14px',
+                  }}
+                >
                   Project:
                 </div>
-                <div style={{
-                  flex: 1,
-                  fontSize: '16px',
-                  color: '#2c5aa0',
-                  fontWeight: '600'
-                }}>
+                <div
+                  style={{
+                    flex: 1,
+                    fontSize: '16px',
+                    color: '#2c5aa0',
+                    fontWeight: '600',
+                  }}
+                >
                   {selectedProject.name}
                 </div>
               </div>
 
               {/* Device */}
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{
-                  width: '120px',
-                  fontWeight: '600',
-                  color: '#666',
-                  fontSize: '14px'
-                }}>
+                <div
+                  style={{
+                    width: '120px',
+                    fontWeight: '600',
+                    color: '#666',
+                    fontSize: '14px',
+                  }}
+                >
                   Device:
                 </div>
-                <div style={{
-                  flex: 1,
-                  fontSize: '16px',
-                  color: '#2c5aa0',
-                  fontWeight: '600'
-                }}>
+                <div
+                  style={{
+                    flex: 1,
+                    fontSize: '16px',
+                    color: '#2c5aa0',
+                    fontWeight: '600',
+                  }}
+                >
                   {selectedDevice.name}
                 </div>
               </div>
 
               {/* Version */}
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{
-                  width: '120px',
-                  fontWeight: '600',
-                  color: '#666',
-                  fontSize: '14px'
-                }}>
+                <div
+                  style={{
+                    width: '120px',
+                    fontWeight: '600',
+                    color: '#666',
+                    fontSize: '14px',
+                  }}
+                >
                   Version:
                 </div>
-                <div style={{
-                  flex: 1,
-                  fontSize: '16px',
-                  color: '#2c5aa0',
-                  fontWeight: '600'
-                }}>
+                <div
+                  style={{
+                    flex: 1,
+                    fontSize: '16px',
+                    color: '#2c5aa0',
+                    fontWeight: '600',
+                  }}
+                >
                   {selectedVersion.version_number}
-                  <span style={{
-                    marginLeft: '8px',
-                    padding: '2px 8px',
-                    borderRadius: '12px',
-                    fontSize: '12px',
-                    fontWeight: '500',
-                    backgroundColor: selectedVersion.type === 'renewal' ? '#e67e22' : '#27ae60',
-                    color: 'white'
-                  }}>
+                  <span
+                    style={{
+                      marginLeft: '8px',
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      backgroundColor: selectedVersion.type === 'renewal' ? '#e67e22' : '#27ae60',
+                      color: 'white',
+                    }}
+                  >
                     {selectedVersion.type === 'renewal' ? 'Renewal' : 'Version'}
                   </span>
                 </div>
@@ -407,115 +487,133 @@ const CompletionSummary = ({
 
               {/* Market */}
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{
-                  width: '120px',
-                  fontWeight: '600',
-                  color: '#666',
-                  fontSize: '14px'
-                }}>
+                <div
+                  style={{
+                    width: '120px',
+                    fontWeight: '600',
+                    color: '#666',
+                    fontSize: '14px',
+                  }}
+                >
                   Market:
                 </div>
-                <div style={{
-                  flex: 1,
-                  fontSize: '16px',
-                  color: '#2c5aa0',
-                  fontWeight: '600'
-                }}>
+                <div
+                  style={{
+                    flex: 1,
+                    fontSize: '16px',
+                    color: '#2c5aa0',
+                    fontWeight: '600',
+                  }}
+                >
                   {selectedMarket.name}
                 </div>
               </div>
 
               {/* Country */}
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{
-                  width: '120px',
-                  fontWeight: '600',
-                  color: '#666',
-                  fontSize: '14px'
-                }}>
+                <div
+                  style={{
+                    width: '120px',
+                    fontWeight: '600',
+                    color: '#666',
+                    fontSize: '14px',
+                  }}
+                >
                   Country:
                 </div>
-                <div style={{
-                  flex: 1,
-                  fontSize: '16px',
-                  color: '#2c5aa0',
-                  fontWeight: '600'
-                }}>
+                <div
+                  style={{
+                    flex: 1,
+                    fontSize: '16px',
+                    color: '#2c5aa0',
+                    fontWeight: '600',
+                  }}
+                >
                   {countryName}
                 </div>
               </div>
 
               {/* License */}
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{
-                  width: '120px',
-                  fontWeight: '600',
-                  color: '#666',
-                  fontSize: '14px'
-                }}>
+                <div
+                  style={{
+                    width: '120px',
+                    fontWeight: '600',
+                    color: '#666',
+                    fontSize: '14px',
+                  }}
+                >
                   License:
                 </div>
-                <div style={{
-                  flex: 1,
-                  fontSize: '16px',
-                  color: '#2c5aa0',
-                  fontWeight: '600'
-                }}>
+                <div
+                  style={{
+                    flex: 1,
+                    fontSize: '16px',
+                    color: '#2c5aa0',
+                    fontWeight: '600',
+                  }}
+                >
                   {licenseName}
-                  <span style={{
-                    marginLeft: '8px',
-                    padding: '2px 8px',
-                    borderRadius: '12px',
-                    fontSize: '12px',
-                    fontWeight: '500',
-                    backgroundColor: '#17a2b8',
-                    color: 'white'
-                  }}>
+                  <span
+                    style={{
+                      marginLeft: '8px',
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      backgroundColor: '#17a2b8',
+                      color: 'white',
+                    }}
+                  >
                     License
                   </span>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
 
         {/* Next Steps */}
-        <div style={{
-          border: '1px solid #e0e0e0',
-          borderRadius: '8px',
-          backgroundColor: '#fff',
-          overflow: 'hidden',
-          marginBottom: '24px'
-        }}>
-          <div style={{
-            padding: '16px 20px',
-            backgroundColor: '#f8f9fa',
-            borderBottom: '1px solid #e0e0e0',
-            fontWeight: '600',
-            color: '#2c5aa0'
-          }}>
+        <div
+          style={{
+            border: '1px solid #e0e0e0',
+            borderRadius: '8px',
+            backgroundColor: '#fff',
+            overflow: 'hidden',
+            marginBottom: '24px',
+          }}
+        >
+          <div
+            style={{
+              padding: '16px 20px',
+              backgroundColor: '#f8f9fa',
+              borderBottom: '1px solid #e0e0e0',
+              fontWeight: '600',
+              color: '#2c5aa0',
+            }}
+          >
             Recommended Next Steps
           </div>
 
           <div style={{ padding: '20px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                <div style={{
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '50%',
-                  backgroundColor: '#28a745',
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  flexShrink: 0,
-                  marginTop: '2px'
-                }}>
+                <div
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    backgroundColor: '#28a745',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    flexShrink: 0,
+                    marginTop: '2px',
+                  }}
+                >
                   1
                 </div>
                 <div>
@@ -523,76 +621,79 @@ const CompletionSummary = ({
                     Prepare Documentation
                   </div>
                   <div style={{ color: '#666', fontSize: '14px' }}>
-                    Gather all required documents for {licenseName} license application in {countryName}
+                    Gather all required documents for {licenseName} license application in{' '}
+                    {countryName}
                   </div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                <div style={{
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '50%',
-                  backgroundColor: '#17a2b8',
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  flexShrink: 0,
-                  marginTop: '2px'
-                }}>
+                <div
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    backgroundColor: '#17a2b8',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    flexShrink: 0,
+                    marginTop: '2px',
+                  }}
+                >
                   2
                 </div>
                 <div>
-                  <div style={{ fontWeight: '600', marginBottom: '4px' }}>
-                    Submit Application
-                  </div>
+                  <div style={{ fontWeight: '600', marginBottom: '4px' }}>Submit Application</div>
                   <div style={{ color: '#666', fontSize: '14px' }}>
-                    Submit your {licenseName} license application to the relevant regulatory authority
+                    Submit your {licenseName} license application to the relevant regulatory
+                    authority
                   </div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                <div style={{
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '50%',
-                  backgroundColor: '#ffc107',
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  flexShrink: 0,
-                  marginTop: '2px'
-                }}>
+                <div
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ffc107',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    flexShrink: 0,
+                    marginTop: '2px',
+                  }}
+                >
                   3
                 </div>
                 <div>
-                  <div style={{ fontWeight: '600', marginBottom: '4px' }}>
-                    Track Progress
-                  </div>
+                  <div style={{ fontWeight: '600', marginBottom: '4px' }}>Track Progress</div>
                   <div style={{ color: '#666', fontSize: '14px' }}>
                     Monitor application status and respond to any regulatory queries
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '16px',
-          marginTop: '32px'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '16px',
+            marginTop: '32px',
+          }}
+        >
           <button
             onClick={onStartNew}
             style={{
@@ -643,8 +744,6 @@ const CompletionSummary = ({
             📁 User Database
           </button>
 
-
-
           <button
             onClick={onBack}
             style={{
@@ -675,11 +774,10 @@ const CompletionSummary = ({
         <InteractiveChecklist
           selectedMarket={selectedMarket}
           selectedLicense={selectedLicense}
-          onProgressUpdate={(progress) => {
+          onProgressUpdate={progress => {
             console.log('Checklist progress updated:', progress);
           }}
         />
-
       </div>
     </div>
   );

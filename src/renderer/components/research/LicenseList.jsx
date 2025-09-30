@@ -1,16 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import ActionMenu from '../ActionMenu.jsx';
 
-const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selectedMarket, licenses, onCreate, onDelete, onSelect, dispatch }) => {
+const LicenseList = ({
+  selectedProject,
+  selectedDevice,
+  selectedVersion,
+  selectedMarket,
+  licenses,
+  onCreate,
+  onDelete,
+  onSelect,
+  dispatch,
+}) => {
   const [showLicenseDropdown, setShowLicenseDropdown] = useState(false);
 
   if (!selectedMarket) return null;
 
   // Country-specific license options
   const licenseOptions = {
-    'India': [
+    India: [
       'CDSCO',
-      'BIS', 
+      'BIS',
       'Free Sale Certificate',
       'Test License',
       'AERB',
@@ -18,17 +28,11 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
       'ISO-13485',
       'IAA',
       'ISO-1135',
-      'ISO-1137'
+      'ISO-1137',
     ],
-    'USA': [
-      'FDA'
-    ],
-    'China': [
-      'CFDA'
-    ],
-    'Europe': [
-      'CE'
-    ]
+    USA: ['FDA'],
+    China: ['CFDA'],
+    Europe: ['CE'],
   };
 
   // Get the selected country from the market object
@@ -36,11 +40,15 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
   const availableLicenses = licenseOptions[selectedCountry] || [];
 
   // Check which licenses are already added
-  const isLicenseAdded = (license) => {
-    return licenses && licenses.some(existingLicense => 
-      existingLicense === license || 
-      existingLicense?.name === license ||
-      existingLicense?.license_number === license
+  const isLicenseAdded = license => {
+    return (
+      licenses &&
+      licenses.some(
+        existingLicense =>
+          existingLicense === license ||
+          existingLicense?.name === license ||
+          existingLicense?.license_number === license
+      )
     );
   };
 
@@ -49,7 +57,7 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = event => {
       if (showLicenseDropdown && !event.target.closest('.license-dropdown-container')) {
         setShowLicenseDropdown(false);
       }
@@ -61,22 +69,24 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
     };
   }, [showLicenseDropdown]);
 
-  const handleAddLicense = async (license) => {
+  const handleAddLicense = async license => {
     setShowLicenseDropdown(false);
-    
+
     if (!selectedProject || !selectedVersion || !selectedMarket) {
       console.error('Missing required data for license creation:', {
         selectedProject,
-        selectedVersion, 
-        selectedMarket
+        selectedVersion,
+        selectedMarket,
       });
-      alert('Missing required information. Please ensure a project, version, and market are selected.');
+      alert(
+        'Missing required information. Please ensure a project, version, and market are selected.'
+      );
       return;
     }
-    
+
     try {
       console.log(`Attempting to add license: ${license}`);
-      
+
       // Create license in database
       const newLicense = await window.dbAPI.createLicense({
         project_id: selectedProject.id,
@@ -84,11 +94,11 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
         version_id: selectedVersion.id,
         license_number: license,
         status: 'pending',
-        notes: `${license} license for ${selectedCountry}`
+        notes: `${license} license for ${selectedCountry}`,
       });
-      
+
       console.log('License created successfully:', newLicense);
-      
+
       // Reload licenses from database to get the updated list
       try {
         const result = await window.dbAPI.getLicenses();
@@ -99,10 +109,9 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
       } catch (reloadError) {
         console.error('Failed to reload licenses:', reloadError);
       }
-      
     } catch (error) {
       console.error('Failed to create license:', error);
-      
+
       // Provide user-friendly error messages
       let errorMessage = error.message;
       if (error.message.includes('UNIQUE constraint failed')) {
@@ -110,7 +119,7 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
       } else if (error.message.includes('SQLITE_CONSTRAINT')) {
         errorMessage = `${license} violates database constraints.`;
       }
-      
+
       alert(`Failed to add ${license}: ${errorMessage}`);
     }
   };
@@ -118,16 +127,18 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
   return (
     <div style={{ marginTop: 0 }}>
       {/* Header with Add License Button */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        marginBottom: 16 
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}
+      >
         <div style={{ color: '#666', fontSize: '14px' }}>
           Licenses for {selectedMarket?.name || 'Selected Market'} - {selectedCountry}
         </div>
-        
+
         <div className="license-dropdown-container" style={{ position: 'relative' }}>
           <button
             onClick={() => setShowLicenseDropdown(!showLicenseDropdown)}
@@ -148,13 +159,15 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
             <span>+</span>
             Add License
             {availableLicenses.length > 0 && (
-              <span style={{
-                backgroundColor: 'rgba(255,255,255,0.2)',
-                borderRadius: '10px',
-                padding: '2px 6px',
-                fontSize: '11px',
-                marginLeft: '4px'
-              }}>
+              <span
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.2)',
+                  borderRadius: '10px',
+                  padding: '2px 6px',
+                  fontSize: '11px',
+                  marginLeft: '4px',
+                }}
+              >
                 {licenses?.length || 0}/{availableLicenses.length}
               </span>
             )}
@@ -178,32 +191,36 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
               }}
             >
               {/* Header */}
-              <div style={{
-                padding: '8px 16px',
-                backgroundColor: '#f8f9fa',
-                borderBottom: '1px solid #eee',
-                fontSize: '12px',
-                color: '#666',
-                fontWeight: '600',
-                position: 'sticky',
-                top: 0,
-                zIndex: 1
-              }}>
+              <div
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#f8f9fa',
+                  borderBottom: '1px solid #eee',
+                  fontSize: '12px',
+                  color: '#666',
+                  fontWeight: '600',
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 1,
+                }}
+              >
                 Select License ({availableToAdd.length} available, {licenses?.length || 0} added)
               </div>
-              
+
               {/* Available Licenses */}
               {availableToAdd.length > 0 && (
                 <>
-                  <div style={{
-                    padding: '6px 16px',
-                    backgroundColor: '#e8f5e8',
-                    fontSize: '11px',
-                    color: '#2d5a2d',
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>
+                  <div
+                    style={{
+                      padding: '6px 16px',
+                      backgroundColor: '#e8f5e8',
+                      fontSize: '11px',
+                      color: '#2d5a2d',
+                      fontWeight: '600',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                    }}
+                  >
                     Available ({availableToAdd.length})
                   </div>
                   {availableToAdd.map((license, index) => (
@@ -223,7 +240,7 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
                         color: '#333',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between'
+                        justifyContent: 'space-between',
                       }}
                       onMouseEnter={e => {
                         e.target.style.backgroundColor = '#f0f8f0';
@@ -234,31 +251,35 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
                       title={`Add ${license} license`}
                     >
                       <span>{license}</span>
-                      <span style={{ 
-                        fontSize: '12px', 
-                        color: '#28a745',
-                        fontWeight: '600'
-                      }}>
+                      <span
+                        style={{
+                          fontSize: '12px',
+                          color: '#28a745',
+                          fontWeight: '600',
+                        }}
+                      >
                         + Add
                       </span>
                     </button>
                   ))}
                 </>
               )}
-              
+
               {/* Already Added Licenses */}
               {licenses && licenses.length > 0 && (
                 <>
-                  <div style={{
-                    padding: '6px 16px',
-                    backgroundColor: '#f0f0f0',
-                    fontSize: '11px',
-                    color: '#666',
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    borderTop: availableToAdd.length > 0 ? '2px solid #ddd' : 'none'
-                  }}>
+                  <div
+                    style={{
+                      padding: '6px 16px',
+                      backgroundColor: '#f0f0f0',
+                      fontSize: '11px',
+                      color: '#666',
+                      fontWeight: '600',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      borderTop: availableToAdd.length > 0 ? '2px solid #ddd' : 'none',
+                    }}
+                  >
                     Already Added ({licenses.length})
                   </div>
                   {availableLicenses
@@ -280,46 +301,51 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
                           opacity: 0.7,
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'space-between'
+                          justifyContent: 'space-between',
                         }}
                         title={`${license} has already been added`}
                       >
                         <span>{license}</span>
-                        <span style={{ 
-                          fontSize: '12px', 
-                          color: '#28a745',
-                          fontWeight: '600'
-                        }}>
+                        <span
+                          style={{
+                            fontSize: '12px',
+                            color: '#28a745',
+                            fontWeight: '600',
+                          }}
+                        >
                           ✓ Added
                         </span>
                       </button>
-                    ))
-                  }
+                    ))}
                 </>
               )}
-              
+
               {/* No licenses available message */}
               {availableLicenses.length === 0 && (
-                <div style={{
-                  padding: '16px',
-                  fontSize: '14px',
-                  color: '#666',
-                  textAlign: 'center',
-                  fontStyle: 'italic'
-                }}>
+                <div
+                  style={{
+                    padding: '16px',
+                    fontSize: '14px',
+                    color: '#666',
+                    textAlign: 'center',
+                    fontStyle: 'italic',
+                  }}
+                >
                   No licenses configured for {selectedCountry}
                 </div>
               )}
-              
+
               {/* All licenses added message */}
               {availableToAdd.length === 0 && availableLicenses.length > 0 && (
-                <div style={{
-                  padding: '16px',
-                  fontSize: '14px',
-                  color: '#666',
-                  textAlign: 'center',
-                  fontStyle: 'italic'
-                }}>
+                <div
+                  style={{
+                    padding: '16px',
+                    fontSize: '14px',
+                    color: '#666',
+                    textAlign: 'center',
+                    fontStyle: 'italic',
+                  }}
+                >
                   🎉 All licenses have been added!
                 </div>
               )}
@@ -332,7 +358,10 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {licenses && licenses.length > 0 ? (
           licenses.map((license, index) => {
-            const licenseName = typeof license === 'string' ? license : license?.license_number || license?.name || 'Unknown License';
+            const licenseName =
+              typeof license === 'string'
+                ? license
+                : license?.license_number || license?.name || 'Unknown License';
             return (
               <li key={license?.id || licenseName || index} style={{ marginBottom: 12 }}>
                 <div
@@ -357,23 +386,27 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
                   }}
                 >
                   <div style={{ flex: 1 }}>
-                    <div style={{ 
-                      fontWeight: '600', 
-                      fontSize: '16px', 
-                      color: '#2c5aa0',
-                      marginBottom: '4px'
-                    }}>
+                    <div
+                      style={{
+                        fontWeight: '600',
+                        fontSize: '16px',
+                        color: '#2c5aa0',
+                        marginBottom: '4px',
+                      }}
+                    >
                       {licenseName}
                     </div>
-                    <div style={{ 
-                      fontSize: '12px', 
-                      color: '#666'
-                    }}>
+                    <div
+                      style={{
+                        fontSize: '12px',
+                        color: '#666',
+                      }}
+                    >
                       Click to proceed to next step • License for {selectedCountry}
                     </div>
                   </div>
-                  
-                  <div onClick={(e) => e.stopPropagation()}>
+
+                  <div onClick={e => e.stopPropagation()}>
                     <ActionMenu
                       actions={[
                         {
@@ -381,8 +414,8 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
                           label: 'Delete',
                           icon: '🗑️',
                           danger: true,
-                          onClick: () => onDelete(license)
-                        }
+                          onClick: () => onDelete(license),
+                        },
                       ]}
                     />
                   </div>
@@ -391,12 +424,14 @@ const LicenseList = ({ selectedProject, selectedDevice, selectedVersion, selecte
             );
           })
         ) : (
-          <li style={{ 
-            color: '#888', 
-            textAlign: 'center', 
-            padding: '20px',
-            fontStyle: 'italic'
-          }}>
+          <li
+            style={{
+              color: '#888',
+              textAlign: 'center',
+              padding: '20px',
+              fontStyle: 'italic',
+            }}
+          >
             No licenses added yet. Use the "Add License" button above to get started.
           </li>
         )}

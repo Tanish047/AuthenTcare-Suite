@@ -45,7 +45,7 @@ export const useDevices = (state, dispatch, selectedProject) => {
     }
   }, [selectedProject, dispatch]);
 
-  const handleCreateDevice = async (e) => {
+  const handleCreateDevice = async e => {
     if (e) e.preventDefault();
     if (!newDeviceName.trim() || !selectedProject) return;
 
@@ -115,13 +115,13 @@ export const useDevices = (state, dispatch, selectedProject) => {
     setShowDeviceModal(true);
   };
 
-  const handleEditClick = (device) => {
+  const handleEditClick = device => {
     setEditingDevice(device);
     setEditDeviceName(device.name);
     setShowDeviceEditModal(true);
   };
 
-  const handleDeleteClick = (device) => {
+  const handleDeleteClick = device => {
     setDeleteDevice(device);
     setShowDeviceDeleteModal(true);
   };

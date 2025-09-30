@@ -1,0 +1,119 @@
+/* Input Fix Override - Force textarea to work */
+/* This file ensures the textarea input works regardless of other CSS conflicts */
+
+/* Force textarea to be interactive - highest specificity */
+.professional-message-input textarea.professional-textarea,
+.professional-message-input .professional-textarea,
+textarea.professional-textarea,
+.professional-textarea,
+.textarea-container textarea,
+.professional-message-input textarea {
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  cursor: text !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  resize: none !important;
+  font-size: 15px !important;
+  line-height: 1.4 !important;
+  color: #1e293b !important;
+  width: 100% !important;
+  min-height: 36px !important;
+  max-height: 120px !important;
+  padding: 6px 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 100 !important;
+  position: relative !important;
+}
+
+/* Override any conflicting old styles */
+.professional-message-input * {
+  pointer-events: auto !important;
+}
+
+.professional-message-input .professional-textarea {
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+/* Force container to allow interaction */
+.textarea-container,
+.professional-input-container,
+.input-wrapper,
+.professional-message-input {
+  pointer-events: auto !important;
+  user-select: auto !important;
+  -webkit-user-select: auto !important;
+  cursor: auto !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Override any conflicting styles */
+.professional-message-input * {
+  pointer-events: auto !important;
+}
+
+.professional-message-input .textarea-container * {
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+/* Ensure no overlay is blocking input */
+.professional-message-input::before,
+.professional-message-input::after,
+.textarea-container::before,
+.textarea-container::after {
+  display: none !important;
+}
+
+/* Force focus styles */
+.professional-textarea:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Placeholder styles */
+.professional-textarea::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+  user-select: none !important;
+  pointer-events: none !important;
+}
+
+/* Disable any potential overlays */
+.drag-overlay,
+.placeholder-hint {
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* Force input to be on top */
+.professional-textarea {
+  z-index: 100 !important;
+  position: relative !important;
+}
+
+/* Remove any potential blocking elements */
+.professional-message-input .placeholder-hint {
+  pointer-events: none !important;
+  position: absolute !important;
+  z-index: 1 !important;
+}
+
+.professional-message-input .professional-textarea {
+  z-index: 10 !important;
+  position: relative !important;
+}

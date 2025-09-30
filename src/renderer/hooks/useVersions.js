@@ -57,24 +57,24 @@ export const useVersions = (state, dispatch, selectedProject, selectedDevice) =>
     if (oldFormatMatch) {
       const baseNum = oldFormatMatch[1];
       const sequenceNum = oldFormatMatch[2] || '1';
-      
+
       if (baseNum === baseVersionNum) {
         const newFormat = `R-v${baseNum}-${sequenceNum}`;
         console.log(`Migrating renewal from ${renewal.version_number} to ${newFormat}`);
-        
+
         try {
           // Update in database
           await window.dbAPI.updateVersion(renewal.id, {
-            version_number: newFormat
+            version_number: newFormat,
           });
-          
+
           // Update local state
           const updatedRenewal = {
             ...renewal,
-            version_number: newFormat
+            version_number: newFormat,
           };
           dispatch({ type: 'UPDATE_VERSION', version: updatedRenewal });
-          
+
           return newFormat;
         } catch (error) {
           console.error('Failed to migrate renewal format:', error);
@@ -106,15 +106,15 @@ export const useVersions = (state, dispatch, selectedProject, selectedDevice) =>
         // Find existing renewals for this base version (more flexible pattern matching)
         const renewalsForBase = existingVersions.filter(v => {
           if (v.type !== 'renewal') return false;
-          
+
           // Check for new format: R-v1-1, R-v1-2, etc.
           const newFormatMatch = v.version_number.match(/^R-v(\d+)-\d+$/);
           if (newFormatMatch && newFormatMatch[1] === baseVersionNum) return true;
-          
+
           // Check for old format: R-1, R-1.1, R-1.2, etc. (for backward compatibility)
           const oldFormatMatch = v.version_number.match(/^R-(\d+)(?:\.\d+)?$/);
           if (oldFormatMatch && oldFormatMatch[1] === baseVersionNum) return true;
-          
+
           return false;
         });
 
@@ -143,11 +143,18 @@ export const useVersions = (state, dispatch, selectedProject, selectedDevice) =>
         const maxSeq = existingSeqNumbers.length ? Math.max(...existingSeqNumbers) : 0;
         const nextRenewalNumber = maxSeq + 1;
         versionNumber = `R-v${baseVersionNum}-${nextRenewalNumber}`;
-        
-        console.log(`Found ${renewalsForBase.length} existing renewals for base version v${baseVersionNum}`);
-        console.log(`Next renewal sequence computed from max existing = ${maxSeq} → ${nextRenewalNumber}`);
+
+        console.log(
+          `Found ${renewalsForBase.length} existing renewals for base version v${baseVersionNum}`
+        );
+        console.log(
+          `Next renewal sequence computed from max existing = ${maxSeq} → ${nextRenewalNumber}`
+        );
         console.log(`Creating renewal ${versionNumber} for base version v${baseVersionNum}`);
-        console.log('Existing renewals:', renewalsForBase.map(r => r.version_number));
+        console.log(
+          'Existing renewals:',
+          renewalsForBase.map(r => r.version_number)
+        );
       } else {
         // For new versions, use simple integer versioning (v1, v2, v3)
         const newVersions = existingVersions.filter(v => v.type === 'new_version');
@@ -192,7 +199,8 @@ export const useVersions = (state, dispatch, selectedProject, selectedDevice) =>
         type: type, // 'renewal' or 'new_version'
         base_version_id: baseVersion?.id || null, // Store reference to base version for renewals
         release_date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
-        changes: type === 'renewal' ? `Renewal of ${baseVersion?.version_number}` : 'New version release'
+        changes:
+          type === 'renewal' ? `Renewal of ${baseVersion?.version_number}` : 'New version release',
       };
 
       const newVersion = await window.dbAPI.createVersion(versionData);
@@ -200,7 +208,7 @@ export const useVersions = (state, dispatch, selectedProject, selectedDevice) =>
       // Update local state (normalized)
       dispatch({
         type: 'ADD_VERSION',
-        version: newVersion
+        version: newVersion,
       });
 
       setShowVersionModal(false);
@@ -213,7 +221,7 @@ export const useVersions = (state, dispatch, selectedProject, selectedDevice) =>
     }
   };
 
-  const handleEditVersion = async (e) => {
+  const handleEditVersion = async e => {
     e.preventDefault();
     if (!editVersionName.trim() || !editingVersion) return;
 
@@ -238,7 +246,7 @@ export const useVersions = (state, dispatch, selectedProject, selectedDevice) =>
     }
   };
 
-  const handleDeleteVersion = async (e) => {
+  const handleDeleteVersion = async e => {
     e.preventDefault();
     if (!deleteVersion || !checkPassword(versionDeletePassword)) {
       setVersionDeleteError('Incorrect password.');
@@ -267,7 +275,7 @@ export const useVersions = (state, dispatch, selectedProject, selectedDevice) =>
     }
   };
 
-  const handleCreateClick = (type) => {
+  const handleCreateClick = type => {
     if (type === 'renewal') {
       setShowRenewalSelector(true);
     } else {
@@ -275,7 +283,7 @@ export const useVersions = (state, dispatch, selectedProject, selectedDevice) =>
     }
   };
 
-  const handleRenewalVersionSelect = (baseVersion) => {
+  const handleRenewalVersionSelect = baseVersion => {
     handleCreateVersion('renewal', baseVersion);
     setShowRenewalSelector(false);
   };
@@ -298,7 +306,6 @@ export const useVersions = (state, dispatch, selectedProject, selectedDevice) =>
       }
 
       console.log(`Successfully deleted ${versionsToDelete.length} versions`);
-
     } catch (err) {
       setError(err.message);
       console.error('Failed to bulk delete versions:', err);

@@ -31,22 +31,25 @@ const DeviceModals = ({
           <button key="cancel" onClick={onCloseCreate}>
             Cancel
           </button>,
-          <button 
-            key="save" 
-            onClick={(e) => {
+          <button
+            key="save"
+            onClick={e => {
               e.preventDefault();
               handleCreateDevice();
-            }} 
+            }}
             disabled={!newDeviceName.trim()}
           >
             Save
           </button>,
         ]}
       >
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          handleCreateDevice(e);
-        }} style={{ width: '100%' }}>
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            handleCreateDevice(e);
+          }}
+          style={{ width: '100%' }}
+        >
           <input
             type="text"
             value={newDeviceName}

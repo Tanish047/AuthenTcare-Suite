@@ -11,17 +11,14 @@ function NavDropdown({
   onItemClick,
 }) {
   const navBtnRef = useRef();
-  
+
   // Memoize computed values
-  const hasChildren = useMemo(() => 
-    Array.isArray(item.children) && item.children.length > 0, 
+  const hasChildren = useMemo(
+    () => Array.isArray(item.children) && item.children.length > 0,
     [item.children]
   );
-  
-  const isOpen = useMemo(() => 
-    openMenu === item.key, 
-    [openMenu, item.key]
-  );
+
+  const isOpen = useMemo(() => openMenu === item.key, [openMenu, item.key]);
 
   // Memoized event handlers to prevent unnecessary re-renders
   const handleEnter = useCallback(() => {
@@ -31,7 +28,7 @@ function NavDropdown({
       setOpenMenu(item.key);
     }
   }, [hasChildren, closeTimer, handleAnyMouseEnter, item.key, setOpenMenu]);
-  
+
   const handleLeave = useCallback(() => {
     if (hasChildren) {
       handleAnyMouseLeave && handleAnyMouseLeave();

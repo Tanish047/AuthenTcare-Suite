@@ -18,19 +18,19 @@ export const useMarkets = (state, dispatch, selectedVersion = null) => {
   const [error, setError] = useState('');
 
   // Get version-specific markets
-  const versionMarkets = selectedVersion ? (state.versionMarkets[selectedVersion.id] || []) : [];
-  
+  const versionMarkets = selectedVersion ? state.versionMarkets[selectedVersion.id] || [] : [];
+
   // Load version markets when version changes
   const loadVersionMarkets = useCallback(async () => {
     if (!selectedVersion) return;
-    
+
     try {
       setLoading(true);
       const result = await window.dbAPI.getVersionMarkets(selectedVersion.id);
       dispatch({
         type: 'SET_VERSION_MARKETS',
         versionId: selectedVersion.id,
-        markets: result.data || []
+        markets: result.data || [],
       });
     } catch (error) {
       console.error('Error loading version markets:', error);
@@ -62,16 +62,16 @@ export const useMarkets = (state, dispatch, selectedVersion = null) => {
     loadAllMarkets();
   }, [loadAllMarkets]);
 
-  const handleAddMarketToVersion = async (marketId) => {
+  const handleAddMarketToVersion = async marketId => {
     if (!selectedVersion) return;
-    
+
     try {
       setLoading(true);
       const market = await window.dbAPI.addVersionMarket(selectedVersion.id, marketId);
       dispatch({
         type: 'ADD_VERSION_MARKET',
         versionId: selectedVersion.id,
-        market
+        market,
       });
       setError('');
     } catch (error) {
@@ -84,30 +84,31 @@ export const useMarkets = (state, dispatch, selectedVersion = null) => {
 
   const handleEditMarket = async () => {
     if (!editMarket) return;
-    
+
     try {
       setLoading(true);
       const updatedMarket = await window.dbAPI.updateMarket(editMarket.id, {
         name: editMarketName,
         region: editMarketRegion,
         regulatory_body: editMarketRegulatoryBody,
-        requirements: editMarketRequirements
+        requirements: editMarketRequirements,
       });
-      
+
       // Update the market in all relevant places
-      dispatch({ type: 'SET_ALL_MARKETS', markets: state.allMarkets.map(m => 
-        m.id === editMarket.id ? updatedMarket : m
-      )});
-      
+      dispatch({
+        type: 'SET_ALL_MARKETS',
+        markets: state.allMarkets.map(m => (m.id === editMarket.id ? updatedMarket : m)),
+      });
+
       // Update in version markets if present
       if (selectedVersion && versionMarkets.some(m => m.id === editMarket.id)) {
         dispatch({
           type: 'SET_VERSION_MARKETS',
           versionId: selectedVersion.id,
-          markets: versionMarkets.map(m => m.id === editMarket.id ? updatedMarket : m)
+          markets: versionMarkets.map(m => (m.id === editMarket.id ? updatedMarket : m)),
         });
       }
-      
+
       setShowMarketEditModal(false);
       resetEditForm();
       setError('');
@@ -124,20 +125,20 @@ export const useMarkets = (state, dispatch, selectedVersion = null) => {
       setMarketDeleteError('Incorrect password.');
       return;
     }
-    
+
     try {
       setLoading(true);
-      
+
       if (selectedVersion) {
         // Remove from version-specific markets
         await window.dbAPI.removeVersionMarket(selectedVersion.id, deleteMarket.id);
         dispatch({
           type: 'REMOVE_VERSION_MARKET',
           versionId: selectedVersion.id,
-          marketId: deleteMarket.id
+          marketId: deleteMarket.id,
         });
       }
-      
+
       setShowMarketDeleteModal(false);
       resetDeleteForm();
       setError('');
@@ -167,7 +168,7 @@ export const useMarkets = (state, dispatch, selectedVersion = null) => {
     setShowMarketModal(true);
   };
 
-  const handleEditClick = (market) => {
+  const handleEditClick = market => {
     setEditMarket(market);
     setEditMarketName(market.name || '');
     setEditMarketRegion(market.region || '');
@@ -176,27 +177,27 @@ export const useMarkets = (state, dispatch, selectedVersion = null) => {
     setShowMarketEditModal(true);
   };
 
-  const handleDeleteClick = (market) => {
+  const handleDeleteClick = market => {
     setDeleteMarket(market);
     setShowMarketDeleteModal(true);
   };
 
-  const handleBulkDeleteMarkets = async (marketIds) => {
+  const handleBulkDeleteMarkets = async marketIds => {
     if (!selectedVersion || marketIds.length === 0) return;
-    
+
     try {
       setLoading(true);
-      
+
       // Remove all selected markets from version
       for (const marketId of marketIds) {
         await window.dbAPI.removeVersionMarket(selectedVersion.id, marketId);
         dispatch({
           type: 'REMOVE_VERSION_MARKET',
           versionId: selectedVersion.id,
-          marketId: marketId
+          marketId: marketId,
         });
       }
-      
+
       setError('');
     } catch (error) {
       console.error('Error removing markets from version:', error);
@@ -213,7 +214,7 @@ export const useMarkets = (state, dispatch, selectedVersion = null) => {
     allMarkets: state.allMarkets,
     loading,
     error,
-    
+
     // Create
     showMarketModal,
     setShowMarketModal,
@@ -221,7 +222,7 @@ export const useMarkets = (state, dispatch, selectedVersion = null) => {
     setNewMarket,
     handleCreateClick,
     handleAddMarketToVersion,
-    
+
     // Edit
     showMarketEditModal,
     setShowMarketEditModal,
@@ -236,7 +237,7 @@ export const useMarkets = (state, dispatch, selectedVersion = null) => {
     setEditMarketRequirements,
     handleEditClick,
     handleEditMarket,
-    
+
     // Delete
     showMarketDeleteModal,
     setShowMarketDeleteModal,
@@ -246,7 +247,7 @@ export const useMarkets = (state, dispatch, selectedVersion = null) => {
     marketDeleteError,
     handleDeleteClick,
     handleDeleteMarket,
-    
+
     // Utility
     loadVersionMarkets,
     resetEditForm,

@@ -26,6 +26,47 @@ const initialState = {
   modals: {}, // { modalName: boolean }
   loading: {}, // { key: boolean }
   errors: {}, // { key: string }
+
+  // Revolutionary MCP State
+  mcp: {
+    initialized: false,
+    status: 'disconnected',
+    servers: [],
+    tools: {},
+    autonomousAgents: [],
+    analytics: null,
+    performanceMetrics: null,
+    predictions: [],
+    recommendations: [],
+    workflowAnalysis: null,
+    realTimeEvents: [],
+    orchestrationHistory: [],
+  },
+
+  // Multi-Modal RAG State
+  rag: {
+    initialized: false,
+    status: 'disconnected',
+    documents: [],
+    analytics: null,
+    queryHistory: [],
+    indexingProgress: null,
+    realTimeEvents: [],
+    statusData: null,
+    config: null,
+    metrics: {
+      documentsIndexed: 0,
+      queriesProcessed: 0,
+      averageRetrievalTime: 0,
+      modalityDistribution: {
+        text: 0,
+        image: 0,
+        audio: 0,
+        video: 0,
+        structured: 0,
+      },
+    },
+  },
 };
 
 function appReducer(state, action) {
@@ -52,12 +93,12 @@ function appReducer(state, action) {
         }),
       };
     case 'SET_DEVICES':
-      return { 
-        ...state, 
+      return {
+        ...state,
         devices: [
           ...state.devices.filter(d => d.project_id !== action.projectId),
-          ...action.devices
-        ]
+          ...action.devices,
+        ],
       };
     case 'ADD_DEVICE':
       return {
@@ -67,7 +108,7 @@ function appReducer(state, action) {
     case 'UPDATE_DEVICE':
       return {
         ...state,
-        devices: state.devices.map(d => d.id === action.device.id ? action.device : d),
+        devices: state.devices.map(d => (d.id === action.device.id ? action.device : d)),
       };
     case 'REMOVE_DEVICE':
       return {
@@ -76,12 +117,12 @@ function appReducer(state, action) {
         versions: state.versions.filter(v => v.device_id !== action.deviceId),
       };
     case 'SET_VERSIONS':
-      return { 
-        ...state, 
+      return {
+        ...state,
         versions: [
           ...state.versions.filter(v => v.device_id !== action.deviceId),
-          ...action.versions
-        ]
+          ...action.versions,
+        ],
       };
     case 'ADD_VERSION':
       return {
@@ -91,7 +132,7 @@ function appReducer(state, action) {
     case 'UPDATE_VERSION':
       return {
         ...state,
-        versions: state.versions.map(v => v.id === action.version.id ? action.version : v),
+        versions: state.versions.map(v => (v.id === action.version.id ? action.version : v)),
       };
     case 'REMOVE_VERSION':
       return {
@@ -105,31 +146,30 @@ function appReducer(state, action) {
         ...state,
         versionMarkets: {
           ...state.versionMarkets,
-          [action.versionId]: action.markets
-        }
+          [action.versionId]: action.markets,
+        },
       };
     case 'ADD_VERSION_MARKET':
       return {
         ...state,
         versionMarkets: {
           ...state.versionMarkets,
-          [action.versionId]: [
-            ...(state.versionMarkets[action.versionId] || []),
-            action.market
-          ]
-        }
+          [action.versionId]: [...(state.versionMarkets[action.versionId] || []), action.market],
+        },
       };
     case 'REMOVE_VERSION_MARKET':
       return {
         ...state,
         versionMarkets: {
           ...state.versionMarkets,
-          [action.versionId]: (state.versionMarkets[action.versionId] || [])
-            .filter(m => m.id !== action.marketId)
-        }
+          [action.versionId]: (state.versionMarkets[action.versionId] || []).filter(
+            m => m.id !== action.marketId
+          ),
+        },
       };
     case 'CLEAR_VERSION_MARKETS':
-      const { [action.versionId]: removedVersionMarkets, ...remainingVersionMarkets } = state.versionMarkets;
+      const { [action.versionId]: removedVersionMarkets, ...remainingVersionMarkets } =
+        state.versionMarkets;
       return { ...state, versionMarkets: remainingVersionMarkets };
     case 'SET_MARKET_LICENSES':
       return { ...state, marketLicenses: action.marketLicenses };
@@ -148,23 +188,23 @@ function appReducer(state, action) {
     case 'SET_SELECTED_LICENSE':
       return { ...state, selectedLicense: action.license };
     case 'CLEAR_SELECTIONS':
-      return { 
-        ...state, 
+      return {
+        ...state,
         selectedProject: null,
         selectedDevice: null,
         selectedVersion: null,
         selectedMarket: null,
         selectedLicense: null,
-        currentLevel: 'project'
+        currentLevel: 'project',
       };
     case 'SET_CHECKLIST_ITEMS':
       return { ...state, checklistItems: action.items };
     case 'UPDATE_CHECKLIST_ITEM':
-      return { 
-        ...state, 
-        checklistItems: state.checklistItems.map(item => 
+      return {
+        ...state,
+        checklistItems: state.checklistItems.map(item =>
           item.id === action.itemId ? { ...item, status: action.status } : item
-        )
+        ),
       };
     case 'SET_CHECKLIST_PROGRESS':
       return { ...state, checklistProgress: action.progress };
@@ -182,6 +222,203 @@ function appReducer(state, action) {
     case 'CLEAR_ERROR':
       const { [action.key]: removedError, ...remainingErrors } = state.errors;
       return { ...state, errors: remainingErrors };
+
+    // Revolutionary MCP Actions
+    case 'MCP_SET_INITIALIZED':
+      return {
+        ...state,
+        mcp: {
+          ...state.mcp,
+          initialized: action.initialized,
+          status: action.initialized ? 'connected' : 'disconnected',
+        },
+      };
+
+    case 'MCP_SET_STATUS':
+      return {
+        ...state,
+        mcp: { ...state.mcp, status: action.status },
+      };
+
+    case 'MCP_SET_SERVERS':
+      return {
+        ...state,
+        mcp: { ...state.mcp, servers: action.servers },
+      };
+
+    case 'MCP_SET_TOOLS':
+      return {
+        ...state,
+        mcp: { ...state.mcp, tools: action.tools },
+      };
+
+    case 'MCP_SET_AGENTS':
+      return {
+        ...state,
+        mcp: { ...state.mcp, autonomousAgents: action.agents },
+      };
+
+    case 'MCP_SET_ANALYTICS':
+      return {
+        ...state,
+        mcp: { ...state.mcp, analytics: action.analytics },
+      };
+
+    case 'MCP_SET_PERFORMANCE_METRICS':
+      return {
+        ...state,
+        mcp: { ...state.mcp, performanceMetrics: action.metrics },
+      };
+
+    case 'MCP_SET_PREDICTIONS':
+      return {
+        ...state,
+        mcp: { ...state.mcp, predictions: action.predictions },
+      };
+
+    case 'MCP_SET_RECOMMENDATIONS':
+      return {
+        ...state,
+        mcp: { ...state.mcp, recommendations: action.recommendations },
+      };
+
+    case 'MCP_SET_WORKFLOW_ANALYSIS':
+      return {
+        ...state,
+        mcp: { ...state.mcp, workflowAnalysis: action.analysis },
+      };
+
+    case 'MCP_ADD_REAL_TIME_EVENT':
+      return {
+        ...state,
+        mcp: {
+          ...state.mcp,
+          realTimeEvents: [
+            action.event,
+            ...state.mcp.realTimeEvents.slice(0, 99), // Keep last 100 events
+          ],
+        },
+      };
+
+    case 'MCP_ADD_ORCHESTRATION_RESULT':
+      return {
+        ...state,
+        mcp: {
+          ...state.mcp,
+          orchestrationHistory: [
+            action.result,
+            ...state.mcp.orchestrationHistory.slice(0, 49), // Keep last 50 results
+          ],
+        },
+      };
+
+    case 'MCP_CLEAR_EVENTS':
+      return {
+        ...state,
+        mcp: { ...state.mcp, realTimeEvents: [] },
+      };
+
+    // Multi-Modal RAG Actions
+    case 'RAG_SET_INITIALIZED':
+      return {
+        ...state,
+        rag: {
+          ...state.rag,
+          initialized: action.initialized,
+          status: action.initialized ? 'connected' : 'disconnected',
+        },
+      };
+
+    case 'RAG_SET_STATUS':
+      return {
+        ...state,
+        rag: { ...state.rag, status: action.status },
+      };
+
+    case 'RAG_SET_DOCUMENTS':
+      return {
+        ...state,
+        rag: { ...state.rag, documents: action.documents },
+      };
+
+    case 'RAG_SET_ANALYTICS':
+      return {
+        ...state,
+        rag: { ...state.rag, analytics: action.analytics },
+      };
+
+    case 'RAG_SET_STATUS_DATA':
+      return {
+        ...state,
+        rag: { ...state.rag, statusData: action.statusData },
+      };
+
+    case 'RAG_SET_METRICS':
+      return {
+        ...state,
+        rag: { ...state.rag, metrics: action.metrics },
+      };
+
+    case 'RAG_ADD_QUERY_RESULT':
+      return {
+        ...state,
+        rag: {
+          ...state.rag,
+          queryHistory: [
+            action.result,
+            ...state.rag.queryHistory.slice(0, 99), // Keep last 100 queries
+          ],
+        },
+      };
+
+    case 'RAG_SET_INDEXING_PROGRESS':
+      return {
+        ...state,
+        rag: { ...state.rag, indexingProgress: action.progress },
+      };
+
+    case 'RAG_CLEAR_INDEXING_PROGRESS':
+      return {
+        ...state,
+        rag: { ...state.rag, indexingProgress: null },
+      };
+
+    case 'RAG_ADD_REAL_TIME_EVENT':
+      return {
+        ...state,
+        rag: {
+          ...state.rag,
+          realTimeEvents: [
+            action.event,
+            ...state.rag.realTimeEvents.slice(0, 99), // Keep last 100 events
+          ],
+        },
+      };
+
+    case 'RAG_INCREMENT_DOCUMENT_COUNT':
+      return {
+        ...state,
+        rag: {
+          ...state.rag,
+          metrics: {
+            ...state.rag.metrics,
+            documentsIndexed: state.rag.metrics.documentsIndexed + 1,
+          },
+        },
+      };
+
+    case 'RAG_UPDATE_CONFIG':
+      return {
+        ...state,
+        rag: { ...state.rag, config: action.config },
+      };
+
+    case 'RAG_CLEAR_EVENTS':
+      return {
+        ...state,
+        rag: { ...state.rag, realTimeEvents: [] },
+      };
+
     default:
       return state;
   }

@@ -1,0 +1,2 @@
+{"timestamp":"2025-09-25T20:41:41.281Z","category":"telemetry","event":"service_initialized","data":{"timestamp":"2025-09-25T20:41:41.280Z","version":"1.0.0"}}
+{"timestamp":"2025-09-25T20:41:41.282Z","category":"maintenance","event":"mcp_engine_init","data":{"status":"completed"}}

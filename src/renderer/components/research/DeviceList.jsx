@@ -14,12 +14,14 @@ const DeviceList = ({
 
   return (
     <div style={{ marginTop: 0 }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        marginBottom: 16 
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}
+      >
         <div style={{ color: '#666', fontSize: '14px' }}>
           Devices for <strong>{selectedProject.name}</strong>
         </div>
@@ -72,37 +74,41 @@ const DeviceList = ({
                 }}
               >
                 <div style={{ flex: 1 }}>
-                  <div style={{ 
-                    fontWeight: '600', 
-                    fontSize: '16px', 
-                    color: '#2c5aa0',
-                    marginBottom: '4px'
-                  }}>
+                  <div
+                    style={{
+                      fontWeight: '600',
+                      fontSize: '16px',
+                      color: '#2c5aa0',
+                      marginBottom: '4px',
+                    }}
+                  >
                     {device.name}
                   </div>
-                  <div style={{ 
-                    fontSize: '12px', 
-                    color: '#666'
-                  }}>
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      color: '#666',
+                    }}
+                  >
                     Click to view versions
                   </div>
                 </div>
-                
+
                 <ActionMenu
                   actions={[
                     {
                       key: 'edit',
                       label: 'Edit',
                       icon: '✏️',
-                      onClick: () => onEdit(device)
+                      onClick: () => onEdit(device),
                     },
                     {
                       key: 'delete',
                       label: 'Delete',
                       icon: '🗑️',
                       danger: true,
-                      onClick: () => onDelete(device)
-                    }
+                      onClick: () => onDelete(device),
+                    },
                   ]}
                 />
               </div>

@@ -6,6 +6,8 @@ import { fileURLToPath } from 'url';
 import { runMigrations } from './database/migrationRunner.js';
 import { migrate } from './storage/sqlite/migrate.js';
 import IPCHandler from './main/ipc/handlers.js';
+import { MCPHandlers } from './main/ipc/mcpHandlers.js';
+import { RAGHandlers } from './main/ipc/ragHandlers.js';
 import { backupService } from './services/backup.js';
 import { telemetry } from './services/telemetry.js';
 
@@ -35,6 +37,28 @@ async function initDatabase() {
 
   // Register IPC handlers that require DB access
   _ipcHandler = new IPCHandler(db);
+
+  // Initialize MCP handlers (fixed the require issue)
+  setTimeout(async () => {
+    try {
+      const mcpHandlers = new MCPHandlers();
+      console.log('✅ MCP handlers initialized');
+    } catch (error) {
+      console.error('❌ Failed to initialize MCP handlers:', error);
+      // Continue without MCP - app should still work
+    }
+  }, 100);
+
+  // Initialize RAG handlers
+  setTimeout(async () => {
+    try {
+      const ragHandlers = new RAGHandlers();
+      console.log('✅ RAG handlers initialized');
+    } catch (error) {
+      console.error('❌ Failed to initialize RAG handlers:', error);
+      // Continue without RAG - app should still work
+    }
+  }, 200);
 
   // Initialize services
   await telemetry.initialize();
@@ -117,6 +141,50 @@ ipcMain.handle('run-db-maintenance', async () => {
   }
 });
 
+// Telemetry IPC handlers
+ipcMain.handle('telemetry-log-error', async (event, category, data) => {
+  try {
+    await telemetry.log('error', category, {
+      ...data,
+      source: 'renderer',
+      timestamp: new Date().toISOString(),
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to log error:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('telemetry-log-event', async (event, category, eventName, data) => {
+  try {
+    await telemetry.log('event', `${category}_${eventName}`, {
+      ...data,
+      source: 'renderer',
+      timestamp: new Date().toISOString(),
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to log event:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('telemetry-log-performance', async (event, operation, duration, metadata) => {
+  try {
+    await telemetry.log('performance', operation, {
+      duration,
+      ...metadata,
+      source: 'renderer',
+      timestamp: new Date().toISOString(),
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to log performance:', error);
+    return { success: false, error: error.message };
+  }
+});
+
 // Backup management
 ipcMain.handle('create-backup', async () => {
   try {
@@ -180,9 +248,12 @@ function scheduleNightlyBackup() {
 app.whenReady().then(async () => {
   await initDatabase();
 
-  // --- Runtime CSP (covers dev & prod) ---
-  const csp =
-    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';";
+  // --- Secure CSP (covers dev & prod) ---
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  const csp = isDevelopment
+    ? "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' http://localhost:11434 http://localhost:8000; font-src 'self' data:;"
+    : "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' http://localhost:11434 http://localhost:8000; font-src 'self' data:;";
+  
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     const headers = { ...details.responseHeaders, 'Content-Security-Policy': [csp] };
     callback({ responseHeaders: headers });
