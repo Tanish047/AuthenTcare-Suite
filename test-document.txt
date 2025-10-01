@@ -1,0 +1,14 @@
+FDA 510(k) Premarket Notification Requirements
+
+A 510(k) is a premarket submission made to FDA to demonstrate that the device to be marketed is as safe and effective, that is, substantially equivalent (SE) to a legally marketed device (predicate device) that is not subject to PMA.
+
+Key Requirements:
+1. Device description and intended use
+2. Substantial equivalence comparison to predicate device
+3. Performance data demonstrating safety and effectiveness
+4. Proposed labeling
+5. Risk analysis per ISO 14971
+
+The 510(k) process typically takes 90 days for FDA review, though this can be extended if additional information is requested.
+
+Class II medical devices typically require 510(k) clearance before marketing in the United States.

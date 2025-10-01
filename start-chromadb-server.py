@@ -44,33 +44,58 @@ def start_server():
         os.environ["CHROMA_PERSIST_DIRECTORY"] = str(data_dir.absolute())
         os.environ["ANONYMIZED_TELEMETRY"] = "False"
         
-        # Start the server using ChromaDB's built-in server
-        from chromadb.server.fastapi import FastAPI
-        
-        # Create settings
-        settings = Settings(
-            chroma_db_impl="duckdb+parquet",
-            persist_directory=str(data_dir.absolute()),
-            anonymized_telemetry=False,
-            allow_reset=True
-        )
-        
-        # Create client and app
-        client = chromadb.PersistentClient(
-            path=str(data_dir.absolute()),
-            settings=settings
-        )
-        
-        app = FastAPI(client)
-        
-        # Run server
-        uvicorn.run(
-            app,
-            host="localhost",
-            port=8000,
-            log_level="info",
-            access_log=True
-        )
+        # Use the new ChromaDB server approach
+        try:
+            # Try the new server method
+            import subprocess
+            import time
+            
+            print("🔧 Starting ChromaDB server with new configuration...")
+            
+            # Start ChromaDB server using the CLI
+            cmd = [
+                "python", "-m", "chromadb.cli.cli", "run",
+                "--host", "localhost",
+                "--port", "8000",
+                "--path", str(data_dir.absolute())
+            ]
+            
+            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            
+            # Wait a moment for server to start
+            time.sleep(2)
+            
+            # Check if process is still running
+            if process.poll() is None:
+                print("✅ ChromaDB server started successfully!")
+                print("🌐 Server running at: http://localhost:8000")
+                
+                # Keep the process running
+                try:
+                    process.wait()
+                except KeyboardInterrupt:
+                    print("\n🛑 Stopping ChromaDB server...")
+                    process.terminate()
+                    process.wait()
+            else:
+                # If CLI method fails, try alternative
+                raise Exception("CLI method failed")
+                
+        except Exception as cli_error:
+            print(f"⚠️  CLI method failed: {cli_error}")
+            print("🔧 Trying alternative server method...")
+            
+            # Alternative: Use uvicorn directly with chromadb app
+            try:
+                uvicorn.run(
+                    "chromadb.app:app",
+                    host="localhost",
+                    port=8000,
+                    log_level="info"
+                )
+            except Exception as uvicorn_error:
+                print(f"❌ Alternative method also failed: {uvicorn_error}")
+                raise Exception("All server startup methods failed")
         
     except KeyboardInterrupt:
         print("\n" + "=" * 50)

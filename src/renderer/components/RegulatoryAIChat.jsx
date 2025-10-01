@@ -2,13 +2,15 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { performanceMonitor } from '../utils/performanceMonitor.js';
 import { telemetry } from '../utils/telemetry.js';
 import LocalAIService from '../services/free-ai/LocalAIService.js';
+import { getSharedChromaDBService } from '../services/SharedChromaDBService.js';
+import DocumentHub from './DocumentHub.jsx';
 import '../styles/regulatory-ai-chat.css';
 
 /**
  * Regulatory AI Chat - Clean implementation focused on local Ollama models
  */
 const RegulatoryAIChat = () => {
-    
+
     // Chat configuration
     const [settings, setSettings] = useState({
         model: 'phi3:mini',
@@ -17,15 +19,18 @@ const RegulatoryAIChat = () => {
         systemPrompt: 'You are a regulatory AI assistant specializing in medical device compliance. Provide accurate, practical guidance on FDA regulations and quality systems.'
     });
 
-    // AI service instance
+    // AI service instances
     const [localAIService] = useState(() => new LocalAIService());
+    const [chromaService] = useState(() => getSharedChromaDBService());
     const [availableModels, setAvailableModels] = useState([]);
-    
+    const [isChromaConnected, setIsChromaConnected] = useState(false);
+    const [activeTab, setActiveTab] = useState('chat'); // 'chat' or 'documents'
+
     const [messages, setMessages] = useState([
         {
             id: 'welcome',
             type: 'assistant',
-            content: `Hello! I'm your **AI-powered** regulatory compliance assistant using local Ollama models.
+            content: `Hello! I'm your **AI-powered** regulatory compliance assistant with **document analysis** capabilities.
 
 ## 🏥 **FDA Regulations**
 • Device classifications (Class I, II, III)
@@ -42,9 +47,16 @@ const RegulatoryAIChat = () => {
 • Health Canada CMDCAS
 • International regulatory pathways
 
-**Current Model**: 🖥️ Local - ${settings.model}
+## 📄 **Document Analysis** (NEW!)
+• Upload regulatory documents in the **Document Hub** tab
+• Ask questions about YOUR specific documents
+• Get AI answers based on your uploaded content
+• 100% private - all data stays on your computer
 
-💡 **Tip**: Ask specific questions about medical device regulations!
+**Current Model**: 🖥️ Local - ${settings.model}
+**Document Storage**: ${isChromaConnected ? '🟢 Server Mode' : '🚀 Optimized Mode'}
+
+💡 **Tip**: Upload your regulatory documents and ask specific questions about them!
 
 What regulatory topic would you like to explore today?`,
             timestamp: new Date(),
@@ -70,10 +82,23 @@ What regulatory topic would you like to explore today?`,
         const sessionId = `regulatory_chat_${Date.now()}`;
         setCurrentSession(sessionId);
         loadAvailableModels();
-        
+        initializeChromaDB();
+
         const timer = performanceMonitor.startTimer('regulatory_chat_init');
         return () => timer.end();
     }, []);
+
+    // Initialize ChromaDB connection
+    const initializeChromaDB = async () => {
+        try {
+            const connected = await chromaService.initialize();
+            setIsChromaConnected(connected);
+            console.log(`🔌 ChromaDB connection: ${connected ? 'Success' : 'Failed'}`);
+        } catch (error) {
+            console.error('❌ ChromaDB initialization failed:', error);
+            setIsChromaConnected(false);
+        }
+    };
 
     // Load available AI models from Ollama
     const loadAvailableModels = async () => {
@@ -86,7 +111,7 @@ What regulatory topic would you like to explore today?`,
             // Set default model prioritizing newest and fastest
             if (models.length > 0) {
                 // Priority: 1) Newest (qwen2.5:3b), 2) Fastest (gemma2:2b), 3) Reliable (llama3.2:1b)
-                const bestModel = 
+                const bestModel =
                     models.find(m => (m.name || m).includes('qwen2.5:3b')) ||   // Newest training (mid-2024)
                     models.find(m => (m.name || m).includes('gemma2:2b')) ||    // Fastest performance
                     models.find(m => (m.name || m).includes('llama3.2:1b')) ||  // Known working
@@ -94,7 +119,7 @@ What regulatory topic would you like to explore today?`,
                     models.find(m => (m.name || m).includes('2b')) ||           // 2B models
                     models.find(m => (m.name || m).includes('3b')) ||           // 3B models
                     models[0];  // Fallback to first available
-                
+
                 const modelName = bestModel.name || bestModel;
                 console.log(`✅ Setting model to: ${modelName}`);
                 setSettings(prev => ({ ...prev, model: modelName }));
@@ -116,16 +141,60 @@ What regulatory topic would you like to explore today?`,
         }
     }, []);
 
-    // Generate regulatory responses using LOCAL Ollama models ONLY
+    // Generate regulatory responses using LOCAL Ollama models with RAG
     const generateRegulatoryResponse = async (query) => {
         try {
             console.log(`🤖 Generating response with model: ${settings.model}`);
-            
-            // Use exactly what the user typed - no modifications
-            const regulatoryPrompt = query;
 
-            // Call LOCAL Ollama service directly
-            const response = await localAIService.generateResponse(regulatoryPrompt, {
+            let contextualPrompt = query;
+            let sources = ['Local AI Model'];
+            let relevantDocs = [];
+
+            // Try to get relevant documents from ChromaDB if connected
+            if (isChromaConnected) {
+                try {
+                    console.log('🔍 Searching documents for relevant context...');
+                    console.log(`🔧 ChromaDB service initialized: ${chromaService.isInitialized}`);
+                    console.log(`🔧 ChromaDB fallback mode: ${chromaService.fallbackMode}`);
+                    
+                    // Check if we have any documents first
+                    const allDocs = await chromaService.listDocuments();
+                    console.log(`📚 Total documents available: ${allDocs.length}`);
+                    
+                    relevantDocs = await chromaService.queryDocuments(query, 3);
+
+                    if (relevantDocs.length > 0) {
+                        console.log(`📄 Found ${relevantDocs.length} relevant document chunks`);
+
+                        // Build context from relevant documents
+                        const documentContext = relevantDocs
+                            .map((doc, index) => `**Document ${index + 1}** (Relevance: ${Math.round(doc.relevanceScore * 100)}%)\n${doc.content}`)
+                            .join('\n\n---\n\n');
+
+                        // Enhanced prompt with document context
+                        contextualPrompt = `Based on the following regulatory documents and your knowledge, please answer this question: "${query}"
+
+**RELEVANT DOCUMENT EXCERPTS:**
+${documentContext}
+
+**INSTRUCTIONS:**
+- Use the document excerpts above as your primary source of information
+- If the documents contain relevant information, cite them in your response
+- If the documents don't fully answer the question, supplement with your general regulatory knowledge
+- Be specific and reference the document content when applicable
+- Maintain accuracy and provide practical guidance
+
+**QUESTION:** ${query}`;
+
+                        sources = ['Local AI Model', 'Your Uploaded Documents'];
+                    }
+                } catch (docError) {
+                    console.warn('⚠️ Document search failed, using AI knowledge only:', docError);
+                }
+            }
+
+            // Call LOCAL Ollama service
+            const response = await localAIService.generateResponse(contextualPrompt, {
                 model: settings.model,
                 temperature: settings.temperature,
                 max_tokens: settings.maxTokens,
@@ -134,18 +203,30 @@ What regulatory topic would you like to explore today?`,
 
             console.log('✅ Response generated successfully');
 
+            // Format response with document sources if available
+            let finalResponse = response || 'I apologize, but I could not generate a response. Please try again.';
+
+            if (relevantDocs.length > 0) {
+                finalResponse += `\n\n---\n\n**📚 Sources from Your Documents:**\n`;
+                relevantDocs.forEach((doc, index) => {
+                    finalResponse += `• **Document ${index + 1}**: ${doc.metadata?.title || 'Unknown'} (${Math.round(doc.relevanceScore * 100)}% relevant)\n`;
+                });
+                finalResponse += `\n🔒 *All information sourced from your local documents - completely private*`;
+            }
+
             return {
-                content: response || 'I apologize, but I could not generate a response. Please try again.',
+                content: finalResponse,
                 model: settings.model,
                 provider: 'ollama-local',
-                confidence: 0.9,
-                sources: ['Local AI Model'],
+                confidence: relevantDocs.length > 0 ? 0.95 : 0.9,
+                sources,
+                relevantDocs,
                 timestamp: new Date().toISOString()
             };
 
         } catch (error) {
             console.error('❌ AI generation failed:', error);
-            
+
             // Provide helpful error message with specific guidance
             return {
                 content: `I encountered an issue generating a response for: "${query}"
@@ -243,7 +324,7 @@ While you fix the AI connection, here's some general guidance:
             });
         } catch (error) {
             console.error('Chat error:', error);
-            
+
             const errorMessage = {
                 id: `msg_${Date.now()}_error`,
                 type: 'assistant',
@@ -263,16 +344,16 @@ While you fix the AI connection, here's some general guidance:
     const handleCopyMessage = useCallback(async (content) => {
         try {
             await navigator.clipboard.writeText(content);
-            
+
             // Show temporary success feedback
             const clickedButton = document.activeElement;
-            
+
             if (clickedButton && clickedButton.classList.contains('copy-button')) {
                 const originalText = clickedButton.textContent;
                 clickedButton.textContent = '✅';
                 clickedButton.style.background = 'var(--ai-success)';
                 clickedButton.style.color = 'white';
-                
+
                 setTimeout(() => {
                     clickedButton.textContent = originalText;
                     clickedButton.style.background = '';
@@ -286,7 +367,7 @@ While you fix the AI connection, here's some general guidance:
             });
         } catch (error) {
             console.error('Failed to copy message:', error);
-            
+
             // Fallback for older browsers
             const textArea = document.createElement('textarea');
             textArea.value = content;
@@ -327,9 +408,9 @@ While you fix the AI connection, here's some general guidance:
             await loadAvailableModels();
             const testQuery = "Hello, can you confirm you're working? Please respond briefly.";
             console.log(`🧪 Testing AI with model: ${settings.model}`);
-            
+
             const response = await generateRegulatoryResponse(testQuery);
-            
+
             const testMessage = {
                 id: `test_${Date.now()}`,
                 type: 'assistant',
@@ -344,7 +425,7 @@ While you fix the AI connection, here's some general guidance:
                 timestamp: new Date(),
                 metadata: { isTest: true }
             };
-            
+
             setMessages(prev => [...prev, testMessage]);
         } catch (error) {
             const errorMessage = {
@@ -366,7 +447,7 @@ While you fix the AI connection, here's some general guidance:
                 timestamp: new Date(),
                 metadata: { isTest: true, error: error.message }
             };
-            
+
             setMessages(prev => [...prev, errorMessage]);
         } finally {
             setIsLoading(false);
@@ -403,6 +484,42 @@ While you fix the AI connection, here's some general guidance:
         setCurrentSession(`regulatory_chat_${Date.now()}`);
     }, []);
 
+    // Document Hub handlers
+    const handleDocumentAdded = useCallback((count) => {
+        const message = {
+            id: `doc_added_${Date.now()}`,
+            type: 'assistant',
+            content: `✅ **${count} document(s) uploaded successfully!**
+
+Your documents have been processed and are now available for AI analysis. You can:
+
+• **Ask specific questions** about the content in your documents
+• **Search for information** across all uploaded documents  
+• **Get AI-powered insights** based on your regulatory files
+
+**Example questions you can ask:**
+• "What are the key requirements mentioned in my uploaded FDA guidance?"
+• "Summarize the risk management sections from my documents"
+• "Find information about Class II device requirements in my files"
+
+🚀 **Optimized Storage**: Documents are stored in high-performance memory for instant access and complete privacy.
+
+Try asking a question about your uploaded documents!`,
+            timestamp: new Date(),
+            metadata: { type: 'document_upload' }
+        };
+
+        setMessages(prev => [...prev, message]);
+
+        // Switch to chat tab to see the confirmation
+        setActiveTab('chat');
+    }, []);
+
+    const handleDocumentDeleted = useCallback((documentId) => {
+        console.log(`📄 Document deleted: ${documentId}`);
+        // Optionally add a message about document deletion
+    }, []);
+
     return (
         <div className="regulatory-ai-chat-container">
             {/* Chat Header */}
@@ -410,9 +527,10 @@ While you fix the AI connection, here's some general guidance:
                 <div className="chat-title-section">
                     <h2 className="chat-title">Regulatory AI Assistant</h2>
                     <p className="chat-subtitle">
-                        Expert guidance using local AI models
+                        Expert guidance using local AI models with document analysis
                         <span className="model-status">
-                            🖥️ {settings.model} ({availableModels.length} models available)
+                            🖥️ {settings.model} ({availableModels.length} models) |
+                            📄 Storage {isChromaConnected ? '🟢 Server' : '🚀 Optimized'}
                         </span>
                     </p>
                 </div>
@@ -423,6 +541,9 @@ While you fix the AI connection, here's some general guidance:
                     </button>
                     <button className="btn btn-secondary" onClick={testAIConnection} title="Test AI">
                         🧪
+                    </button>
+                    <button className="btn btn-secondary" onClick={initializeChromaDB} title="Test ChromaDB">
+                        🔌
                     </button>
                     <button className="btn btn-secondary" onClick={() => setShowHistory(!showHistory)} title="History">
                         📋
@@ -437,6 +558,22 @@ While you fix the AI connection, here's some general guidance:
                         🗑️
                     </button>
                 </div>
+            </div>
+
+            {/* Tab Navigation */}
+            <div className="tab-navigation">
+                <button
+                    className={`tab-button ${activeTab === 'chat' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('chat')}
+                >
+                    💬 AI Chat
+                </button>
+                <button
+                    className={`tab-button ${activeTab === 'documents' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('documents')}
+                >
+                    📄 Document Hub
+                </button>
             </div>
 
             {/* Settings Panel */}
@@ -516,106 +653,123 @@ While you fix the AI connection, here's some general guidance:
                 </div>
             )}
 
-            {/* Main Chat */}
-            <div className="regulatory-chat-main">
-                <div className="regulatory-messages-container" ref={messagesContainerRef}>
-                    <div className="messages-list">
-                        {messages.map(message => (
-                            <div key={message.id} className={`message ${message.type}`}>
-                                <div className="message-content">
-                                    {/* Copy button for assistant messages */}
-                                    {message.type === 'assistant' && (
-                                        <button
-                                            className="copy-button"
-                                            onClick={() => handleCopyMessage(message.content)}
-                                            title="Copy message"
-                                        >
-                                            📋
-                                        </button>
-                                    )}
-                                    <div className="message-text">
-                                        {message.content.split('\n').map((line, index) => (
-                                            <div key={index}>
-                                                {line.startsWith('##') ? (
-                                                    <h3 className="message-heading">{line.replace('##', '').trim()}</h3>
-                                                ) : line.startsWith('###') ? (
-                                                    <h4 className="message-subheading">{line.replace('###', '').trim()}</h4>
-                                                ) : line.startsWith('•') ? (
-                                                    <div className="message-bullet">{line}</div>
-                                                ) : line.startsWith('✅') || line.startsWith('⚠️') ? (
-                                                    <div className="message-status">{line}</div>
-                                                ) : (
-                                                    <div>{line}</div>
-                                                )}
+            {/* Main Content Area */}
+            <div className="main-content-area">
+                {activeTab === 'chat' ? (
+                    /* AI Chat Tab */
+                    <div className="regulatory-chat-main">
+                        <div className="regulatory-messages-container" ref={messagesContainerRef}>
+                            <div className="messages-list">
+                                {messages.map(message => (
+                                    <div key={message.id} className={`message ${message.type}`}>
+                                        <div className="message-content">
+                                            {/* Copy button for assistant messages */}
+                                            {message.type === 'assistant' && (
+                                                <button
+                                                    className="copy-button"
+                                                    onClick={() => handleCopyMessage(message.content)}
+                                                    title="Copy message"
+                                                >
+                                                    📋
+                                                </button>
+                                            )}
+                                            <div className="message-text">
+                                                {message.content.split('\n').map((line, index) => (
+                                                    <div key={index}>
+                                                        {line.startsWith('##') ? (
+                                                            <h3 className="message-heading">{line.replace('##', '').trim()}</h3>
+                                                        ) : line.startsWith('###') ? (
+                                                            <h4 className="message-subheading">{line.replace('###', '').trim()}</h4>
+                                                        ) : line.startsWith('•') ? (
+                                                            <div className="message-bullet">{line}</div>
+                                                        ) : line.startsWith('✅') || line.startsWith('⚠️') ? (
+                                                            <div className="message-status">{line}</div>
+                                                        ) : (
+                                                            <div>{line}</div>
+                                                        )}
+                                                    </div>
+                                                ))}
                                             </div>
-                                        ))}
-                                    </div>
-                                    {message.metadata && (
-                                        <div className="message-metadata">
-                                            {message.metadata.model && (
-                                                <span className="metadata-item">Model: {message.metadata.model}</span>
+                                            {message.metadata && (
+                                                <div className="message-metadata">
+                                                    {message.metadata.model && (
+                                                        <span className="metadata-item">Model: {message.metadata.model}</span>
+                                                    )}
+                                                    {message.metadata.relevantDocs && message.metadata.relevantDocs.length > 0 && (
+                                                        <span className="metadata-item">📄 {message.metadata.relevantDocs.length} docs referenced</span>
+                                                    )}
+                                                </div>
                                             )}
                                         </div>
-                                    )}
-                                </div>
-                                <div className="message-timestamp">
-                                    {message.timestamp.toLocaleTimeString()}
-                                </div>
-                            </div>
-                        ))}
-                        {isTyping && (
-                            <div className="message assistant typing">
-                                <div className="message-content">
-                                    <div className="typing-indicator">
-                                        <span></span><span></span><span></span>
+                                        <div className="message-timestamp">
+                                            {message.timestamp.toLocaleTimeString()}
+                                        </div>
                                     </div>
-                                </div>
+                                ))}
+                                {isTyping && (
+                                    <div className="message assistant typing">
+                                        <div className="message-content">
+                                            <div className="typing-indicator">
+                                                <span></span><span></span><span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                <div ref={messagesEndRef} />
                             </div>
-                        )}
-                        <div ref={messagesEndRef} />
-                    </div>
-                </div>
+                        </div>
 
-                {/* Quick Prompts */}
-                <div className="quick-prompts">
-                    <div className="quick-prompts-header">💡 Quick Questions:</div>
-                    <div className="quick-prompts-list">
-                        {quickPrompts.map((prompt, index) => (
-                            <button
-                                key={index}
-                                className="quick-prompt-btn"
-                                onClick={() => handleQuickPrompt(prompt)}
-                                disabled={isLoading}
-                            >
-                                {prompt}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+                        {/* Quick Prompts */}
+                        <div className="quick-prompts">
+                            <div className="quick-prompts-header">💡 Quick Questions:</div>
+                            <div className="quick-prompts-list">
+                                {quickPrompts.map((prompt, index) => (
+                                    <button
+                                        key={index}
+                                        className="quick-prompt-btn"
+                                        onClick={() => handleQuickPrompt(prompt)}
+                                        disabled={isLoading}
+                                    >
+                                        {prompt}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
 
-                {/* Input Area */}
-                <div className="regulatory-input-container">
-                    <div className="input-wrapper">
-                        <textarea
-                            ref={inputRef}
-                            value={inputValue}
-                            onChange={e => setInputValue(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            placeholder="Ask about FDA regulations, ISO standards, EU MDR, or any regulatory topic..."
-                            className="regulatory-input"
-                            rows={3}
-                            disabled={isLoading}
-                        />
-                        <button
-                            onClick={() => handleSendMessage()}
-                            disabled={!inputValue.trim() || isLoading}
-                            className={`send-button ${inputValue.trim() ? 'active' : ''}`}
-                            title="Send Message"
-                        >
-                            {isLoading ? '⏳' : '🚀'}
-                        </button>
+                        {/* Input Area */}
+                        <div className="regulatory-input-container">
+                            <div className="input-wrapper">
+                                <textarea
+                                    ref={inputRef}
+                                    value={inputValue}
+                                    onChange={e => setInputValue(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    placeholder={isChromaConnected
+                                        ? "Ask about FDA regulations, your uploaded documents, or any regulatory topic..."
+                                        : "Ask about FDA regulations, ISO standards, EU MDR, or any regulatory topic..."
+                                    }
+                                    className="regulatory-input"
+                                    rows={3}
+                                    disabled={isLoading}
+                                />
+                                <button
+                                    onClick={() => handleSendMessage()}
+                                    disabled={!inputValue.trim() || isLoading}
+                                    className={`send-button ${inputValue.trim() ? 'active' : ''}`}
+                                    title="Send Message"
+                                >
+                                    {isLoading ? '⏳' : '🚀'}
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    /* Document Hub Tab */
+                    <DocumentHub
+                        onDocumentAdded={handleDocumentAdded}
+                        onDocumentDeleted={handleDocumentDeleted}
+                    />
+                )}
             </div>
         </div>
     );

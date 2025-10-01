@@ -69,32 +69,16 @@ class FreeAIManager {
   }
 
   async checkChromaDBService() {
-    try {
-      // Check if ChromaDB Python package is available by testing local file storage
-      const testResponse = await fetch('http://localhost:8000/api/v1/heartbeat', {
-        method: 'GET',
-        signal: AbortSignal.timeout(1000), // Quick check
-      });
-
-      if (testResponse.ok) {
-        this.services.chromadb = {
-          available: true,
-          endpoint: 'http://localhost:8000',
-          collections: [],
-          mode: 'server'
-        };
-        console.log('✅ ChromaDB server available');
-      }
-    } catch (error) {
-      // ChromaDB server not running, but we can still use local embedded mode
-      console.log('💡 ChromaDB server not running - using embedded local storage');
-      this.services.chromadb = {
-        available: true,  // Still available in embedded mode
-        endpoint: 'embedded',
-        collections: [],
-        mode: 'embedded'
-      };
-    }
+    // Skip server check - use embedded mode for instant startup
+    console.log('✅ ChromaDB embedded mode ready - instant document storage');
+    this.services.chromadb = {
+      available: true,
+      endpoint: 'embedded-local',
+      collections: [],
+      mode: 'embedded',
+      storage: './documents_db',
+      features: ['document_upload', 'semantic_search', 'rag_queries']
+    };
   }
 
   // Conversational AI Query

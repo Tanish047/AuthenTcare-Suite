@@ -753,4 +753,103 @@
   .message.user .message-content {
     border: 2px solid #000000;
   }
+}/
+* Tab Navigation Styles */
+.tab-navigation {
+    display: flex;
+    border-bottom: 2px solid var(--border-color, #e0e0e0);
+    background: var(--bg-secondary, #f8f9fa);
+    margin-bottom: 0;
+}
+
+.tab-button {
+    padding: 12px 24px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-secondary, #666);
+    transition: all 0.2s ease;
+    border-bottom: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tab-button:hover {
+    background: var(--bg-hover, #e9ecef);
+    color: var(--text-primary, #333);
+}
+
+.tab-button.active {
+    color: var(--primary-color, #007bff);
+    border-bottom-color: var(--primary-color, #007bff);
+    background: var(--bg-primary, #ffffff);
+}
+
+/* Main Content Area */
+.main-content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Enhanced message metadata */
+.message-metadata {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-light, #f0f0f0);
+}
+
+.metadata-item {
+    font-size: 0.8rem;
+    color: var(--text-muted, #999);
+    background: var(--bg-secondary, #f5f5f5);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* Responsive tab design */
+@media (max-width: 768px) {
+    .tab-button {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+    
+    .regulatory-chat-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .chat-actions {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+}
+
+/* Dark mode support for tabs */
+@media (prefers-color-scheme: dark) {
+    .tab-navigation {
+        background: var(--bg-secondary-dark, #2d2d2d);
+        border-bottom-color: var(--border-dark, #404040);
+    }
+    
+    .tab-button {
+        color: var(--text-secondary-dark, #cccccc);
+    }
+    
+    .tab-button:hover {
+        background: var(--bg-hover-dark, #3a3a3a);
+        color: var(--text-primary-dark, #ffffff);
+    }
+    
+    .tab-button.active {
+        background: var(--bg-primary-dark, #1a1a1a);
+        color: var(--primary-light, #4dabf7);
+        border-bottom-color: var(--primary-light, #4dabf7);
+    }
 }
