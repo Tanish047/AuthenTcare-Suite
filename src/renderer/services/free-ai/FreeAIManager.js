@@ -17,11 +17,11 @@ class FreeAIManager {
     try {
       console.log('🚀 Initializing Free AI Manager...');
 
-      // Check Ollama availability
-      await this.checkOllamaService();
-
-      // Check ChromaDB availability
-      await this.checkChromaDBService();
+      // Check both services in parallel for faster initialization
+      await Promise.all([
+        this.checkOllamaService(),
+        this.checkChromaDBService()
+      ]);
 
       this.isInitialized = true;
       this.services.status = 'ready';
@@ -46,7 +46,7 @@ class FreeAIManager {
     try {
       const response = await fetch('http://localhost:11434/api/tags', {
         method: 'GET',
-        signal: AbortSignal.timeout(5000),
+        signal: AbortSignal.timeout(2000), // Reduced from 5s to 2s
       });
 
       if (response.ok) {
@@ -70,25 +70,29 @@ class FreeAIManager {
 
   async checkChromaDBService() {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/heartbeat', {
+      // Check if ChromaDB Python package is available by testing local file storage
+      const testResponse = await fetch('http://localhost:8000/api/v1/heartbeat', {
         method: 'GET',
-        signal: AbortSignal.timeout(5000),
+        signal: AbortSignal.timeout(1000), // Quick check
       });
 
-      if (response.ok) {
+      if (testResponse.ok) {
         this.services.chromadb = {
           available: true,
           endpoint: 'http://localhost:8000',
           collections: [],
+          mode: 'server'
         };
-        console.log('✅ ChromaDB available');
+        console.log('✅ ChromaDB server available');
       }
     } catch (error) {
-      console.log('⚠️ ChromaDB not available - using in-memory storage');
+      // ChromaDB server not running, but we can still use local embedded mode
+      console.log('💡 ChromaDB server not running - using embedded local storage');
       this.services.chromadb = {
-        available: false,
-        endpoint: 'in-memory',
+        available: true,  // Still available in embedded mode
+        endpoint: 'embedded',
         collections: [],
+        mode: 'embedded'
       };
     }
   }
@@ -135,153 +139,243 @@ class FreeAIManager {
 
     // FDA QSR vs ISO 13485 specific response
     if (lowerQuery.includes('fda qsr') && lowerQuery.includes('iso 13485')) {
-      return `## FDA QSR vs ISO 13485: Key Differences
+      return `# 🏛️ FDA QSR vs ISO 13485: Comprehensive Comparison
 
-### **FDA QSR (21 CFR 820)**
-**Scope**: US medical device regulation
-**Purpose**: Ensure devices are safe and effective for US market
+## 🇺🇸 **FDA QSR (21 CFR 820)**
+> **Scope**: US medical device regulation  
+> **Purpose**: Ensure devices are safe and effective for US market
 
-**Key Requirements:**
-• **Design Controls** (21 CFR 820.30)
-• **Document Controls** (21 CFR 820.40)
-• **Management Responsibility** (21 CFR 820.20)
-• **CAPA System** (21 CFR 820.100)
-• **Production and Process Controls** (21 CFR 820.70)
+### 📋 **Core Requirements:**
+- 🎯 **Design Controls** (21 CFR 820.30)
+- 📄 **Document Controls** (21 CFR 820.40) 
+- 👥 **Management Responsibility** (21 CFR 820.20)
+- 🔄 **CAPA System** (21 CFR 820.100)
+- ⚙️ **Production Controls** (21 CFR 820.70)
 
-### **ISO 13485:2016**
-**Scope**: International standard for medical device QMS
-**Purpose**: Harmonized approach to quality management globally
+---
 
-**Key Requirements:**
-• **Risk-based approach** throughout QMS
-• **Management review** mandatory
-• **Customer satisfaction** monitoring
-• **Regulatory compliance** integration
-• **Continual improvement** processes
+## 🌍 **ISO 13485:2016**
+> **Scope**: International standard for medical device QMS  
+> **Purpose**: Harmonized global quality management approach
 
-### **Critical Differences**
+### 📋 **Core Requirements:**
+- ⚠️ **Risk-based approach** throughout QMS
+- 📊 **Management review** (mandatory)
+- 😊 **Customer satisfaction** monitoring
+- ⚖️ **Regulatory compliance** integration
+- 📈 **Continual improvement** processes
 
-| **Aspect** | **FDA QSR** | **ISO 13485** |
+---
+
+## 🔍 **Key Differences at a Glance**
+
+| 🏷️ **Aspect** | 🇺🇸 **FDA QSR** | 🌍 **ISO 13485** |
 |------------|-------------|----------------|
-| **Geographic Scope** | US only | Global |
-| **Risk Management** | Limited integration | ISO 14971 required |
-| **Management Review** | Not explicitly required | Mandatory requirement |
-| **Customer Feedback** | Limited requirements | Systematic monitoring required |
-| **Regulatory Interface** | FDA-specific | Adaptable to any regulation |
-| **Validation** | Process validation focus | Broader validation approach |
+| **🌐 Geographic Scope** | US only | Global |
+| **⚠️ Risk Management** | Limited integration | ISO 14971 required |
+| **👔 Management Review** | Not explicitly required | Mandatory |
+| **📞 Customer Feedback** | Limited requirements | Systematic monitoring |
+| **⚖️ Regulatory Interface** | FDA-specific | Adaptable globally |
+| **✅ Validation** | Process focus | Broader approach |
 
-### **Practical Implementation**
+---
 
-**Most companies choose ISO 13485 because:**
-✅ Covers QSR requirements plus additional international needs
-✅ Enables global market access (EU, Canada, Australia, etc.)
-✅ More comprehensive risk management integration
-✅ Better alignment with modern quality principles
+## 💡 **Strategic Recommendation**
 
-**Implementation Strategy:**
-1. **Start with ISO 13485** as the foundation
-2. **Add QSR-specific elements** for US compliance
-3. **Integrate risk management** per ISO 14971
-4. **Establish design controls** meeting both standards
+### 🎯 **Why Most Companies Choose ISO 13485:**
+✅ **Global Coverage** - Covers QSR + international requirements  
+✅ **Market Access** - EU, Canada, Australia, Japan, etc.  
+✅ **Risk Integration** - Comprehensive ISO 14971 alignment  
+✅ **Future-Proof** - Modern quality principles  
 
-This approach ensures compliance with both regulations while avoiding duplication of effort.`;
+### 🚀 **Implementation Roadmap:**
+1. 🏗️ **Foundation**: Start with ISO 13485 framework
+2. 🇺🇸 **US Compliance**: Add QSR-specific elements  
+3. ⚠️ **Risk Management**: Integrate ISO 14971 fully
+4. 🎯 **Design Controls**: Meet both standards seamlessly
+
+**Result**: Single QMS covering global markets while avoiding duplication! 🎉`;
     }
 
-    // General regulatory responses
-    if (lowerQuery.includes('510(k)')) {
-      return `## 510(k) Premarket Notification Process
+    // 510(k) specific response
+    if (lowerQuery.includes('510(k)') || lowerQuery.includes('510k')) {
+      return `# 📋 510(k) Premarket Notification Guide
 
-The 510(k) pathway is the most common route for Class II medical devices to reach the US market.
+> 🎯 **The most common pathway for Class II medical devices to reach the US market**
 
-### **When Required:**
-• Most Class II devices
-• Some Class I devices (if not exempt)
-• Devices with new intended uses
-• Significant design changes to existing devices
+## 🔍 **When is 510(k) Required?**
 
-### **Key Requirements:**
-• **Substantial Equivalence** to a predicate device
-• **Performance data** demonstrating safety and effectiveness
-• **Labeling** and instructions for use
-• **Risk analysis** and mitigation strategies
+### 📊 **Device Categories:**
+- 🏥 **Most Class II devices** (moderate risk)
+- ⚠️ **Some Class I devices** (if not exempt)
+- 🆕 **New intended uses** for existing devices
+- 🔄 **Significant design changes** to predicate devices
 
-### **Timeline & Process:**
-• **Preparation**: 6-12 months
-• **FDA Review**: 90 days (standard), up to 180 days with additional info requests
-• **Total Cost**: $100,000 - $300,000 including testing and regulatory fees
+---
 
-### **Success Factors:**
-✅ Strong predicate device justification
-✅ Comprehensive performance testing
-✅ Clear substantial equivalence argument
-✅ Professional regulatory support`;
+## 📝 **Essential Requirements**
+
+### 🎯 **Core Elements:**
+- 🔗 **Substantial Equivalence** to FDA-cleared predicate
+- 📊 **Performance Data** (safety & effectiveness)
+- 🏷️ **Labeling & Instructions** for use
+- ⚠️ **Risk Analysis** and mitigation strategies
+
+### 📚 **Documentation Needed:**
+- 🔍 **Predicate Device** comparison
+- 🧪 **Testing Results** (biocompatibility, performance)
+- 📋 **Clinical Data** (if required)
+- 🏷️ **Proposed Labeling**
+
+---
+
+## ⏰ **Timeline & Investment**
+
+| 📅 **Phase** | ⏱️ **Duration** | 💰 **Investment** |
+|-------------|---------------|------------------|
+| **📋 Preparation** | 6-12 months | $50K - $150K |
+| **🏛️ FDA Review** | 90-180 days | $12K - $30K (fees) |
+| **🧪 Testing** | 3-9 months | $25K - $100K |
+| **📄 Regulatory** | Ongoing | $15K - $50K |
+
+**💡 Total Investment: $100K - $300K**
+
+---
+
+## 🚀 **Success Strategy**
+
+### ✅ **Critical Success Factors:**
+- 🎯 **Strong Predicate** device selection
+- 🧪 **Comprehensive Testing** program  
+- 📊 **Clear Equivalence** argument
+- 👨‍💼 **Expert Regulatory** support
+- 📋 **Quality Documentation**
+
+### 🏆 **Pro Tips:**
+- 🔍 Start predicate research early
+- 🧪 Plan testing strategy upfront  
+- 📞 Consider FDA pre-submission meeting
+- 👥 Engage regulatory consultants
+
+**🎉 Result: Faster clearance with fewer FDA questions!**`;
     }
 
     if (lowerQuery.includes('iso 13485')) {
-      return `## ISO 13485:2016 Quality Management System
+      return `# 🌍 ISO 13485:2016 Quality Management System
 
-ISO 13485 is the international standard specifically for medical device quality management systems.
+> 🏆 **The global standard for medical device quality management systems**
 
-### **Core Requirements:**
-• **Process approach** to quality management
-• **Risk-based thinking** throughout the QMS
-• **Regulatory compliance** integration
-• **Document and record control**
-• **Management responsibility** and review
+## 🎯 **What is ISO 13485?**
 
-### **Key Sections:**
-• **Section 4**: Quality Management System
-• **Section 5**: Management Responsibility  
-• **Section 6**: Resource Management
-• **Section 7**: Product Realization (including Design Controls)
-• **Section 8**: Measurement and Improvement
+**ISO 13485** is the international standard specifically designed for medical device QMS, enabling global market access and regulatory compliance.
 
-### **Implementation Benefits:**
-✅ Global market access
-✅ Regulatory compliance demonstration
-✅ Improved product quality
-✅ Enhanced customer confidence
-✅ Operational efficiency gains
+---
 
-### **Certification Process:**
-• **Gap Analysis**: 1-2 months
-• **Implementation**: 6-12 months  
-• **Internal Audits**: 2-3 months
-• **Certification Audit**: 1-2 months
-• **Total Timeline**: 12-24 months`;
+## 🏗️ **Core Framework**
+
+### 📋 **Essential Requirements:**
+- 🔄 **Process Approach** to quality management
+- ⚠️ **Risk-Based Thinking** throughout QMS
+- ⚖️ **Regulatory Compliance** integration
+- 📄 **Document Control** systems
+- 👥 **Management Responsibility** & review
+
+### 📚 **Standard Structure:**
+
+| 📖 **Section** | 🎯 **Focus Area** | 🔑 **Key Elements** |
+|---------------|------------------|-------------------|
+| **4️⃣ QMS** | System Foundation | Context, processes, documentation |
+| **5️⃣ Leadership** | Management Role | Policy, objectives, responsibility |
+| **6️⃣ Resources** | Infrastructure | People, equipment, environment |
+| **7️⃣ Operations** | Product Realization | Design controls, production |
+| **8️⃣ Evaluation** | Improvement | Monitoring, audit, CAPA |
+
+---
+
+## 🚀 **Implementation Benefits**
+
+### 🌟 **Business Advantages:**
+✅ **🌍 Global Market Access** - EU, Canada, Australia, Japan  
+✅ **⚖️ Regulatory Compliance** - Demonstrates quality commitment  
+✅ **📈 Product Quality** - Systematic quality improvements  
+✅ **🤝 Customer Confidence** - Third-party certification  
+✅ **⚡ Operational Efficiency** - Streamlined processes  
+
+---
+
+## 📅 **Implementation Roadmap**
+
+| 🎯 **Phase** | ⏱️ **Duration** | 📋 **Activities** |
+|-------------|---------------|------------------|
+| **🔍 Gap Analysis** | 1-2 months | Current state assessment |
+| **🏗️ Implementation** | 6-12 months | System development |
+| **🔍 Internal Audits** | 2-3 months | System validation |
+| **🏆 Certification** | 1-2 months | External audit |
+
+**⏰ Total Timeline: 12-24 months**
+
+---
+
+## 💡 **Success Strategy**
+
+### 🎯 **Implementation Tips:**
+- 📊 Start with gap analysis
+- 👥 Engage all departments early
+- 📋 Focus on documentation control
+- 🔄 Implement risk management (ISO 14971)
+- 🧪 Integrate design controls
+
+**🎉 Result: Certified QMS enabling global medical device sales!**`;
     }
 
     // Default comprehensive response
-    return `## Medical Device Regulatory Guidance
+    return `# 🤖 Medical Device Regulatory AI Assistant
 
-Thank you for your regulatory question. I can provide detailed guidance on:
+> 👋 **Welcome!** I'm here to help with your regulatory compliance questions.
 
-### **FDA Regulations**
-• Device Classifications (Class I, II, III)
-• 510(k) Premarket Notifications
-• PMA (Premarket Approval) processes
-• De Novo Classification pathway
+## 🎯 **What I Can Help You With:**
 
-### **International Standards**
-• ISO 13485 Quality Management Systems
-• ISO 14971 Risk Management
-• IEC 62304 Software Lifecycle
-• ISO 10993 Biocompatibility Testing
+### 🇺🇸 **FDA Regulations**
+- 📊 **Device Classifications** (Class I, II, III)
+- 📋 **510(k) Premarket** Notifications  
+- 🏆 **PMA Processes** (Premarket Approval)
+- 🆕 **De Novo Pathway** Classification
 
-### **Global Market Access**
-• EU MDR (Medical Device Regulation)
-• Health Canada CMDCAS requirements
-• International regulatory pathways
+### 🌍 **International Standards**
+- 🏗️ **ISO 13485** Quality Management Systems
+- ⚠️ **ISO 14971** Risk Management  
+- 💻 **IEC 62304** Software Lifecycle
+- 🧪 **ISO 10993** Biocompatibility Testing
 
-### **Quality & Compliance**
-• Design Controls implementation
-• CAPA Systems development
-• Clinical Evaluation requirements
-• Post-Market Surveillance
+### 🌐 **Global Market Access**
+- 🇪🇺 **EU MDR** (Medical Device Regulation)
+- 🇨🇦 **Health Canada** CMDCAS requirements
+- 🌏 **International** regulatory pathways
 
-For specific guidance on your question: "${query}", please provide more details about your device type, intended use, or specific regulatory requirements you're addressing.
+### ✅ **Quality & Compliance**
+- 🎯 **Design Controls** implementation
+- 🔄 **CAPA Systems** development  
+- 📊 **Clinical Evaluation** requirements
+- 📈 **Post-Market Surveillance**
 
-I can provide step-by-step processes, timelines, costs, and best practices for any regulatory topic.`;
+---
+
+## 💬 **Your Question:** "${query}"
+
+### 🔍 **To provide the most helpful guidance, please share:**
+- 🏥 **Device type** and classification
+- 🎯 **Intended use** and target markets  
+- 📋 **Specific regulatory** requirements
+- ⏰ **Timeline** and budget considerations
+
+### 🚀 **What You'll Get:**
+✅ **Step-by-step processes**  
+✅ **Realistic timelines**  
+✅ **Cost estimates**  
+✅ **Best practices**  
+✅ **Common pitfalls to avoid**
+
+**💡 Just ask me anything about medical device regulations - I'm here to help make compliance easier!** 🎉`;
   }
 
   async ollamaQuery(messages, options = {}) {

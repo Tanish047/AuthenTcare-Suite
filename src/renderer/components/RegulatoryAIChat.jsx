@@ -259,6 +259,44 @@ While you fix the AI connection, here's some general guidance:
         }
     }, [inputValue, isLoading, currentSession, settings]);
 
+    // Handle copying message content
+    const handleCopyMessage = useCallback(async (content) => {
+        try {
+            await navigator.clipboard.writeText(content);
+            
+            // Show temporary success feedback
+            const clickedButton = document.activeElement;
+            
+            if (clickedButton && clickedButton.classList.contains('copy-button')) {
+                const originalText = clickedButton.textContent;
+                clickedButton.textContent = '✅';
+                clickedButton.style.background = 'var(--ai-success)';
+                clickedButton.style.color = 'white';
+                
+                setTimeout(() => {
+                    clickedButton.textContent = originalText;
+                    clickedButton.style.background = '';
+                    clickedButton.style.color = '';
+                }, 2000);
+            }
+
+            await telemetry.logEvent('regulatory_chat', 'message_copied', {
+                contentLength: content.length,
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error('Failed to copy message:', error);
+            
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = content;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        }
+    }, []);
+
     // Handle keyboard shortcuts
     const handleKeyDown = useCallback(e => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -485,6 +523,16 @@ While you fix the AI connection, here's some general guidance:
                         {messages.map(message => (
                             <div key={message.id} className={`message ${message.type}`}>
                                 <div className="message-content">
+                                    {/* Copy button for assistant messages */}
+                                    {message.type === 'assistant' && (
+                                        <button
+                                            className="copy-button"
+                                            onClick={() => handleCopyMessage(message.content)}
+                                            title="Copy message"
+                                        >
+                                            📋
+                                        </button>
+                                    )}
                                     <div className="message-text">
                                         {message.content.split('\n').map((line, index) => (
                                             <div key={index}>
@@ -506,11 +554,6 @@ While you fix the AI connection, here's some general guidance:
                                         <div className="message-metadata">
                                             {message.metadata.model && (
                                                 <span className="metadata-item">Model: {message.metadata.model}</span>
-                                            )}
-                                            {message.metadata.confidence && (
-                                                <span className="metadata-item">
-                                                    Confidence: {Math.round(message.metadata.confidence * 100)}%
-                                                </span>
                                             )}
                                         </div>
                                     )}

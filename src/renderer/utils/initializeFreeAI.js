@@ -63,7 +63,7 @@ class FreeAIInitializer {
     try {
       const response = await fetch('http://localhost:11434/api/tags', {
         method: 'GET',
-        timeout: 5000,
+        signal: AbortSignal.timeout(1500), // Reduced to 1.5s
       });
       return response.ok;
     } catch (error) {
@@ -76,7 +76,7 @@ class FreeAIInitializer {
     try {
       const response = await fetch('http://localhost:8000/api/v1/heartbeat', {
         method: 'GET',
-        timeout: 5000,
+        signal: AbortSignal.timeout(1500), // Reduced to 1.5s
       });
       return response.ok;
     } catch (error) {
