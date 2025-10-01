@@ -253,7 +253,7 @@ app.whenReady().then(async () => {
   const csp = isDevelopment
     ? "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' http://localhost:11434 http://localhost:8000; font-src 'self' data:;"
     : "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' http://localhost:11434 http://localhost:8000; font-src 'self' data:;";
-  
+
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     const headers = { ...details.responseHeaders, 'Content-Security-Policy': [csp] };
     callback({ responseHeaders: headers });

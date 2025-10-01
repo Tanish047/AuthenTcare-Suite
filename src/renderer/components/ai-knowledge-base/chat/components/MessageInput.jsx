@@ -21,7 +21,7 @@ const MessageInput = ({ onSendMessage, onFileUpload, disabled, settings }) => {
   // Handle send message
   const handleSend = () => {
     if ((!message.trim() && attachments.length === 0) || disabled) return;
-    
+
     onSendMessage(message, attachments);
     setMessage('');
     setAttachments([]);
@@ -29,7 +29,7 @@ const MessageInput = ({ onSendMessage, onFileUpload, disabled, settings }) => {
   };
 
   // Handle key press
-  const handleKeyPress = (e) => {
+  const handleKeyPress = e => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -37,31 +37,31 @@ const MessageInput = ({ onSendMessage, onFileUpload, disabled, settings }) => {
   };
 
   // Handle file selection
-  const handleFileSelect = (e) => {
+  const handleFileSelect = e => {
     const files = Array.from(e.target.files);
     addAttachments(files);
   };
 
   // Add attachments
-  const addAttachments = (files) => {
+  const addAttachments = files => {
     const newAttachments = files.map(file => ({
       id: `file_${Date.now()}_${Math.random()}`,
       name: file.name,
       size: file.size,
       type: file.type,
-      file: file
+      file: file,
     }));
-    
+
     setAttachments(prev => [...prev, ...newAttachments]);
   };
 
   // Remove attachment
-  const removeAttachment = (id) => {
+  const removeAttachment = id => {
     setAttachments(prev => prev.filter(att => att.id !== id));
   };
 
   // Format file size
-  const formatFileSize = (bytes) => {
+  const formatFileSize = bytes => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -70,7 +70,7 @@ const MessageInput = ({ onSendMessage, onFileUpload, disabled, settings }) => {
   };
 
   // Get file icon
-  const getFileIcon = (type) => {
+  const getFileIcon = type => {
     if (type.startsWith('image/')) return '🖼️';
     if (type.includes('pdf')) return '📄';
     if (type.includes('word') || type.includes('docx')) return '📝';
@@ -79,8 +79,6 @@ const MessageInput = ({ onSendMessage, onFileUpload, disabled, settings }) => {
     return '📁';
   };
 
-
-
   return (
     <div className={`message-input-container ${isExpanded ? 'expanded' : ''}`}>
       {/* Attachments Preview */}
@@ -88,22 +86,19 @@ const MessageInput = ({ onSendMessage, onFileUpload, disabled, settings }) => {
         <div className="attachments-preview">
           <div className="attachments-header">
             <span>📎 {attachments.length} file(s) attached</span>
-            <button 
-              className="clear-attachments"
-              onClick={() => setAttachments([])}
-            >
+            <button className="clear-attachments" onClick={() => setAttachments([])}>
               Clear all
             </button>
           </div>
           <div className="attachments-list">
-            {attachments.map((attachment) => (
+            {attachments.map(attachment => (
               <div key={attachment.id} className="attachment-preview">
                 <span className="attachment-icon">{getFileIcon(attachment.type)}</span>
                 <div className="attachment-details">
                   <span className="attachment-name">{attachment.name}</span>
                   <span className="attachment-size">{formatFileSize(attachment.size)}</span>
                 </div>
-                <button 
+                <button
                   className="remove-attachment"
                   onClick={() => removeAttachment(attachment.id)}
                 >
@@ -131,7 +126,7 @@ const MessageInput = ({ onSendMessage, onFileUpload, disabled, settings }) => {
           <textarea
             ref={textareaRef}
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={e => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ask me about medical device regulations, FDA requirements, compliance processes..."
             disabled={disabled}
@@ -152,11 +147,7 @@ const MessageInput = ({ onSendMessage, onFileUpload, disabled, settings }) => {
             </button>
 
             {/* Voice Input (Future feature) */}
-            <button
-              className="action-btn"
-              disabled={true}
-              title="Voice input (coming soon)"
-            >
+            <button className="action-btn" disabled={true} title="Voice input (coming soon)">
               🎤
             </button>
 
@@ -178,11 +169,9 @@ const MessageInput = ({ onSendMessage, onFileUpload, disabled, settings }) => {
             <span className="model-info">
               Using {settings.model} • {settings.temperature} temperature
             </span>
-            {settings.enableRAG && (
-              <span className="rag-indicator">📚 RAG Enhanced</span>
-            )}
+            {settings.enableRAG && <span className="rag-indicator">📚 RAG Enhanced</span>}
           </div>
-          
+
           <div className="input-shortcuts">
             <span>Press Enter to send, Shift+Enter for new line</span>
           </div>

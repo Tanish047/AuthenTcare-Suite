@@ -16,7 +16,7 @@ class PerformanceMonitor {
       memoryWarning: 100 * 1024 * 1024, // 100MB
       bundleSize: 5 * 1024 * 1024, // 5MB
     };
-    
+
     this.initialize();
   }
 
@@ -25,35 +25,35 @@ class PerformanceMonitor {
 
     // Monitor Core Web Vitals
     this.observeWebVitals();
-    
+
     // Monitor React rendering performance
     this.observeReactPerformance();
-    
+
     // Monitor memory usage
     this.observeMemoryUsage();
-    
+
     // Monitor network performance
     this.observeNetworkPerformance();
-    
+
     // Monitor user interactions
     this.observeUserInteractions();
-    
+
     console.log('📊 Performance monitoring initialized');
   }
 
   observeWebVitals() {
     // Largest Contentful Paint (LCP)
     if ('PerformanceObserver' in window) {
-      const lcpObserver = new PerformanceObserver((entryList) => {
+      const lcpObserver = new PerformanceObserver(entryList => {
         const entries = entryList.getEntries();
         const lastEntry = entries[entries.length - 1];
-        
+
         this.recordMetric('lcp', lastEntry.startTime, {
           element: lastEntry.element?.tagName,
           url: lastEntry.url,
         });
       });
-      
+
       try {
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
         this.observers.set('lcp', lcpObserver);
@@ -64,15 +64,15 @@ class PerformanceMonitor {
 
     // First Input Delay (FID)
     if ('PerformanceObserver' in window) {
-      const fidObserver = new PerformanceObserver((entryList) => {
+      const fidObserver = new PerformanceObserver(entryList => {
         const entries = entryList.getEntries();
-        entries.forEach((entry) => {
+        entries.forEach(entry => {
           this.recordMetric('fid', entry.processingStart - entry.startTime, {
             eventType: entry.name,
           });
         });
       });
-      
+
       try {
         fidObserver.observe({ entryTypes: ['first-input'] });
         this.observers.set('fid', fidObserver);
@@ -86,15 +86,15 @@ class PerformanceMonitor {
       let clsValue = 0;
       let lastLogTime = 0;
       const LOG_THROTTLE = 5000; // Only log CLS every 5 seconds
-      
-      const clsObserver = new PerformanceObserver((entryList) => {
+
+      const clsObserver = new PerformanceObserver(entryList => {
         const entries = entryList.getEntries();
-        entries.forEach((entry) => {
+        entries.forEach(entry => {
           if (!entry.hadRecentInput) {
             clsValue += entry.value;
           }
         });
-        
+
         // Only log if enough time has passed and CLS is significant
         const now = Date.now();
         if (now - lastLogTime > LOG_THROTTLE && clsValue > 0.01) {
@@ -102,7 +102,7 @@ class PerformanceMonitor {
           lastLogTime = now;
         }
       });
-      
+
       try {
         clsObserver.observe({ entryTypes: ['layout-shift'] });
         this.observers.set('cls', clsObserver);
@@ -126,12 +126,12 @@ class PerformanceMonitor {
               commitTime,
             });
           }
-        }
+        },
       };
     }
 
     // Monitor React error boundaries
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', event => {
       if (event.error && event.error.stack && event.error.stack.includes('React')) {
         this.recordMetric('react_error', 1, {
           message: event.error.message,
@@ -147,27 +147,30 @@ class PerformanceMonitor {
     if ('memory' in performance) {
       setInterval(() => {
         const memory = performance.memory;
-        
+
         // Only log if memory usage is significant or has changed substantially
         const currentUsage = memory.usedJSHeapSize;
         const lastUsage = this.lastMemoryUsage || 0;
         const changeThreshold = 5 * 1024 * 1024; // 5MB change threshold
-        
-        if (Math.abs(currentUsage - lastUsage) > changeThreshold || currentUsage > this.thresholds.memoryWarning) {
+
+        if (
+          Math.abs(currentUsage - lastUsage) > changeThreshold ||
+          currentUsage > this.thresholds.memoryWarning
+        ) {
           this.recordMetric('memory_usage', currentUsage, {
             totalJSHeapSize: memory.totalJSHeapSize,
             jsHeapSizeLimit: memory.jsHeapSizeLimit,
           });
           this.lastMemoryUsage = currentUsage;
         }
-        
+
         // Warn if memory usage is high (but don't spam)
         if (currentUsage > this.thresholds.memoryWarning && !this.memoryWarningLogged) {
           this.recordMetric('memory_warning', currentUsage, {
             percentage: (currentUsage / memory.jsHeapSizeLimit) * 100,
           });
           this.memoryWarningLogged = true;
-          
+
           // Reset warning flag after 5 minutes
           setTimeout(() => {
             this.memoryWarningLogged = false;
@@ -179,12 +182,16 @@ class PerformanceMonitor {
 
   observeNetworkPerformance() {
     if ('PerformanceObserver' in window) {
-      const networkObserver = new PerformanceObserver((entryList) => {
+      const networkObserver = new PerformanceObserver(entryList => {
         const entries = entryList.getEntries();
-        entries.forEach((entry) => {
+        entries.forEach(entry => {
           if (entry.initiatorType === 'fetch' || entry.initiatorType === 'xmlhttprequest') {
             // Only log slow requests or errors to reduce noise
-            if (entry.duration > 1000 || entry.name.includes('error') || entry.name.includes('fail')) {
+            if (
+              entry.duration > 1000 ||
+              entry.name.includes('error') ||
+              entry.name.includes('fail')
+            ) {
               this.recordMetric('network_request', entry.duration, {
                 url: entry.name.substring(0, 100), // Truncate long URLs
                 method: entry.initiatorType,
@@ -195,7 +202,7 @@ class PerformanceMonitor {
           }
         });
       });
-      
+
       try {
         networkObserver.observe({ entryTypes: ['resource'] });
         this.observers.set('network', networkObserver);
@@ -207,13 +214,13 @@ class PerformanceMonitor {
 
   observeUserInteractions() {
     // Track click interactions
-    document.addEventListener('click', (event) => {
+    document.addEventListener('click', event => {
       const startTime = performance.now();
-      
+
       // Use requestAnimationFrame to measure interaction response time
       requestAnimationFrame(() => {
         const responseTime = performance.now() - startTime;
-        
+
         if (responseTime > this.thresholds.slowInteraction) {
           this.recordMetric('slow_interaction', responseTime, {
             element: event.target.tagName,
@@ -258,10 +265,10 @@ class PerformanceMonitor {
     if (!this.metrics.has(name)) {
       this.metrics.set(name, []);
     }
-    
+
     const metrics = this.metrics.get(name);
     metrics.push(metric);
-    
+
     // Keep only last 100 entries per metric
     if (metrics.length > 100) {
       metrics.shift();
@@ -306,13 +313,13 @@ class PerformanceMonitor {
   // Public API methods
   startTimer(name) {
     const startTime = performance.now();
-    
+
     return {
       end: (metadata = {}) => {
         const duration = performance.now() - startTime;
         this.recordMetric(name, duration, metadata);
         return duration;
-      }
+      },
     };
   }
 
@@ -324,7 +331,7 @@ class PerformanceMonitor {
     if (name) {
       return this.metrics.get(name) || [];
     }
-    
+
     const allMetrics = {};
     for (const [key, value] of this.metrics.entries()) {
       allMetrics[key] = value;
@@ -332,13 +339,14 @@ class PerformanceMonitor {
     return allMetrics;
   }
 
-  getAverageMetric(name, timeWindow = 300000) { // 5 minutes default
+  getAverageMetric(name, timeWindow = 300000) {
+    // 5 minutes default
     const metrics = this.metrics.get(name) || [];
     const cutoff = Date.now() - timeWindow;
-    
+
     const recentMetrics = metrics.filter(m => m.timestamp > cutoff);
     if (recentMetrics.length === 0) return null;
-    
+
     const sum = recentMetrics.reduce((acc, m) => acc + m.value, 0);
     return sum / recentMetrics.length;
   }
@@ -354,7 +362,7 @@ class PerformanceMonitor {
 
     // Calculate averages for key metrics
     const keyMetrics = ['lcp', 'fid', 'cls', 'memory_usage', 'network_request'];
-    
+
     keyMetrics.forEach(metric => {
       const average = this.getAverageMetric(metric);
       if (average !== null) {
@@ -378,50 +386,54 @@ class PerformanceMonitor {
 
   calculatePerformanceScore() {
     let score = 100;
-    
+
     // Deduct points for poor metrics
     const lcp = this.getAverageMetric('lcp');
     if (lcp > 4000) score -= 30;
     else if (lcp > 2500) score -= 15;
-    
+
     const fid = this.getAverageMetric('fid');
     if (fid > 300) score -= 25;
     else if (fid > 100) score -= 10;
-    
+
     const cls = this.getAverageMetric('cls');
     if (cls > 0.25) score -= 25;
     else if (cls > 0.1) score -= 10;
-    
+
     return Math.max(0, score);
   }
 
   getActiveWarnings() {
     const warnings = [];
-    
+
     if (this.getAverageMetric('memory_usage') > this.thresholds.memoryWarning) {
       warnings.push('High memory usage detected');
     }
-    
+
     if (this.getAverageMetric('slow_interaction') > this.thresholds.slowInteraction) {
       warnings.push('Slow user interactions detected');
     }
-    
+
     return warnings;
   }
 
   getRecommendations() {
     const recommendations = [];
-    
+
     const lcp = this.getAverageMetric('lcp');
     if (lcp > 2500) {
-      recommendations.push('Optimize largest contentful paint by reducing image sizes and improving server response times');
+      recommendations.push(
+        'Optimize largest contentful paint by reducing image sizes and improving server response times'
+      );
     }
-    
+
     const memoryUsage = this.getAverageMetric('memory_usage');
     if (memoryUsage > this.thresholds.memoryWarning) {
-      recommendations.push('Consider implementing virtual scrolling for large lists and cleaning up unused components');
+      recommendations.push(
+        'Consider implementing virtual scrolling for large lists and cleaning up unused components'
+      );
     }
-    
+
     return recommendations;
   }
 
@@ -458,7 +470,7 @@ export function ProfiledComponent({ id, children, onRender }) {
       children
     );
   }
-  
+
   return children;
 }
 
@@ -467,12 +479,12 @@ export function withPerformanceTracking(Component, componentName) {
   return function PerformanceTrackedComponent(props) {
     React.useEffect(() => {
       const timer = performanceMonitor.startTimer(`component_mount_${componentName}`);
-      
+
       return () => {
         timer.end();
       };
     }, []);
-    
+
     return React.createElement(Component, props);
   };
 }
@@ -483,9 +495,9 @@ export function usePerformanceTracking(componentName) {
     const timer = performanceMonitor.startTimer(`component_render_${componentName}`);
     timer.end();
   });
-  
+
   return {
-    startTimer: (name) => performanceMonitor.startTimer(name),
+    startTimer: name => performanceMonitor.startTimer(name),
     markMilestone: (name, metadata) => performanceMonitor.markMilestone(name, metadata),
   };
 }

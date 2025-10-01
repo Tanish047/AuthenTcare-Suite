@@ -25,14 +25,12 @@ const LoadingOverlay = ({ message, details = [], progress = null }) => {
         {progress !== null && (
           <div className="loading-progress">
             <div className="progress-bar">
-              <div 
+              <div
                 className="progress-fill"
                 style={{ width: `${Math.max(0, Math.min(100, progress))}%` }}
               ></div>
             </div>
-            <div className="progress-text">
-              {Math.round(progress)}% Complete
-            </div>
+            <div className="progress-text">{Math.round(progress)}% Complete</div>
           </div>
         )}
 
@@ -52,9 +50,7 @@ const LoadingOverlay = ({ message, details = [], progress = null }) => {
         <div className="loading-tips">
           <div className="tip-item">
             <span className="tip-icon">💡</span>
-            <span className="tip-text">
-              First-time initialization may take a few minutes
-            </span>
+            <span className="tip-text">First-time initialization may take a few minutes</span>
           </div>
         </div>
       </div>

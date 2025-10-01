@@ -7,10 +7,10 @@ class LocalAIService {
   constructor() {
     this.baseURL = 'http://localhost:11434';
     this.isAvailable = false;
-    this.currentModel = 'phi3:mini';  // Fast, working model
-    this.fallbackModels = ['llama3.1:8b', 'gpt-oss:20b'];
+    this.currentModel = 'phi3:mini'; // Fast, working model
+    this.fallbackModels = ['llama3.1:8b', 'phi3:mini', 'qwen2:7b'];
     this.timeout = 20000; // 20 second timeout
-    
+
     this.initialize();
   }
 
@@ -21,14 +21,14 @@ class LocalAIService {
       if (response.ok) {
         const data = await response.json();
         this.isAvailable = true;
-        
+
         // Check available models
         const models = data.models || [];
         const availableModels = models.map(m => m.name);
-        
+
         // Use best available model
         if (availableModels.includes(this.currentModel)) {
-          // Use preferred model (gpt-oss:20b)
+          // Use preferred model (phi3:mini - fast and efficient)
           console.log(`✅ Using your installed model: ${this.currentModel}`);
         } else {
           // Try fallback models
@@ -40,10 +40,10 @@ class LocalAIService {
             this.currentModel = availableModels[0];
             console.log(`Using available model: ${this.currentModel}`);
           } else {
-            console.warn('No Ollama models found. Please install: ollama pull gpt-oss:20b');
+            console.warn('No Ollama models found. Please install: ollama pull phi3:mini');
           }
         }
-        
+
         console.log(`Local AI Service initialized with model: ${this.currentModel}`);
       }
     } catch (error) {
@@ -75,9 +75,9 @@ class LocalAIService {
             temperature: options.temperature || 0.7,
             top_p: options.top_p || 0.9,
             num_predict: options.max_tokens || 500, // Limit response length
-            num_ctx: 2048 // Reduce context window for speed
-          }
-        })
+            num_ctx: 2048, // Reduce context window for speed
+          },
+        }),
       });
 
       clearTimeout(timeoutId);
@@ -87,7 +87,7 @@ class LocalAIService {
       }
 
       const data = await response.json();
-      
+
       return {
         success: true,
         content: data.message?.content || 'No response generated',
@@ -98,10 +98,9 @@ class LocalAIService {
         usage: {
           prompt_tokens: this.estimateTokens(messages),
           completion_tokens: this.estimateTokens([{ content: data.message?.content || '' }]),
-          total_tokens: 0
-        }
+          total_tokens: 0,
+        },
       };
-
     } catch (error) {
       console.error('Local AI Service error:', error);
       return this.getMockResponse(messages);
@@ -111,12 +110,16 @@ class LocalAIService {
   async generateEmbeddings(texts) {
     if (!this.isAvailable) {
       // Return mock embeddings for development
-      return texts.map(() => Array(384).fill(0).map(() => Math.random() - 0.5));
+      return texts.map(() =>
+        Array(384)
+          .fill(0)
+          .map(() => Math.random() - 0.5)
+      );
     }
 
     try {
       const embeddings = [];
-      
+
       for (const text of texts) {
         const response = await fetch(`${this.baseURL}/api/embeddings`, {
           method: 'POST',
@@ -125,8 +128,8 @@ class LocalAIService {
           },
           body: JSON.stringify({
             model: 'nomic-embed-text', // Specialized embedding model
-            prompt: text
-          })
+            prompt: text,
+          }),
         });
 
         if (response.ok) {
@@ -134,7 +137,11 @@ class LocalAIService {
           embeddings.push(data.embedding);
         } else {
           // Fallback to mock embedding
-          embeddings.push(Array(384).fill(0).map(() => Math.random() - 0.5));
+          embeddings.push(
+            Array(384)
+              .fill(0)
+              .map(() => Math.random() - 0.5)
+          );
         }
       }
 
@@ -142,27 +149,36 @@ class LocalAIService {
     } catch (error) {
       console.error('Embedding generation error:', error);
       // Return mock embeddings
-      return texts.map(() => Array(384).fill(0).map(() => Math.random() - 0.5));
+      return texts.map(() =>
+        Array(384)
+          .fill(0)
+          .map(() => Math.random() - 0.5)
+      );
     }
   }
 
   getMockResponse(messages) {
     const lastMessage = messages[messages.length - 1]?.content || '';
-    
+
     // Generate contextual mock responses for regulatory queries
     const mockResponses = {
-      'fda': 'The FDA (Food and Drug Administration) regulates medical devices through a risk-based classification system. Class I devices have the lowest risk, Class II devices require 510(k) clearance, and Class III devices need PMA approval.',
-      'class ii': 'FDA Class II medical devices are moderate-risk devices that typically require 510(k) premarket clearance. Examples include powered wheelchairs, infusion pumps, and surgical drapes. They must comply with special controls and general controls.',
-      '510(k)': 'A 510(k) is a premarket submission to FDA to demonstrate that a device is substantially equivalent to a legally marketed predicate device. The process typically takes 90 days for review, though it can be longer with additional information requests.',
-      'iso 13485': 'ISO 13485 is an international standard for quality management systems specific to medical devices. It specifies requirements for a comprehensive quality management system for the design and manufacture of medical devices.',
-      'clinical trials': 'Clinical trials for medical devices are studies conducted to evaluate the safety and effectiveness of devices in humans. The requirements vary based on device classification and risk level, with IDE (Investigational Device Exemption) needed for significant risk studies.',
-      'default': 'I can help you with FDA regulations, medical device classifications, 510(k) submissions, ISO standards, clinical trials, and other regulatory compliance topics. What specific regulatory question do you have?'
+      fda: 'The FDA (Food and Drug Administration) regulates medical devices through a risk-based classification system. Class I devices have the lowest risk, Class II devices require 510(k) clearance, and Class III devices need PMA approval.',
+      'class ii':
+        'FDA Class II medical devices are moderate-risk devices that typically require 510(k) premarket clearance. Examples include powered wheelchairs, infusion pumps, and surgical drapes. They must comply with special controls and general controls.',
+      '510(k)':
+        'A 510(k) is a premarket submission to FDA to demonstrate that a device is substantially equivalent to a legally marketed predicate device. The process typically takes 90 days for review, though it can be longer with additional information requests.',
+      'iso 13485':
+        'ISO 13485 is an international standard for quality management systems specific to medical devices. It specifies requirements for a comprehensive quality management system for the design and manufacture of medical devices.',
+      'clinical trials':
+        'Clinical trials for medical devices are studies conducted to evaluate the safety and effectiveness of devices in humans. The requirements vary based on device classification and risk level, with IDE (Investigational Device Exemption) needed for significant risk studies.',
+      default:
+        'I can help you with FDA regulations, medical device classifications, 510(k) submissions, ISO standards, clinical trials, and other regulatory compliance topics. What specific regulatory question do you have?',
     };
 
     // Find relevant response based on keywords
     const lowerMessage = lastMessage.toLowerCase();
     let response = mockResponses.default;
-    
+
     for (const [keyword, mockResponse] of Object.entries(mockResponses)) {
       if (lowerMessage.includes(keyword)) {
         response = mockResponse;
@@ -180,8 +196,8 @@ class LocalAIService {
       usage: {
         prompt_tokens: this.estimateTokens(messages),
         completion_tokens: this.estimateTokens([{ content: response }]),
-        total_tokens: 0
-      }
+        total_tokens: 0,
+      },
     };
   }
 
@@ -204,7 +220,7 @@ class LocalAIService {
     } catch (error) {
       console.error('Error fetching models:', error);
     }
-    
+
     return ['mock-regulatory-ai'];
   }
 
@@ -218,7 +234,7 @@ class LocalAIService {
       available: this.isAvailable,
       currentModel: this.currentModel,
       endpoint: this.baseURL,
-      provider: this.isAvailable ? 'ollama' : 'mock'
+      provider: this.isAvailable ? 'ollama' : 'mock',
     };
   }
 }

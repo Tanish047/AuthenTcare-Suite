@@ -11,8 +11,12 @@ const AINavigationTabs = ({ activeTab, onTabChange, aiStatus, showSetupGuide }) 
       label: 'AI Assistant',
       icon: '💬',
       description: 'Conversational AI for regulatory queries and guidance',
-      badge: aiStatus.services.free ? 'FREE' : aiStatus.services.openai || aiStatus.services.cohere ? 'AI' : null,
-      disabled: false
+      badge: aiStatus.services.free
+        ? 'FREE'
+        : aiStatus.services.openai || aiStatus.services.cohere
+          ? 'AI'
+          : null,
+      disabled: false,
     },
     {
       id: 'documents',
@@ -20,7 +24,7 @@ const AINavigationTabs = ({ activeTab, onTabChange, aiStatus, showSetupGuide }) 
       icon: '📚',
       description: 'Upload, analyze, and search regulatory documents',
       badge: aiStatus.rag.initialized ? 'RAG' : null,
-      disabled: false
+      disabled: false,
     },
     {
       id: 'analytics',
@@ -28,7 +32,7 @@ const AINavigationTabs = ({ activeTab, onTabChange, aiStatus, showSetupGuide }) 
       icon: '📊',
       description: 'Usage insights and performance metrics',
       badge: 'PRO',
-      disabled: false
+      disabled: false,
     },
     {
       id: 'settings',
@@ -36,8 +40,8 @@ const AINavigationTabs = ({ activeTab, onTabChange, aiStatus, showSetupGuide }) 
       icon: '⚙️',
       description: 'Configure AI models and system preferences',
       badge: null,
-      disabled: false
-    }
+      disabled: false,
+    },
   ];
 
   // Add setup tab if needed
@@ -48,13 +52,13 @@ const AINavigationTabs = ({ activeTab, onTabChange, aiStatus, showSetupGuide }) 
       icon: '🆓',
       description: 'Set up your free AI Knowledge Base',
       badge: 'NEW',
-      disabled: false
+      disabled: false,
     });
   }
 
-  const handleTabClick = (tabId) => {
+  const handleTabClick = tabId => {
     if (tabs.find(tab => tab.id === tabId)?.disabled) return;
-    
+
     performanceMonitor.markMilestone(`tab_click_${tabId}`);
     onTabChange(tabId);
   };
@@ -62,7 +66,7 @@ const AINavigationTabs = ({ activeTab, onTabChange, aiStatus, showSetupGuide }) 
   return (
     <div className="ai-navigation-tabs">
       <div className="tabs-container">
-        {tabs.map((tab) => (
+        {tabs.map(tab => (
           <button
             key={tab.id}
             className={`tab-button ${
@@ -79,24 +83,18 @@ const AINavigationTabs = ({ activeTab, onTabChange, aiStatus, showSetupGuide }) 
                 <span className="tab-description">{tab.description}</span>
               </div>
               {tab.badge && (
-                <span className={`tab-badge badge-${tab.badge.toLowerCase()}`}>
-                  {tab.badge}
-                </span>
+                <span className={`tab-badge badge-${tab.badge.toLowerCase()}`}>{tab.badge}</span>
               )}
             </div>
-            
+
             {/* Active indicator */}
-            {activeTab === tab.id && (
-              <div className="tab-active-indicator"></div>
-            )}
+            {activeTab === tab.id && <div className="tab-active-indicator"></div>}
           </button>
         ))}
       </div>
-      
+
       {/* Tab content preview */}
-      <div className="tab-preview">
-        {tabs.find(tab => tab.id === activeTab)?.description}
-      </div>
+      <div className="tab-preview">{tabs.find(tab => tab.id === activeTab)?.description}</div>
     </div>
   );
 };

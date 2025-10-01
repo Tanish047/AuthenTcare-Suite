@@ -57,21 +57,21 @@ export const telemetry = new RendererTelemetry();
 // Performance measurement utilities
 export function measurePerformance(operation) {
   const startTime = performance.now();
-  
+
   return {
     end: async (metadata = {}) => {
       const duration = performance.now() - startTime;
       await telemetry.logPerformance(operation, duration, metadata);
       return duration;
-    }
+    },
   };
 }
 
 // Error tracking decorator
 export function trackErrors(target, propertyKey, descriptor) {
   const originalMethod = descriptor.value;
-  
-  descriptor.value = async function(...args) {
+
+  descriptor.value = async function (...args) {
     try {
       return await originalMethod.apply(this, args);
     } catch (error) {
@@ -84,6 +84,6 @@ export function trackErrors(target, propertyKey, descriptor) {
       throw error;
     }
   };
-  
+
   return descriptor;
 }

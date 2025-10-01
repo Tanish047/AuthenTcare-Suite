@@ -11,7 +11,7 @@ const ModelSelector = React.forwardRef(({ selectedModel, onModelChange, classNam
 
   // Model configurations with performance characteristics
   const modelConfigs = {
-    'auto': {
+    auto: {
       name: 'Auto',
       icon: '🤖',
       description: 'Automatically selects the best model for your query',
@@ -19,7 +19,7 @@ const ModelSelector = React.forwardRef(({ selectedModel, onModelChange, classNam
       quality: 'Optimal',
       size: 'Adaptive',
       color: '#10b981',
-      isAuto: true
+      isAuto: true,
     },
     'phi3:mini': {
       name: 'Phi-3 Mini',
@@ -29,7 +29,7 @@ const ModelSelector = React.forwardRef(({ selectedModel, onModelChange, classNam
       quality: 'Good',
       size: '2.2GB',
       color: '#3b82f6',
-      bestFor: ['Quick questions', 'Simple tasks', 'Fast responses']
+      bestFor: ['Quick questions', 'Simple tasks', 'Fast responses'],
     },
     'mistral:7b': {
       name: 'Mistral 7B',
@@ -39,7 +39,7 @@ const ModelSelector = React.forwardRef(({ selectedModel, onModelChange, classNam
       quality: 'Very Good',
       size: '4.4GB',
       color: '#8b5cf6',
-      bestFor: ['General questions', 'Regulatory advice', 'Balanced performance']
+      bestFor: ['General questions', 'Regulatory advice', 'Balanced performance'],
     },
     'qwen2:7b': {
       name: 'Qwen2 7B',
@@ -49,7 +49,7 @@ const ModelSelector = React.forwardRef(({ selectedModel, onModelChange, classNam
       quality: 'Very Good',
       size: '4.4GB',
       color: '#f59e0b',
-      bestFor: ['Technical questions', 'Document analysis', 'Detailed explanations']
+      bestFor: ['Technical questions', 'Document analysis', 'Detailed explanations'],
     },
     'llama3.1:8b': {
       name: 'Llama 3.1 8B',
@@ -59,18 +59,9 @@ const ModelSelector = React.forwardRef(({ selectedModel, onModelChange, classNam
       quality: 'Excellent',
       size: '4.9GB',
       color: '#ef4444',
-      bestFor: ['Complex questions', 'Reasoning tasks', 'High-quality responses']
+      bestFor: ['Complex questions', 'Reasoning tasks', 'High-quality responses'],
     },
-    'gpt-oss:20b': {
-      name: 'GPT-OSS 20B',
-      icon: '🎯',
-      description: 'Most powerful model, best for complex reasoning',
-      speed: 'Slow (~45s)',
-      quality: 'Exceptional',
-      size: '13GB',
-      color: '#6366f1',
-      bestFor: ['Complex reasoning', 'Advanced analysis', 'Detailed research']
-    }
+
   };
 
   useEffect(() => {
@@ -84,11 +75,11 @@ const ModelSelector = React.forwardRef(({ selectedModel, onModelChange, classNam
       if (response.ok) {
         const data = await response.json();
         const models = data.models?.map(m => m.name) || [];
-        
+
         // Add auto mode and filter available models
         const available = ['auto', ...models.filter(model => modelConfigs[model])];
         setAvailableModels(available);
-        
+
         // Set default to auto if not already selected
         if (!selectedModel || !available.includes(selectedModel)) {
           onModelChange('auto');
@@ -105,65 +96,98 @@ const ModelSelector = React.forwardRef(({ selectedModel, onModelChange, classNam
   // Auto model selection logic (like Cursor)
   const selectBestModel = (query = '') => {
     if (!query) return 'phi3:mini'; // Default for empty queries
-    
+
     const queryLower = query.toLowerCase();
     const queryLength = query.length;
     const wordCount = query.split(' ').length;
-    
+
     // Complex reasoning indicators
     const complexKeywords = [
-      'analyze', 'compare', 'evaluate', 'explain in detail', 'comprehensive',
-      'step by step', 'pros and cons', 'advantages and disadvantages',
-      'complex', 'detailed analysis', 'research', 'thorough'
+      'analyze',
+      'compare',
+      'evaluate',
+      'explain in detail',
+      'comprehensive',
+      'step by step',
+      'pros and cons',
+      'advantages and disadvantages',
+      'complex',
+      'detailed analysis',
+      'research',
+      'thorough',
     ];
-    
+
     // Technical content indicators
     const technicalKeywords = [
-      'technical', 'specification', 'implementation', 'architecture',
-      'algorithm', 'code', 'programming', 'development', 'engineering'
+      'technical',
+      'specification',
+      'implementation',
+      'architecture',
+      'algorithm',
+      'code',
+      'programming',
+      'development',
+      'engineering',
     ];
-    
+
     // Regulatory/compliance indicators
     const regulatoryKeywords = [
-      'fda', 'regulation', 'compliance', 'iso', 'standard', 'requirement',
-      'guideline', 'approval', 'submission', 'validation', 'audit'
+      'fda',
+      'regulation',
+      'compliance',
+      'iso',
+      'standard',
+      'requirement',
+      'guideline',
+      'approval',
+      'submission',
+      'validation',
+      'audit',
     ];
-    
+
     // Quick question indicators
     const quickKeywords = [
-      'what is', 'define', 'quick', 'simple', 'brief', 'short answer',
-      'yes or no', 'true or false', 'list', 'name'
+      'what is',
+      'define',
+      'quick',
+      'simple',
+      'brief',
+      'short answer',
+      'yes or no',
+      'true or false',
+      'list',
+      'name',
     ];
-    
+
     const hasComplexKeywords = complexKeywords.some(keyword => queryLower.includes(keyword));
     const hasTechnicalKeywords = technicalKeywords.some(keyword => queryLower.includes(keyword));
     const hasRegulatoryKeywords = regulatoryKeywords.some(keyword => queryLower.includes(keyword));
     const hasQuickKeywords = quickKeywords.some(keyword => queryLower.includes(keyword));
-    
+
     // Decision logic
     if (hasQuickKeywords || (queryLength < 50 && wordCount < 10)) {
       return 'phi3:mini'; // Fast for simple questions
     }
-    
+
     if (hasComplexKeywords || queryLength > 200 || wordCount > 40) {
       // Use most powerful available model for complex queries
-      if (availableModels.includes('gpt-oss:20b')) return 'gpt-oss:20b';
       if (availableModels.includes('llama3.1:8b')) return 'llama3.1:8b';
+      if (availableModels.includes('mistral:7b')) return 'mistral:7b';
     }
-    
+
     if (hasTechnicalKeywords) {
       return availableModels.includes('qwen2:7b') ? 'qwen2:7b' : 'mistral:7b';
     }
-    
+
     if (hasRegulatoryKeywords) {
       return availableModels.includes('mistral:7b') ? 'mistral:7b' : 'llama3.1:8b';
     }
-    
+
     // Default balanced choice
     return availableModels.includes('mistral:7b') ? 'mistral:7b' : 'phi3:mini';
   };
 
-  const handleModelSelect = (modelId) => {
+  const handleModelSelect = modelId => {
     if (modelId === 'auto') {
       setAutoMode(true);
     } else {
@@ -180,7 +204,7 @@ const ModelSelector = React.forwardRef(({ selectedModel, onModelChange, classNam
   // Expose the auto selection function for parent components
   React.useImperativeHandle(ref, () => ({
     selectBestModel,
-    getAutoSelectedModel
+    getAutoSelectedModel,
   }));
 
   if (isLoading) {
@@ -196,7 +220,7 @@ const ModelSelector = React.forwardRef(({ selectedModel, onModelChange, classNam
     <div className={`model-selector ${className}`}>
       <div className="model-selector-header">
         <h4>🤖 AI Model</h4>
-        <button 
+        <button
           className="refresh-btn"
           onClick={checkAvailableModels}
           title="Refresh available models"
@@ -211,7 +235,7 @@ const ModelSelector = React.forwardRef(({ selectedModel, onModelChange, classNam
           if (!config) return null;
 
           const isSelected = selectedModel === modelId;
-          
+
           return (
             <div
               key={modelId}
@@ -223,9 +247,7 @@ const ModelSelector = React.forwardRef(({ selectedModel, onModelChange, classNam
                 <span className="model-icon">{config.icon}</span>
                 <div className="model-info">
                   <h5 className="model-name">{config.name}</h5>
-                  {config.isAuto && (
-                    <span className="auto-badge">Smart Selection</span>
-                  )}
+                  {config.isAuto && <span className="auto-badge">Smart Selection</span>}
                 </div>
                 {isSelected && <span className="selected-indicator">✓</span>}
               </div>
@@ -269,18 +291,21 @@ const ModelSelector = React.forwardRef(({ selectedModel, onModelChange, classNam
             <h5>Auto Mode Active</h5>
           </div>
           <p>
-            I'll automatically choose the best model based on your question complexity.
-            Simple questions use fast models, complex analysis uses powerful models.
+            I'll automatically choose the best model based on your question complexity. Simple
+            questions use fast models, complex analysis uses powerful models.
           </p>
           <div className="auto-examples">
             <div className="example">
-              <strong>Quick question:</strong> "What is FDA?" → <span className="model-tag phi3">Phi-3 Mini ⚡</span>
+              <strong>Quick question:</strong> "What is FDA?" →{' '}
+              <span className="model-tag phi3">Phi-3 Mini ⚡</span>
             </div>
             <div className="example">
-              <strong>Regulatory advice:</strong> "510(k) requirements" → <span className="model-tag mistral">Mistral 7B 🚀</span>
+              <strong>Regulatory advice:</strong> "510(k) requirements" →{' '}
+              <span className="model-tag mistral">Mistral 7B 🚀</span>
             </div>
             <div className="example">
-              <strong>Complex analysis:</strong> "Compare FDA vs EU regulations" → <span className="model-tag llama">Llama 3.1 🦙</span>
+              <strong>Complex analysis:</strong> "Compare FDA vs EU regulations" →{' '}
+              <span className="model-tag llama">Llama 3.1 🦙</span>
             </div>
           </div>
         </div>

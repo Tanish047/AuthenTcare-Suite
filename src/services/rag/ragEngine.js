@@ -157,7 +157,7 @@ export class RAGEngine extends EventEmitter {
 
   async initializeAIServices() {
     console.log('🤖 Initializing AI services...');
-    
+
     try {
       const result = await aiServiceManager.initialize({
         openai: {
@@ -828,7 +828,7 @@ export class RAGEngine extends EventEmitter {
   async generateResponse(query, context, config) {
     try {
       const contextText = context.map(c => c.content).join('\n\n');
-      
+
       const prompt = `Based on the following context from regulatory documents, please provide a comprehensive answer to the query.
 
 Context:
@@ -853,7 +853,7 @@ Please provide a detailed, accurate response based on the context provided. Incl
       };
     } catch (error) {
       console.warn('AI completion failed, using mock response:', error.message);
-      
+
       // Fallback to mock response
       const contextText = context.map(c => c.content).join('\n\n');
       return {

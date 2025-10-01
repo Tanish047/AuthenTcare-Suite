@@ -29,13 +29,14 @@ function ErrorFallback({ error, resetErrorBoundary }) {
             <line x1="9" y1="9" x2="15" y2="15" strokeWidth="2" />
           </svg>
         </div>
-        
+
         <h2 className="error-title">Something went wrong</h2>
-        
+
         <p className="error-message">
-          We encountered an unexpected error. The application is still running, but this component couldn't load properly.
+          We encountered an unexpected error. The application is still running, but this component
+          couldn't load properly.
         </p>
-        
+
         <div className="error-details">
           <details>
             <summary>Technical Details</summary>
@@ -51,24 +52,18 @@ function ErrorFallback({ error, resetErrorBoundary }) {
             </pre>
           </details>
         </div>
-        
+
         <div className="error-actions">
-          <button 
-            className="btn btn-primary" 
-            onClick={resetErrorBoundary}
-          >
+          <button className="btn btn-primary" onClick={resetErrorBoundary}>
             Try Again
           </button>
-          
-          <button 
-            className="btn btn-secondary" 
-            onClick={() => window.location.reload()}
-          >
+
+          <button className="btn btn-secondary" onClick={() => window.location.reload()}>
             Reload Application
           </button>
         </div>
       </div>
-      
+
       <style jsx>{`
         .error-boundary-container {
           display: flex;
@@ -80,7 +75,7 @@ function ErrorFallback({ error, resetErrorBoundary }) {
           border-radius: 12px;
           margin: 1rem;
         }
-        
+
         .error-boundary-content {
           text-align: center;
           max-width: 500px;
@@ -89,37 +84,37 @@ function ErrorFallback({ error, resetErrorBoundary }) {
           border-radius: 12px;
           box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
-        
+
         .error-icon {
           color: #e74c3c;
           margin-bottom: 1rem;
         }
-        
+
         .error-title {
           font-size: 1.5rem;
           font-weight: 600;
           color: #2c3e50;
           margin-bottom: 1rem;
         }
-        
+
         .error-message {
           color: #7f8c8d;
           line-height: 1.6;
           margin-bottom: 1.5rem;
         }
-        
+
         .error-details {
           margin-bottom: 1.5rem;
           text-align: left;
         }
-        
+
         .error-details summary {
           cursor: pointer;
           color: #3498db;
           font-weight: 500;
           margin-bottom: 0.5rem;
         }
-        
+
         .error-stack {
           background: #f8f9fa;
           padding: 1rem;
@@ -130,13 +125,13 @@ function ErrorFallback({ error, resetErrorBoundary }) {
           white-space: pre-wrap;
           word-break: break-word;
         }
-        
+
         .error-actions {
           display: flex;
           gap: 1rem;
           justify-content: center;
         }
-        
+
         .btn {
           padding: 0.75rem 1.5rem;
           border: none;
@@ -145,22 +140,22 @@ function ErrorFallback({ error, resetErrorBoundary }) {
           cursor: pointer;
           transition: all 0.2s ease;
         }
-        
+
         .btn-primary {
           background: #3498db;
           color: white;
         }
-        
+
         .btn-primary:hover {
           background: #2980b9;
           transform: translateY(-1px);
         }
-        
+
         .btn-secondary {
           background: #95a5a6;
           color: white;
         }
-        
+
         .btn-secondary:hover {
           background: #7f8c8d;
           transform: translateY(-1px);
@@ -173,7 +168,7 @@ function ErrorFallback({ error, resetErrorBoundary }) {
 function ErrorBoundary({ children, fallback, onError }) {
   const handleError = (error, errorInfo) => {
     console.error('Error Boundary caught an error:', error, errorInfo);
-    
+
     // Log to telemetry service
     if (window.electronAPI?.telemetry) {
       window.electronAPI.telemetry.logError('react_error_boundary', {
@@ -183,7 +178,7 @@ function ErrorBoundary({ children, fallback, onError }) {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     // Call custom error handler if provided
     if (onError) {
       onError(error, errorInfo);
@@ -211,19 +206,19 @@ export function withErrorBoundary(Component, errorBoundaryConfig = {}) {
       <Component {...props} ref={ref} />
     </ErrorBoundary>
   ));
-  
+
   WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
-  
+
   return WrappedComponent;
 }
 
 // Hook for handling async errors in components
 export function useErrorHandler() {
   const [error, setError] = React.useState(null);
-  
-  const handleError = React.useCallback((error) => {
+
+  const handleError = React.useCallback(error => {
     console.error('Async error caught:', error);
-    
+
     // Log to telemetry
     if (window.electronAPI?.telemetry) {
       window.electronAPI.telemetry.logError('async_error', {
@@ -232,19 +227,19 @@ export function useErrorHandler() {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     setError(error);
   }, []);
-  
+
   const resetError = React.useCallback(() => {
     setError(null);
   }, []);
-  
+
   // Throw error to be caught by error boundary
   if (error) {
     throw error;
   }
-  
+
   return { handleError, resetError };
 }
 
@@ -255,7 +250,7 @@ export function handleAsyncError(asyncFn) {
       return await asyncFn(...args);
     } catch (error) {
       console.error('Async operation failed:', error);
-      
+
       // Log to telemetry
       if (window.electronAPI?.telemetry) {
         window.electronAPI.telemetry.logError('async_operation_failed', {
@@ -264,7 +259,7 @@ export function handleAsyncError(asyncFn) {
           timestamp: new Date().toISOString(),
         });
       }
-      
+
       throw error;
     }
   };

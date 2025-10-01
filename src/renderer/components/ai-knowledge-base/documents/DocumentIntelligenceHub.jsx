@@ -22,7 +22,7 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
     totalDocuments: 0,
     totalChunks: 0,
     indexSize: 0,
-    lastUpdated: null
+    lastUpdated: null,
   });
 
   // Initialize document intelligence
@@ -37,7 +37,7 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
         }
 
         await telemetry.logEvent('document_intelligence', 'initialized', {
-          documentCount: ragStatus?.documents?.length || 0
+          documentCount: ragStatus?.documents?.length || 0,
         });
       } catch (error) {
         console.error('Failed to initialize documents:', error);
@@ -50,7 +50,7 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
   }, [aiStatus.rag.initialized]);
 
   // Handle document upload
-  const handleDocumentUpload = async (files) => {
+  const handleDocumentUpload = async files => {
     setIsProcessing(true);
     const timer = performanceMonitor.startTimer('document_upload');
 
@@ -64,8 +64,8 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
             filename: file.name,
             size: file.size,
             type: file.type,
-            uploadedAt: new Date().toISOString()
-          }
+            uploadedAt: new Date().toISOString(),
+          },
         });
 
         if (result.success) {
@@ -77,7 +77,7 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
             status: 'processed',
             chunks: result.chunks,
             uploadedAt: new Date(),
-            metadata: result.metadata
+            metadata: result.metadata,
           });
         }
       }
@@ -94,14 +94,13 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
       await telemetry.logEvent('document_intelligence', 'documents_uploaded', {
         count: uploadResults.length,
         totalSize: uploadResults.reduce((sum, doc) => sum + doc.size, 0),
-        processingTime: timer.end()
+        processingTime: timer.end(),
       });
-
     } catch (error) {
       console.error('Document upload failed:', error);
       await telemetry.logError('document_upload_failed', {
         error: error.message,
-        fileCount: files.length
+        fileCount: files.length,
       });
     } finally {
       setIsProcessing(false);
@@ -123,16 +122,16 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
         maxResults: filters.maxResults || 10,
         threshold: filters.threshold || 0.7,
         documentTypes: filters.documentTypes || [],
-        dateRange: filters.dateRange || null
+        dateRange: filters.dateRange || null,
       });
 
       if (searchResult.success) {
         setSearchResults(searchResult.results);
-        
+
         await telemetry.logEvent('document_intelligence', 'search_performed', {
           query: query.substring(0, 100),
           resultCount: searchResult.results.length,
-          searchTime: timer.end()
+          searchTime: timer.end(),
         });
       }
     } catch (error) {
@@ -152,22 +151,20 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
         options: {
           extractEntities: true,
           generateSummary: true,
-          identifyTopics: true
-        }
+          identifyTopics: true,
+        },
       });
 
       if (result.success) {
         // Update document with analysis results
-        setDocuments(prev => prev.map(doc => 
-          doc.id === documentId 
-            ? { ...doc, analysis: result.analysis }
-            : doc
-        ));
+        setDocuments(prev =>
+          prev.map(doc => (doc.id === documentId ? { ...doc, analysis: result.analysis } : doc))
+        );
 
         await telemetry.logEvent('document_intelligence', 'document_analyzed', {
           documentId,
           analysisType,
-          entitiesFound: result.analysis?.entities?.length || 0
+          entitiesFound: result.analysis?.entities?.length || 0,
         });
       }
     } catch (error) {
@@ -178,13 +175,13 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
   };
 
   // Handle document deletion
-  const handleDocumentDelete = async (documentId) => {
+  const handleDocumentDelete = async documentId => {
     try {
       const result = await window.electronAPI.ragAPI.removeDocument(documentId);
-      
+
       if (result.success) {
         setDocuments(prev => prev.filter(doc => doc.id !== documentId));
-        
+
         // Update stats
         const updatedStats = await window.electronAPI.ragAPI.getStatus();
         if (updatedStats?.success) {
@@ -192,7 +189,7 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
         }
 
         await telemetry.logEvent('document_intelligence', 'document_deleted', {
-          documentId
+          documentId,
         });
       }
     } catch (error) {
@@ -202,10 +199,30 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
 
   // View navigation
   const views = [
-    { id: 'library', label: 'Document Library', icon: '📚', description: 'Manage your document collection' },
-    { id: 'search', label: 'Intelligent Search', icon: '🔍', description: 'Search across all documents' },
-    { id: 'analyzer', label: 'Document Analyzer', icon: '🔬', description: 'Deep analysis and insights' },
-    { id: 'knowledge', label: 'Knowledge Graph', icon: '🕸️', description: 'Visualize document relationships' }
+    {
+      id: 'library',
+      label: 'Document Library',
+      icon: '📚',
+      description: 'Manage your document collection',
+    },
+    {
+      id: 'search',
+      label: 'Intelligent Search',
+      icon: '🔍',
+      description: 'Search across all documents',
+    },
+    {
+      id: 'analyzer',
+      label: 'Document Analyzer',
+      icon: '🔬',
+      description: 'Deep analysis and insights',
+    },
+    {
+      id: 'knowledge',
+      label: 'Knowledge Graph',
+      icon: '🕸️',
+      description: 'Visualize document relationships',
+    },
   ];
 
   const renderActiveView = () => {
@@ -216,17 +233,12 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
       onDocumentAnalyze: handleDocumentAnalysis,
       onDocumentDelete: handleDocumentDelete,
       isProcessing,
-      ragStats
+      ragStats,
     };
 
     switch (activeView) {
       case 'library':
-        return (
-          <DocumentLibrary
-            {...commonProps}
-            onDocumentUpload={handleDocumentUpload}
-          />
-        );
+        return <DocumentLibrary {...commonProps} onDocumentUpload={handleDocumentUpload} />;
       case 'search':
         return (
           <SearchInterface
@@ -236,17 +248,9 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
           />
         );
       case 'analyzer':
-        return (
-          <DocumentAnalyzer
-            {...commonProps}
-          />
-        );
+        return <DocumentAnalyzer {...commonProps} />;
       case 'knowledge':
-        return (
-          <KnowledgeGraph
-            {...commonProps}
-          />
-        );
+        return <KnowledgeGraph {...commonProps} />;
       default:
         return <DocumentLibrary {...commonProps} />;
     }
@@ -260,7 +264,7 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
           <h3>Document Intelligence Unavailable</h3>
           <p>The RAG (Retrieval-Augmented Generation) engine is not initialized.</p>
           <p>Please check your AI configuration and ensure the RAG service is running.</p>
-          <button 
+          <button
             className="btn btn-primary"
             onClick={() => window.electronAPI?.ragAPI?.initialize()}
           >
@@ -279,7 +283,7 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
           <h2>Document Intelligence Hub</h2>
           <p>Advanced RAG-powered document analysis and knowledge extraction</p>
         </div>
-        
+
         {/* RAG Stats */}
         <div className="rag-stats">
           <div className="stat-item">
@@ -312,7 +316,7 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
             </button>
           ))}
         </div>
-        
+
         {/* Processing Indicator */}
         {isProcessing && (
           <div className="processing-indicator">
@@ -323,9 +327,7 @@ const DocumentIntelligenceHub = ({ aiStatus, onStatusUpdate }) => {
       </div>
 
       {/* Main Content */}
-      <div className="hub-content">
-        {renderActiveView()}
-      </div>
+      <div className="hub-content">{renderActiveView()}</div>
 
       {/* Document Uploader (Global) */}
       <DocumentUploader

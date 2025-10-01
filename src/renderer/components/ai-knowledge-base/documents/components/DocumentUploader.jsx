@@ -9,46 +9,48 @@ const DocumentUploader = ({ onUpload, isProcessing, supportedTypes }) => {
   const fileInputRef = useRef(null);
 
   // Handle file selection
-  const handleFileSelect = (files) => {
+  const handleFileSelect = files => {
     const validFiles = Array.from(files).filter(file => {
       const extension = '.' + file.name.split('.').pop().toLowerCase();
       return supportedTypes.includes(extension);
     });
 
     if (validFiles.length > 0) {
-      setUploadQueue(validFiles.map(file => ({
-        file,
-        id: `upload_${Date.now()}_${Math.random()}`,
-        name: file.name,
-        size: file.size,
-        status: 'pending'
-      })));
-      
+      setUploadQueue(
+        validFiles.map(file => ({
+          file,
+          id: `upload_${Date.now()}_${Math.random()}`,
+          name: file.name,
+          size: file.size,
+          status: 'pending',
+        }))
+      );
+
       onUpload(validFiles);
     }
   };
 
   // Handle drag events
-  const handleDragEnter = (e) => {
+  const handleDragEnter = e => {
     e.preventDefault();
     setIsDragOver(true);
   };
 
-  const handleDragLeave = (e) => {
+  const handleDragLeave = e => {
     e.preventDefault();
     if (!e.currentTarget.contains(e.relatedTarget)) {
       setIsDragOver(false);
     }
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = e => {
     e.preventDefault();
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = e => {
     e.preventDefault();
     setIsDragOver(false);
-    
+
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       handleFileSelect(files);
@@ -56,7 +58,7 @@ const DocumentUploader = ({ onUpload, isProcessing, supportedTypes }) => {
   };
 
   // Format file size
-  const formatFileSize = (bytes) => {
+  const formatFileSize = bytes => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -65,17 +67,23 @@ const DocumentUploader = ({ onUpload, isProcessing, supportedTypes }) => {
   };
 
   // Get file icon
-  const getFileIcon = (filename) => {
+  const getFileIcon = filename => {
     const extension = filename.split('.').pop().toLowerCase();
     switch (extension) {
-      case 'pdf': return '📄';
+      case 'pdf':
+        return '📄';
       case 'docx':
-      case 'doc': return '📝';
+      case 'doc':
+        return '📝';
       case 'txt':
-      case 'md': return '📃';
-      case 'json': return '🔧';
-      case 'xml': return '📋';
-      default: return '📁';
+      case 'md':
+        return '📃';
+      case 'json':
+        return '🔧';
+      case 'xml':
+        return '📋';
+      default:
+        return '📁';
     }
   };
 
@@ -102,12 +110,14 @@ const DocumentUploader = ({ onUpload, isProcessing, supportedTypes }) => {
               <div className="upload-icon">📁</div>
               <h3>Upload Documents</h3>
               <p>Drag & drop files here or click to browse</p>
-              
+
               <div className="supported-formats">
                 <strong>Supported formats:</strong>
                 <div className="format-list">
                   {supportedTypes.map(type => (
-                    <span key={type} className="format-tag">{type}</span>
+                    <span key={type} className="format-tag">
+                      {type}
+                    </span>
                   ))}
                 </div>
               </div>
@@ -131,7 +141,7 @@ const DocumentUploader = ({ onUpload, isProcessing, supportedTypes }) => {
         <div className="upload-queue">
           <div className="queue-header">
             <h4>Upload Queue ({uploadQueue.length} files)</h4>
-            <button 
+            <button
               className="clear-queue-btn"
               onClick={() => setUploadQueue([])}
               disabled={isProcessing}
@@ -139,19 +149,17 @@ const DocumentUploader = ({ onUpload, isProcessing, supportedTypes }) => {
               Clear
             </button>
           </div>
-          
+
           <div className="queue-list">
-            {uploadQueue.map((item) => (
+            {uploadQueue.map(item => (
               <div key={item.id} className="queue-item">
-                <div className="item-icon">
-                  {getFileIcon(item.name)}
-                </div>
-                
+                <div className="item-icon">{getFileIcon(item.name)}</div>
+
                 <div className="item-info">
                   <div className="item-name">{item.name}</div>
                   <div className="item-size">{formatFileSize(item.size)}</div>
                 </div>
-                
+
                 <div className="item-status">
                   {isProcessing ? (
                     <span className="status processing">Processing...</span>
@@ -169,11 +177,21 @@ const DocumentUploader = ({ onUpload, isProcessing, supportedTypes }) => {
       <div className="upload-guidelines">
         <h4>📋 Upload Guidelines</h4>
         <ul>
-          <li><strong>File Size:</strong> Maximum 50MB per file</li>
-          <li><strong>Quality:</strong> Clear, readable text for best results</li>
-          <li><strong>Language:</strong> English documents work best</li>
-          <li><strong>Processing:</strong> Large files may take several minutes</li>
-          <li><strong>Privacy:</strong> Documents are processed locally and securely</li>
+          <li>
+            <strong>File Size:</strong> Maximum 50MB per file
+          </li>
+          <li>
+            <strong>Quality:</strong> Clear, readable text for best results
+          </li>
+          <li>
+            <strong>Language:</strong> English documents work best
+          </li>
+          <li>
+            <strong>Processing:</strong> Large files may take several minutes
+          </li>
+          <li>
+            <strong>Privacy:</strong> Documents are processed locally and securely
+          </li>
         </ul>
       </div>
 
@@ -181,15 +199,15 @@ const DocumentUploader = ({ onUpload, isProcessing, supportedTypes }) => {
       <div className="quick-actions">
         <h4>🚀 Quick Actions</h4>
         <div className="action-buttons">
-          <button 
+          <button
             className="action-btn"
             onClick={() => fileInputRef.current?.click()}
             disabled={isProcessing}
           >
             📁 Browse Files
           </button>
-          
-          <button 
+
+          <button
             className="action-btn"
             onClick={() => {
               // Open sample documents dialog
@@ -199,8 +217,8 @@ const DocumentUploader = ({ onUpload, isProcessing, supportedTypes }) => {
           >
             📚 Load Samples
           </button>
-          
-          <button 
+
+          <button
             className="action-btn"
             onClick={() => {
               // Open URL import dialog
@@ -220,7 +238,7 @@ const DocumentUploader = ({ onUpload, isProcessing, supportedTypes }) => {
         multiple
         accept={supportedTypes.join(',')}
         style={{ display: 'none' }}
-        onChange={(e) => handleFileSelect(e.target.files)}
+        onChange={e => handleFileSelect(e.target.files)}
       />
     </div>
   );

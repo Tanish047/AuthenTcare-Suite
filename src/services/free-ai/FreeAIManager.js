@@ -43,15 +43,14 @@ class FreeAIManager {
         message: 'Free AI services initialized',
         services: {
           rag: ragResult,
-          mcp: mcpResult
-        }
+          mcp: mcpResult,
+        },
       };
-
     } catch (error) {
       console.error('Free AI Manager initialization failed:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -161,17 +160,13 @@ class FreeAIManager {
       const ragResponse = await this.ragEngine.query(query, options);
 
       // Then, use MCP for additional analysis
-      const mcpResponse = await this.mcpEngine.callTool(
-        'regulatory-brain',
-        'analyze-query',
-        {
-          query: query,
-          context: ragResponse.content,
-          model: ragResponse.model,
-          temperature: options.temperature || 0.7,
-          maxTokens: options.maxTokens || 2000
-        }
-      );
+      const mcpResponse = await this.mcpEngine.callTool('regulatory-brain', 'analyze-query', {
+        query: query,
+        context: ragResponse.content,
+        model: ragResponse.model,
+        temperature: options.temperature || 0.7,
+        maxTokens: options.maxTokens || 2000,
+      });
 
       // Combine results
       return {
@@ -184,15 +179,15 @@ class FreeAIManager {
         confidence: ragResponse.confidence,
         contextUsed: ragResponse.contextUsed,
         mcpToolsUsed: mcpResponse.success,
-        usage: ragResponse.usage
+        usage: ragResponse.usage,
       };
-
     } catch (error) {
       console.error('Enhanced regulatory analysis error:', error);
       return {
         success: false,
         error: error.message,
-        content: 'I apologize, but I encountered an error during the enhanced analysis. Please try again.'
+        content:
+          'I apologize, but I encountered an error during the enhanced analysis. Please try again.',
       };
     }
   }
@@ -201,36 +196,35 @@ class FreeAIManager {
   async getSystemStatus() {
     const status = {
       initialized: this.isInitialized,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     if (this.isInitialized) {
       try {
         const [ragStatus, mcpStatus] = await Promise.all([
           this.ragEngine.getStatus(),
-          this.mcpEngine.getStatus()
+          this.mcpEngine.getStatus(),
         ]);
 
         status.services = {
           rag: ragStatus,
-          mcp: mcpStatus
+          mcp: mcpStatus,
         };
 
         status.health = {
           overall: 'healthy',
           rag: ragStatus.success ? 'healthy' : 'degraded',
-          mcp: mcpStatus.initialized ? 'healthy' : 'degraded'
+          mcp: mcpStatus.initialized ? 'healthy' : 'degraded',
         };
-
       } catch (error) {
         status.health = {
           overall: 'degraded',
-          error: error.message
+          error: error.message,
         };
       }
     } else {
       status.health = {
-        overall: 'initializing'
+        overall: 'initializing',
       };
     }
 
@@ -242,16 +236,16 @@ class FreeAIManager {
     console.log('Shutting down Free AI Manager...');
     this.isInitialized = false;
     this.initializationPromise = null;
-    
+
     // Cleanup resources if needed
     if (this.ragEngine) {
       // Add cleanup logic if needed
     }
-    
+
     if (this.mcpEngine) {
       // Add cleanup logic if needed
     }
-    
+
     console.log('Free AI Manager shutdown complete');
   }
 }

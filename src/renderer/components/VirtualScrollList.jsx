@@ -29,13 +29,13 @@ const VirtualScrollList = ({
   const listRef = useRef();
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
-  
+
   // Performance tracking
   const performanceTimer = useRef();
-  
+
   useEffect(() => {
     performanceTimer.current = performanceMonitor.startTimer('virtual_list_render');
-    
+
     return () => {
       if (performanceTimer.current) {
         performanceTimer.current.end({
@@ -54,13 +54,13 @@ const VirtualScrollList = ({
 
   // Check if item is loaded
   const isItemLoaded = useMemo(() => {
-    return (index) => !!items[index];
+    return index => !!items[index];
   }, [items]);
 
   // Handle scroll events
   const handleScroll = ({ scrollDirection, scrollOffset, scrollUpdateWasRequested }) => {
     setScrollOffset(scrollOffset);
-    
+
     if (onScroll) {
       onScroll({ scrollDirection, scrollOffset, scrollUpdateWasRequested });
     }
@@ -77,7 +77,7 @@ const VirtualScrollList = ({
   // Item renderer with error boundary
   const ItemRenderer = ({ index, style, data }) => {
     const item = items[index];
-    
+
     // Loading placeholder for infinite scroll
     if (!item) {
       return (
@@ -102,7 +102,7 @@ const VirtualScrollList = ({
         index,
         error: error.message,
       });
-      
+
       return (
         <div style={style} className="virtual-list-error-item">
           <div className="error-content">
@@ -130,11 +130,15 @@ const VirtualScrollList = ({
       overscanCount={overscanCount}
       onScroll={handleScroll}
       onItemsRendered={({ visibleStartIndex, visibleStopIndex }) => {
-        performanceMonitor.recordMetric('virtual_list_visible_range', visibleStopIndex - visibleStartIndex, {
-          startIndex: visibleStartIndex,
-          stopIndex: visibleStopIndex,
-          totalItems: itemCount,
-        });
+        performanceMonitor.recordMetric(
+          'virtual_list_visible_range',
+          visibleStopIndex - visibleStartIndex,
+          {
+            startIndex: visibleStartIndex,
+            stopIndex: visibleStopIndex,
+            totalItems: itemCount,
+          }
+        );
       }}
       className={`virtual-scroll-list ${className}`}
       {...props}
@@ -182,7 +186,7 @@ const VirtualScrollList = ({
       >
         {({ onItemsRendered, ref }) => (
           <ListComponent
-            ref={(list) => {
+            ref={list => {
               ref(list);
               listRef.current = list;
             }}
@@ -228,7 +232,7 @@ const VirtualScrollList = ({
     scrollToTop,
     scrollToBottom,
     getScrollOffset: () => scrollOffset,
-    resetAfterIndex: (index) => {
+    resetAfterIndex: index => {
       if (listRef.current && listRef.current.resetAfterIndex) {
         listRef.current.resetAfterIndex(index);
       }
@@ -248,13 +252,7 @@ const VirtualScrollList = ({
 // Higher-order component for easy integration
 export const withVirtualScrolling = (Component, options = {}) => {
   return React.forwardRef((props, ref) => {
-    const {
-      items = [],
-      renderItem,
-      itemHeight = 60,
-      height = 400,
-      ...otherProps
-    } = props;
+    const { items = [], renderItem, itemHeight = 60, height = 400, ...otherProps } = props;
 
     const defaultRenderItem = ({ item, index }) => (
       <Component item={item} index={index} {...otherProps} />

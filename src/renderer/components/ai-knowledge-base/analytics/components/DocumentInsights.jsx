@@ -19,7 +19,7 @@ const DocumentInsights = ({ analyticsData, timeRange, isLoading, aiStatus }) => 
     <div className="document-insights">
       <h2>Document Insights</h2>
       <p>Document usage patterns and knowledge coverage analysis</p>
-      
+
       {/* Document insights will be implemented based on actual data structure */}
       <div className="metrics-placeholder">
         <div className="placeholder-content">

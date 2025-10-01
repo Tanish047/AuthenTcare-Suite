@@ -14,20 +14,20 @@ class DocumentProcessor {
   async processDocument(file) {
     try {
       console.log(`Processing document: ${file.name}`);
-      
+
       // Extract text based on file type
       const text = await this.extractText(file);
-      
+
       if (!text || text.trim().length === 0) {
         throw new Error('No text content found in document');
       }
 
       // Split into chunks
       const chunks = this.splitIntoChunks(text);
-      
+
       // Generate embeddings for each chunk
       const embeddings = await this.aiService.generateEmbeddings(chunks);
-      
+
       // Prepare documents for vector storage
       const documents = chunks.map((chunk, index) => ({
         id: `${file.name}_chunk_${index}`,
@@ -38,12 +38,12 @@ class DocumentProcessor {
         size: file.size,
         uploadedAt: new Date().toISOString(),
         chunkIndex: index,
-        totalChunks: chunks.length
+        totalChunks: chunks.length,
       }));
 
       // Store in vector database
       const result = await this.vectorDB.addDocuments(documents);
-      
+
       if (result.success) {
         return {
           success: true,
@@ -55,19 +55,18 @@ class DocumentProcessor {
             type: file.type,
             size: file.size,
             chunks: chunks.length,
-            processedAt: new Date().toISOString()
-          }
+            processedAt: new Date().toISOString(),
+          },
         };
       } else {
         throw new Error('Failed to store document in vector database');
       }
-
     } catch (error) {
       console.error('Document processing error:', error);
       return {
         success: false,
         error: error.message,
-        documentId: file.name
+        documentId: file.name,
       };
     }
   }
@@ -79,9 +78,17 @@ class DocumentProcessor {
     try {
       if (fileType.includes('pdf') || fileName.endsWith('.pdf')) {
         return await this.extractPDFText(file);
-      } else if (fileType.includes('word') || fileName.endsWith('.docx') || fileName.endsWith('.doc')) {
+      } else if (
+        fileType.includes('word') ||
+        fileName.endsWith('.docx') ||
+        fileName.endsWith('.doc')
+      ) {
         return await this.extractWordText(file);
-      } else if (fileType.includes('text') || fileName.endsWith('.txt') || fileName.endsWith('.md')) {
+      } else if (
+        fileType.includes('text') ||
+        fileName.endsWith('.txt') ||
+        fileName.endsWith('.md')
+      ) {
         return await this.extractPlainText(file);
       } else if (fileType.includes('json') || fileName.endsWith('.json')) {
         return await this.extractJSONText(file);
@@ -98,7 +105,7 @@ class DocumentProcessor {
   async extractPDFText(file) {
     // For now, return a placeholder. In a real implementation, you'd use pdf-parse or similar
     const arrayBuffer = await file.arrayBuffer();
-    
+
     // Simple PDF text extraction (placeholder)
     // In production, you'd use a library like pdf-parse
     const text = `PDF Document: ${file.name}
@@ -162,16 +169,16 @@ This placeholder allows testing of the document processing pipeline while you se
   splitIntoChunks(text) {
     const chunks = [];
     const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-    
+
     let currentChunk = '';
-    
+
     for (const sentence of sentences) {
       const trimmedSentence = sentence.trim();
-      
+
       if (currentChunk.length + trimmedSentence.length > this.chunkSize) {
         if (currentChunk.length > 0) {
           chunks.push(currentChunk.trim());
-          
+
           // Add overlap from the end of current chunk
           const words = currentChunk.split(' ');
           const overlapWords = words.slice(-Math.floor(this.chunkOverlap / 5)); // Rough word estimate
@@ -185,11 +192,11 @@ This placeholder allows testing of the document processing pipeline while you se
         currentChunk += (currentChunk.length > 0 ? '. ' : '') + trimmedSentence;
       }
     }
-    
+
     if (currentChunk.trim().length > 0) {
       chunks.push(currentChunk.trim());
     }
-    
+
     return chunks.length > 0 ? chunks : [text]; // Fallback to original text if no chunks created
   }
 
@@ -197,10 +204,10 @@ This placeholder allows testing of the document processing pipeline while you se
     try {
       // Generate embedding for the query
       const queryEmbedding = await this.aiService.generateEmbeddings([query]);
-      
+
       // Search in vector database
       const searchResult = await this.vectorDB.searchSimilar(queryEmbedding[0], options);
-      
+
       if (searchResult.success) {
         return {
           success: true,
@@ -209,9 +216,9 @@ This placeholder allows testing of the document processing pipeline while you se
             filename: result.metadata.filename,
             similarity: result.similarity,
             confidence: result.confidence,
-            metadata: result.metadata
+            metadata: result.metadata,
           })),
-          total: searchResult.total
+          total: searchResult.total,
         };
       } else {
         throw new Error('Vector search failed');
@@ -222,7 +229,7 @@ This placeholder allows testing of the document processing pipeline while you se
         success: false,
         error: error.message,
         results: [],
-        total: 0
+        total: 0,
       };
     }
   }
@@ -240,41 +247,40 @@ This placeholder allows testing of the document processing pipeline while you se
     try {
       // This would perform advanced analysis on the document
       // For now, return a structured analysis result
-      
+
       const analysis = {
         summary: 'Document analysis completed successfully',
         keyTopics: [
           'Regulatory Compliance',
           'Quality Management',
           'Risk Assessment',
-          'Documentation Requirements'
+          'Documentation Requirements',
         ],
         entities: [
           { type: 'Organization', value: 'FDA', confidence: 0.95 },
-          { type: 'Standard', value: 'ISO 13485', confidence: 0.90 },
-          { type: 'Process', value: '510(k) Submission', confidence: 0.85 }
+          { type: 'Standard', value: 'ISO 13485', confidence: 0.9 },
+          { type: 'Process', value: '510(k) Submission', confidence: 0.85 },
         ],
         compliance: {
           score: 0.88,
           gaps: ['Missing risk assessment documentation', 'Incomplete quality procedures'],
-          recommendations: ['Update risk management file', 'Enhance QMS documentation']
+          recommendations: ['Update risk management file', 'Enhance QMS documentation'],
         },
         readabilityScore: 0.75,
-        completenessScore: 0.82
+        completenessScore: 0.82,
       };
 
       return {
         success: true,
         analysis: analysis,
         analysisType: analysisType,
-        processedAt: new Date().toISOString()
+        processedAt: new Date().toISOString(),
       };
-
     } catch (error) {
       console.error('Document analysis error:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }

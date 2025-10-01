@@ -18,7 +18,7 @@ const FreeAISetupGuide = ({ onComplete }) => {
     try {
       const status = await freeAIInitializer.initialize();
       setSetupStatus(status);
-      
+
       // Test AI response
       await testAIResponse();
     } catch (error) {
@@ -36,21 +36,21 @@ const FreeAISetupGuide = ({ onComplete }) => {
           model: 'phi3:mini',
           prompt: 'What is FDA?',
           stream: false,
-          options: { num_predict: 50 }
+          options: { num_predict: 50 },
         }),
-        signal: AbortSignal.timeout(15000)
+        signal: AbortSignal.timeout(15000),
       });
 
       const result = await response.json();
       setTestResults({
         working: !!result.response,
         response: result.response?.substring(0, 100) + '...',
-        model: 'phi3:mini'
+        model: 'phi3:mini',
       });
     } catch (error) {
       setTestResults({
         working: false,
-        error: error.message
+        error: error.message,
       });
     }
   };
@@ -72,7 +72,7 @@ const FreeAISetupGuide = ({ onComplete }) => {
       {/* Status Header */}
       <div className="setup-header">
         <h2>🆓 Free AI Knowledge Base</h2>
-        
+
         {isReady ? (
           <div className="setup-success">
             <span className="success-icon">🎉</span>
@@ -115,9 +115,7 @@ const FreeAISetupGuide = ({ onComplete }) => {
 
         <div className="status-card">
           <h4>💰 Cost</h4>
-          <div className="status-indicator success">
-            ✅ $0/month
-          </div>
+          <div className="status-indicator success">✅ $0/month</div>
           <p>Unlimited usage, no API fees</p>
         </div>
       </div>
@@ -127,7 +125,8 @@ const FreeAISetupGuide = ({ onComplete }) => {
         <div className="test-results">
           <h3>🧪 AI Test Results</h3>
           <div className="test-response">
-            <strong>Test Question:</strong> "What is FDA?"<br/>
+            <strong>Test Question:</strong> "What is FDA?"
+            <br />
             <strong>AI Response:</strong> "{testResults.response}"
           </div>
           <div className="test-metrics">
@@ -142,27 +141,16 @@ const FreeAISetupGuide = ({ onComplete }) => {
       <div className="quick-actions">
         <h3>🚀 Quick Actions</h3>
         <div className="action-buttons">
-          <button 
-            className="btn btn-secondary"
-            onClick={checkSetupStatus}
-            disabled={isChecking}
-          >
+          <button className="btn btn-secondary" onClick={checkSetupStatus} disabled={isChecking}>
             {isChecking ? '⏳ Checking...' : '🔄 Refresh Status'}
           </button>
-          
-          <button 
-            className="btn btn-secondary"
-            onClick={testAIResponse}
-            disabled={isChecking}
-          >
+
+          <button className="btn btn-secondary" onClick={testAIResponse} disabled={isChecking}>
             🧪 Test AI Response
           </button>
 
           {isReady && (
-            <button 
-              className="btn btn-primary"
-              onClick={onComplete}
-            >
+            <button className="btn btn-primary" onClick={onComplete}>
               ✨ Start Using AI
             </button>
           )}

@@ -19,7 +19,7 @@ const UsageMetrics = ({ analyticsData, timeRange, isLoading, aiStatus }) => {
     <div className="usage-metrics">
       <h2>Usage Analytics</h2>
       <p>Detailed analysis of user interactions and system usage patterns</p>
-      
+
       {/* Metrics will be implemented based on actual data structure */}
       <div className="metrics-placeholder">
         <div className="placeholder-content">

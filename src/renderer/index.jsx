@@ -9,7 +9,10 @@ import { createRoot } from 'react-dom/client';
 
 import App from './App.jsx';
 import { performanceMonitor } from './utils/performanceMonitor.js';
-import { register as registerSW, initializePerformanceOptimizations } from './utils/serviceWorker.js';
+import {
+  register as registerSW,
+  initializePerformanceOptimizations,
+} from './utils/serviceWorker.js';
 
 // Initialize performance monitoring
 performanceMonitor.markMilestone('app_start');
@@ -21,11 +24,11 @@ initializePerformanceOptimizations();
 const isProduction = window.location.protocol !== 'file:' && !window.electronAPI;
 if (isProduction) {
   registerSW({
-    onSuccess: (registration) => {
+    onSuccess: registration => {
       console.log('Service worker registered successfully');
       performanceMonitor.markMilestone('sw_registered');
     },
-    onUpdate: (registration) => {
+    onUpdate: registration => {
       console.log('New service worker available');
       // Optionally show update notification to user
     },

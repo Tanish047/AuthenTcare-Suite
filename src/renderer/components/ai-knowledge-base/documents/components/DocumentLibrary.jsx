@@ -3,15 +3,15 @@ import React, { useState, useMemo } from 'react';
 /**
  * Document Library - Manage and organize document collection
  */
-const DocumentLibrary = ({ 
-  documents, 
-  selectedDocument, 
-  onDocumentSelect, 
-  onDocumentAnalyze, 
+const DocumentLibrary = ({
+  documents,
+  selectedDocument,
+  onDocumentSelect,
+  onDocumentAnalyze,
   onDocumentDelete,
   onDocumentUpload,
   isProcessing,
-  ragStats 
+  ragStats,
 }) => {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const [sortBy, setSortBy] = useState('uploadedAt');
@@ -25,9 +25,10 @@ const DocumentLibrary = ({
 
     // Apply search filter
     if (searchTerm) {
-      filtered = filtered.filter(doc => 
-        doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (doc.metadata?.description || '').toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        doc =>
+          doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (doc.metadata?.description || '').toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -36,11 +37,16 @@ const DocumentLibrary = ({
       filtered = filtered.filter(doc => {
         const type = doc.type || '';
         switch (filterType) {
-          case 'pdf': return type.includes('pdf');
-          case 'word': return type.includes('word') || type.includes('docx');
-          case 'text': return type.includes('text') || type.includes('plain');
-          case 'json': return type.includes('json');
-          default: return true;
+          case 'pdf':
+            return type.includes('pdf');
+          case 'word':
+            return type.includes('word') || type.includes('docx');
+          case 'text':
+            return type.includes('text') || type.includes('plain');
+          case 'json':
+            return type.includes('json');
+          default:
+            return true;
         }
       });
     }
@@ -69,7 +75,7 @@ const DocumentLibrary = ({
   }, [documents, searchTerm, filterType, sortBy, sortOrder]);
 
   // Format file size
-  const formatFileSize = (bytes) => {
+  const formatFileSize = bytes => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -78,7 +84,7 @@ const DocumentLibrary = ({
   };
 
   // Get file icon
-  const getFileIcon = (type) => {
+  const getFileIcon = type => {
     if (type.includes('pdf')) return '📄';
     if (type.includes('word') || type.includes('docx')) return '📝';
     if (type.includes('text')) return '📃';
@@ -88,17 +94,21 @@ const DocumentLibrary = ({
   };
 
   // Get document status color
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     switch (status) {
-      case 'processed': return 'green';
-      case 'processing': return 'orange';
-      case 'error': return 'red';
-      default: return 'gray';
+      case 'processed':
+        return 'green';
+      case 'processing':
+        return 'orange';
+      case 'error':
+        return 'red';
+      default:
+        return 'gray';
     }
   };
 
   // Handle file drop
-  const handleDrop = (e) => {
+  const handleDrop = e => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
     if (files.length > 0) {
@@ -106,7 +116,7 @@ const DocumentLibrary = ({
     }
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = e => {
     e.preventDefault();
   };
 
@@ -121,7 +131,7 @@ const DocumentLibrary = ({
               type="text"
               placeholder="Search documents..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               className="search-input"
             />
             <span className="search-icon">🔍</span>
@@ -129,9 +139,9 @@ const DocumentLibrary = ({
 
           {/* Filters */}
           <div className="filter-controls">
-            <select 
+            <select
               value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
+              onChange={e => setFilterType(e.target.value)}
               className="filter-select"
             >
               <option value="all">All Types</option>
@@ -141,9 +151,9 @@ const DocumentLibrary = ({
               <option value="json">JSON Files</option>
             </select>
 
-            <select 
+            <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={e => setSortBy(e.target.value)}
               className="sort-select"
             >
               <option value="uploadedAt">Upload Date</option>
@@ -187,7 +197,7 @@ const DocumentLibrary = ({
       </div>
 
       {/* Document Grid/List */}
-      <div 
+      <div
         className={`documents-container ${viewMode}`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -202,7 +212,7 @@ const DocumentLibrary = ({
               ) : (
                 <>
                   <p>Upload documents to start building your knowledge base</p>
-                  <button 
+                  <button
                     className="btn btn-primary"
                     onClick={() => document.querySelector('.document-uploader input').click()}
                   >
@@ -214,30 +224,24 @@ const DocumentLibrary = ({
           </div>
         ) : (
           <div className={`documents-${viewMode}`}>
-            {filteredDocuments.map((document) => (
+            {filteredDocuments.map(document => (
               <div
                 key={document.id}
                 className={`document-item ${selectedDocument?.id === document.id ? 'selected' : ''}`}
                 onClick={() => onDocumentSelect(document)}
               >
                 {/* Document Icon */}
-                <div className="document-icon">
-                  {getFileIcon(document.type)}
-                </div>
+                <div className="document-icon">{getFileIcon(document.type)}</div>
 
                 {/* Document Info */}
                 <div className="document-info">
                   <div className="document-name" title={document.name}>
                     {document.name}
                   </div>
-                  
+
                   <div className="document-meta">
-                    <span className="document-size">
-                      {formatFileSize(document.size)}
-                    </span>
-                    <span className="document-chunks">
-                      {document.chunks || 0} chunks
-                    </span>
+                    <span className="document-size">{formatFileSize(document.size)}</span>
+                    <span className="document-chunks">{document.chunks || 0} chunks</span>
                     <span className="document-date">
                       {new Date(document.uploadedAt).toLocaleDateString()}
                     </span>
@@ -245,9 +249,7 @@ const DocumentLibrary = ({
 
                   {/* Document Status */}
                   <div className="document-status">
-                    <span 
-                      className={`status-indicator ${getStatusColor(document.status)}`}
-                    >
+                    <span className={`status-indicator ${getStatusColor(document.status)}`}>
                       {document.status || 'unknown'}
                     </span>
                   </div>
@@ -269,7 +271,7 @@ const DocumentLibrary = ({
                 <div className="document-actions">
                   <button
                     className="action-btn"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       onDocumentAnalyze(document.id, 'full');
                     }}
@@ -278,10 +280,10 @@ const DocumentLibrary = ({
                   >
                     🔬
                   </button>
-                  
+
                   <button
                     className="action-btn"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       // Download or view document
                       console.log('View document:', document.id);
@@ -290,10 +292,10 @@ const DocumentLibrary = ({
                   >
                     👁️
                   </button>
-                  
+
                   <button
                     className="action-btn danger"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       if (confirm(`Delete "${document.name}"?`)) {
                         onDocumentDelete(document.id);
@@ -320,7 +322,7 @@ const DocumentLibrary = ({
               <div className="stat-label">Total Documents</div>
             </div>
           </div>
-          
+
           <div className="stat-card">
             <div className="stat-icon">🧩</div>
             <div className="stat-content">
@@ -328,7 +330,7 @@ const DocumentLibrary = ({
               <div className="stat-label">Text Chunks</div>
             </div>
           </div>
-          
+
           <div className="stat-card">
             <div className="stat-icon">💾</div>
             <div className="stat-content">
@@ -336,13 +338,11 @@ const DocumentLibrary = ({
               <div className="stat-label">Index Size</div>
             </div>
           </div>
-          
+
           <div className="stat-card">
             <div className="stat-icon">🔬</div>
             <div className="stat-content">
-              <div className="stat-value">
-                {documents.filter(doc => doc.analysis).length}
-              </div>
+              <div className="stat-value">{documents.filter(doc => doc.analysis).length}</div>
               <div className="stat-label">Analyzed</div>
             </div>
           </div>

@@ -3,23 +3,23 @@ import React, { useState } from 'react';
 /**
  * Search Interface - Search across all documents
  */
-const SearchInterface = ({ 
-  documents, 
-  selectedDocument, 
-  onDocumentSelect, 
-  onDocumentAnalyze, 
+const SearchInterface = ({
+  documents,
+  selectedDocument,
+  onDocumentSelect,
+  onDocumentAnalyze,
   onDocumentDelete,
   searchResults,
   onSearch,
   isProcessing,
-  ragStats 
+  ragStats,
 }) => {
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState({
     maxResults: 10,
     threshold: 0.7,
     documentTypes: [],
-    dateRange: null
+    dateRange: null,
   });
 
   const handleSearch = () => {
@@ -28,7 +28,7 @@ const SearchInterface = ({
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = e => {
     if (e.key === 'Enter') {
       handleSearch();
     }
@@ -47,12 +47,12 @@ const SearchInterface = ({
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={e => setQuery(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Search for regulatory information, compliance requirements, or specific topics..."
             className="search-input"
           />
-          <button 
+          <button
             className="search-btn"
             onClick={handleSearch}
             disabled={!query.trim() || isProcessing}
@@ -65,9 +65,11 @@ const SearchInterface = ({
         <div className="search-filters">
           <div className="filter-group">
             <label>Max Results:</label>
-            <select 
+            <select
               value={filters.maxResults}
-              onChange={(e) => setFilters(prev => ({ ...prev, maxResults: parseInt(e.target.value) }))}
+              onChange={e =>
+                setFilters(prev => ({ ...prev, maxResults: parseInt(e.target.value) }))
+              }
             >
               <option value={5}>5 results</option>
               <option value={10}>10 results</option>
@@ -84,7 +86,9 @@ const SearchInterface = ({
               max="1"
               step="0.05"
               value={filters.threshold}
-              onChange={(e) => setFilters(prev => ({ ...prev, threshold: parseFloat(e.target.value) }))}
+              onChange={e =>
+                setFilters(prev => ({ ...prev, threshold: parseFloat(e.target.value) }))
+              }
             />
             <span className="threshold-value">{(filters.threshold * 100).toFixed(0)}%</span>
           </div>
@@ -98,20 +102,18 @@ const SearchInterface = ({
             <div className="results-header">
               <h3>Search Results ({searchResults.length})</h3>
             </div>
-            
+
             {searchResults.map((result, index) => (
               <div key={index} className="result-item">
                 <div className="result-header">
                   <h4 className="result-title">{result.title || result.filename}</h4>
-                  <div className="result-score">
-                    Relevance: {(result.score * 100).toFixed(1)}%
-                  </div>
+                  <div className="result-score">Relevance: {(result.score * 100).toFixed(1)}%</div>
                 </div>
-                
+
                 <div className="result-content">
                   <p className="result-excerpt">{result.content}</p>
                 </div>
-                
+
                 <div className="result-metadata">
                   <span className="result-source">Source: {result.source}</span>
                   <span className="result-page">Page: {result.page || 'N/A'}</span>
@@ -132,8 +134,11 @@ const SearchInterface = ({
             <div className="placeholder-content">
               <div className="placeholder-icon">🔍</div>
               <h3>Intelligent Document Search</h3>
-              <p>Enter your search query above to find relevant information across all your documents.</p>
-              
+              <p>
+                Enter your search query above to find relevant information across all your
+                documents.
+              </p>
+
               <div className="search-tips">
                 <h4>Search Tips:</h4>
                 <ul>

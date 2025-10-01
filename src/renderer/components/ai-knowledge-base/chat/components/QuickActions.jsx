@@ -13,15 +13,15 @@ const QuickActions = ({ onActionClick }) => {
           id: 'fda-classification',
           title: 'Device Classification',
           description: 'Learn about FDA Class I, II, III classifications',
-          icon: '🏷️'
+          icon: '🏷️',
         },
         {
           id: 'regulatory-pathway',
           title: 'Regulatory Pathways',
           description: '510(k), PMA, De Novo pathways explained',
-          icon: '🛤️'
-        }
-      ]
+          icon: '🛤️',
+        },
+      ],
     },
     {
       title: 'Quality Management',
@@ -31,15 +31,15 @@ const QuickActions = ({ onActionClick }) => {
           id: 'qms-requirements',
           title: 'QMS Requirements',
           description: 'ISO 13485 and FDA QSR overview',
-          icon: '📋'
+          icon: '📋',
         },
         {
           id: 'clinical-trials',
           title: 'Clinical Trials',
           description: 'Clinical study requirements and design',
-          icon: '🧪'
-        }
-      ]
+          icon: '🧪',
+        },
+      ],
     },
     {
       title: 'Compliance',
@@ -49,16 +49,16 @@ const QuickActions = ({ onActionClick }) => {
           id: 'labeling-requirements',
           title: 'Labeling Requirements',
           description: 'FDA labeling and IFU requirements',
-          icon: '🏷️'
+          icon: '🏷️',
         },
         {
           id: 'post-market',
           title: 'Post-Market Surveillance',
           description: 'MDR, adverse event reporting, recalls',
-          icon: '📊'
-        }
-      ]
-    }
+          icon: '📊',
+        },
+      ],
+    },
   ];
 
   return (
@@ -67,17 +67,17 @@ const QuickActions = ({ onActionClick }) => {
         <h3>Quick Actions</h3>
         <p>Get instant answers to common regulatory questions</p>
       </div>
-      
+
       <div className="actions-grid">
-        {actionCategories.map((category) => (
+        {actionCategories.map(category => (
           <div key={category.title} className="action-category">
             <div className="category-header">
               <span className="category-icon">{category.icon}</span>
               <h4 className="category-title">{category.title}</h4>
             </div>
-            
+
             <div className="category-actions">
-              {category.actions.map((action) => (
+              {category.actions.map(action => (
                 <button
                   key={action.id}
                   className="action-button"
@@ -98,14 +98,17 @@ const QuickActions = ({ onActionClick }) => {
           </div>
         ))}
       </div>
-      
+
       {/* Custom Query Prompt */}
       <div className="custom-query-prompt">
         <div className="prompt-content">
           <span className="prompt-icon">💡</span>
           <div className="prompt-text">
             <strong>Have a specific question?</strong>
-            <p>Type your regulatory compliance question in the chat below for personalized assistance.</p>
+            <p>
+              Type your regulatory compliance question in the chat below for personalized
+              assistance.
+            </p>
           </div>
         </div>
       </div>

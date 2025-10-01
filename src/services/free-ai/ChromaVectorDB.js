@@ -9,7 +9,7 @@ class ChromaVectorDB {
     this.collectionName = 'regulatory_documents';
     this.isAvailable = false;
     this.collection = null;
-    
+
     this.initialize();
   }
 
@@ -35,7 +35,7 @@ class ChromaVectorDB {
       documents: [],
       embeddings: [],
       metadata: [],
-      ids: []
+      ids: [],
     };
   }
 
@@ -43,7 +43,7 @@ class ChromaVectorDB {
     try {
       // Try to get existing collection
       const response = await fetch(`${this.baseURL}/api/v1/collections/${this.collectionName}`);
-      
+
       if (!response.ok) {
         // Create new collection
         await fetch(`${this.baseURL}/api/v1/collections`, {
@@ -55,9 +55,9 @@ class ChromaVectorDB {
             name: this.collectionName,
             metadata: {
               description: 'Regulatory documents and compliance data',
-              created_at: new Date().toISOString()
-            }
-          })
+              created_at: new Date().toISOString(),
+            },
+          }),
         });
         console.log(`Created ChromaDB collection: ${this.collectionName}`);
       }
@@ -72,25 +72,28 @@ class ChromaVectorDB {
     }
 
     try {
-      const response = await fetch(`${this.baseURL}/api/v1/collections/${this.collectionName}/add`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          documents: documents.map(doc => doc.content),
-          embeddings: documents.map(doc => doc.embedding),
-          metadatas: documents.map(doc => ({
-            filename: doc.filename,
-            type: doc.type,
-            size: doc.size,
-            uploadedAt: doc.uploadedAt,
-            pages: doc.pages || 1,
-            source: doc.source || 'upload'
-          })),
-          ids: documents.map(doc => doc.id)
-        })
-      });
+      const response = await fetch(
+        `${this.baseURL}/api/v1/collections/${this.collectionName}/add`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            documents: documents.map(doc => doc.content),
+            embeddings: documents.map(doc => doc.embedding),
+            metadatas: documents.map(doc => ({
+              filename: doc.filename,
+              type: doc.type,
+              size: doc.size,
+              uploadedAt: doc.uploadedAt,
+              pages: doc.pages || 1,
+              source: doc.source || 'upload',
+            })),
+            ids: documents.map(doc => doc.id),
+          }),
+        }
+      );
 
       if (response.ok) {
         console.log(`Added ${documents.length} documents to ChromaDB`);
@@ -113,7 +116,7 @@ class ChromaVectorDB {
         filename: doc.filename,
         type: doc.type,
         size: doc.size,
-        uploadedAt: doc.uploadedAt
+        uploadedAt: doc.uploadedAt,
       });
       this.inMemoryStorage.ids.push(doc.id);
     });
@@ -131,21 +134,24 @@ class ChromaVectorDB {
     }
 
     try {
-      const response = await fetch(`${this.baseURL}/api/v1/collections/${this.collectionName}/query`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query_embeddings: [queryEmbedding],
-          n_results: maxResults,
-          include: ['documents', 'metadatas', 'distances']
-        })
-      });
+      const response = await fetch(
+        `${this.baseURL}/api/v1/collections/${this.collectionName}/query`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            query_embeddings: [queryEmbedding],
+            n_results: maxResults,
+            include: ['documents', 'metadatas', 'distances'],
+          }),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
-        
+
         // Process results
         const results = [];
         const documents = data.documents?.[0] || [];
@@ -154,13 +160,13 @@ class ChromaVectorDB {
 
         for (let i = 0; i < documents.length; i++) {
           const similarity = 1 - distances[i]; // Convert distance to similarity
-          
+
           if (similarity >= threshold) {
             results.push({
               content: documents[i],
               metadata: metadatas[i],
               similarity: similarity,
-              confidence: similarity
+              confidence: similarity,
             });
           }
         }
@@ -168,7 +174,7 @@ class ChromaVectorDB {
         return {
           success: true,
           results: results,
-          total: results.length
+          total: results.length,
         };
       } else {
         throw new Error(`ChromaDB search failed: ${response.status}`);
@@ -190,7 +196,7 @@ class ChromaVectorDB {
     // Calculate cosine similarity for each document
     const similarities = this.inMemoryStorage.embeddings.map((embedding, index) => ({
       index,
-      similarity: this.cosineSimilarity(queryEmbedding, embedding)
+      similarity: this.cosineSimilarity(queryEmbedding, embedding),
     }));
 
     // Filter by threshold and sort by similarity
@@ -204,13 +210,13 @@ class ChromaVectorDB {
       content: this.inMemoryStorage.documents[item.index],
       metadata: this.inMemoryStorage.metadata[item.index],
       similarity: item.similarity,
-      confidence: item.similarity
+      confidence: item.similarity,
     }));
 
     return {
       success: true,
       results: results,
-      total: results.length
+      total: results.length,
     };
   }
 
@@ -237,7 +243,7 @@ class ChromaVectorDB {
         totalDocuments: this.inMemoryStorage.documents.length,
         totalChunks: this.inMemoryStorage.documents.length,
         indexSize: this.inMemoryStorage.documents.reduce((sum, doc) => sum + doc.length, 0),
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
     }
 
@@ -249,7 +255,7 @@ class ChromaVectorDB {
           totalDocuments: data.count || 0,
           totalChunks: data.count || 0,
           indexSize: data.count * 1000, // Estimate
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         };
       }
     } catch (error) {
@@ -260,7 +266,7 @@ class ChromaVectorDB {
       totalDocuments: 0,
       totalChunks: 0,
       indexSize: 0,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }
 
@@ -279,15 +285,18 @@ class ChromaVectorDB {
     }
 
     try {
-      const response = await fetch(`${this.baseURL}/api/v1/collections/${this.collectionName}/delete`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ids: [documentId]
-        })
-      });
+      const response = await fetch(
+        `${this.baseURL}/api/v1/collections/${this.collectionName}/delete`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ids: [documentId],
+          }),
+        }
+      );
 
       return { success: response.ok };
     } catch (error) {
@@ -302,7 +311,7 @@ class ChromaVectorDB {
       endpoint: this.baseURL,
       collection: this.collectionName,
       provider: this.isAvailable ? 'chromadb' : 'in-memory',
-      storageType: this.isAvailable ? 'unlimited-local' : 'memory'
+      storageType: this.isAvailable ? 'unlimited-local' : 'memory',
     };
   }
 }

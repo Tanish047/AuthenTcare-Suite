@@ -6,7 +6,7 @@ import freeAIInitializer from '../../utils/initializeFreeAI.js';
 
 // Import modular components
 import AINavigationTabs from './navigation/AINavigationTabs.jsx';
-import AIChatAssistant from './chat/AIChatAssistant.jsx';
+import RegulatoryAIChat from '../RegulatoryAIChat.jsx';
 import DocumentIntelligenceHub from './documents/DocumentIntelligenceHub.jsx';
 import KnowledgeAnalytics from './analytics/KnowledgeAnalytics.jsx';
 import AISettings from './settings/AISettings.jsx';
@@ -26,13 +26,13 @@ const AIKnowledgeBaseContainer = () => {
   const [aiStatus, setAiStatus] = useState({
     rag: { initialized: false, status: 'initializing' },
     mcp: { initialized: false, status: 'initializing' },
-    services: { openai: false, cohere: false, pinecone: false, free: false }
+    services: { openai: false, cohere: false, pinecone: false, free: false },
   });
 
   // Performance tracking
   useEffect(() => {
     const timer = performanceMonitor.startTimer('ai_knowledge_base_init');
-    
+
     return () => {
       timer.end({ activeTab });
     };
@@ -43,37 +43,37 @@ const AIKnowledgeBaseContainer = () => {
     const initializeAIServices = async () => {
       try {
         performanceMonitor.markMilestone('ai_services_init_start');
-        
+
         // Initialize Free AI Services first
         console.log('🆓 Initializing Free AI Services...');
         const freeAIResult = await freeAIInitializer.initialize();
-        
+
         if (freeAIResult.success) {
           setAiStatus(prev => ({
             ...prev,
             rag: { initialized: true, status: 'ready' },
             mcp: { initialized: true, status: 'ready' },
-            services: { 
-              openai: false, 
-              cohere: false, 
+            services: {
+              openai: false,
+              cohere: false,
               local: true,
-              free: true
-            }
+              free: true,
+            },
           }));
-          
+
           console.log('✅ Free AI services initialized successfully');
         } else {
           console.log('⚠️ Free AI services not available, trying paid services...');
-          
+
           // Show setup guide if free AI is not working
           setShowSetupGuide(true);
-          
+
           // Fallback to paid services if available
           const ragResult = await window.electronAPI?.ragAPI?.initialize();
           if (ragResult?.success) {
             setAiStatus(prev => ({
               ...prev,
-              rag: { initialized: true, status: 'ready' }
+              rag: { initialized: true, status: 'ready' },
             }));
           }
 
@@ -81,7 +81,7 @@ const AIKnowledgeBaseContainer = () => {
           if (mcpResult?.success) {
             setAiStatus(prev => ({
               ...prev,
-              mcp: { initialized: true, status: 'ready' }
+              mcp: { initialized: true, status: 'ready' },
             }));
           }
 
@@ -90,26 +90,25 @@ const AIKnowledgeBaseContainer = () => {
           if (ragStatus?.aiServicesAvailable) {
             setAiStatus(prev => ({
               ...prev,
-              services: ragStatus.aiServicesAvailable
+              services: ragStatus.aiServicesAvailable,
             }));
           }
         }
 
         performanceMonitor.markMilestone('ai_services_init_complete');
         setIsInitializing(false);
-        
+
         await telemetry.logEvent('ai_knowledge_base', 'initialized', {
           freeAI: freeAIResult.success,
           ragInitialized: true,
           mcpInitialized: true,
-          serviceType: freeAIResult.success ? 'free' : 'paid'
+          serviceType: freeAIResult.success ? 'free' : 'paid',
         });
-        
       } catch (error) {
         console.error('Failed to initialize AI services:', error);
         await telemetry.logError('ai_initialization_failed', {
           error: error.message,
-          stack: error.stack
+          stack: error.stack,
         });
         setIsInitializing(false);
       }
@@ -119,13 +118,13 @@ const AIKnowledgeBaseContainer = () => {
   }, []);
 
   // Handle tab changes
-  const handleTabChange = (tabId) => {
+  const handleTabChange = tabId => {
     performanceMonitor.markMilestone(`ai_tab_switch_${tabId}`);
     setActiveTab(tabId);
-    
+
     telemetry.logEvent('ai_knowledge_base', 'tab_changed', {
       from: activeTab,
-      to: tabId
+      to: tabId,
     });
   };
 
@@ -133,14 +132,14 @@ const AIKnowledgeBaseContainer = () => {
   const renderActiveComponent = () => {
     const commonProps = {
       aiStatus,
-      onStatusUpdate: setAiStatus
+      onStatusUpdate: setAiStatus,
     };
 
     switch (activeTab) {
       case 'chat':
         return (
           <ErrorBoundary>
-            <AIChatAssistant {...commonProps} />
+            <RegulatoryAIChat {...commonProps} />
           </ErrorBoundary>
         );
       case 'documents':
@@ -164,7 +163,7 @@ const AIKnowledgeBaseContainer = () => {
       case 'setup':
         return (
           <ErrorBoundary>
-            <FreeAISetupGuide 
+            <FreeAISetupGuide
               onComplete={() => {
                 setShowSetupGuide(false);
                 setActiveTab('chat');
@@ -175,7 +174,7 @@ const AIKnowledgeBaseContainer = () => {
       default:
         return (
           <ErrorBoundary>
-            <AIChatAssistant {...commonProps} />
+            <RegulatoryAIChat {...commonProps} />
           </ErrorBoundary>
         );
     }
@@ -183,12 +182,12 @@ const AIKnowledgeBaseContainer = () => {
 
   if (isInitializing) {
     return (
-      <LoadingOverlay 
+      <LoadingOverlay
         message="Initializing AI Knowledge Base..."
         details={[
           `RAG Engine: ${aiStatus.rag.status}`,
           `MCP Engine: ${aiStatus.mcp.status}`,
-          `AI Services: ${Object.values(aiStatus.services).filter(Boolean).length}/3 ready`
+          `AI Services: ${Object.values(aiStatus.services).filter(Boolean).length}/3 ready`,
         ]}
       />
     );
@@ -207,7 +206,7 @@ const AIKnowledgeBaseContainer = () => {
             Advanced AI-powered regulatory intelligence and document analysis
           </p>
         </div>
-        
+
         {/* AI Status Indicators */}
         <div className="ai-status-indicators">
           <div className={`status-indicator ${aiStatus.rag.initialized ? 'active' : 'inactive'}`}>
@@ -218,7 +217,9 @@ const AIKnowledgeBaseContainer = () => {
             <span className="status-dot"></span>
             MCP Engine
           </div>
-          <div className={`status-indicator ${Object.values(aiStatus.services).some(Boolean) ? 'active' : 'inactive'}`}>
+          <div
+            className={`status-indicator ${Object.values(aiStatus.services).some(Boolean) ? 'active' : 'inactive'}`}
+          >
             <span className="status-dot"></span>
             AI Services
           </div>
@@ -226,7 +227,7 @@ const AIKnowledgeBaseContainer = () => {
       </div>
 
       {/* Navigation Tabs */}
-      <AINavigationTabs 
+      <AINavigationTabs
         activeTab={activeTab}
         onTabChange={handleTabChange}
         aiStatus={aiStatus}
@@ -234,9 +235,7 @@ const AIKnowledgeBaseContainer = () => {
       />
 
       {/* Main Content Area */}
-      <div className="ai-kb-content">
-        {renderActiveComponent()}
-      </div>
+      <div className="ai-kb-content">{renderActiveComponent()}</div>
     </div>
   );
 };

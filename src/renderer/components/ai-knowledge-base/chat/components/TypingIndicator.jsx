@@ -13,7 +13,7 @@ const TypingIndicator = () => {
           <span className="message-time">typing...</span>
         </div>
       </div>
-      
+
       <div className="message-content">
         <div className="typing-indicator">
           <div className="typing-dots">

@@ -3,20 +3,20 @@ import React from 'react';
 /**
  * Knowledge Graph - Visualize document relationships
  */
-const KnowledgeGraph = ({ 
-  documents, 
-  selectedDocument, 
-  onDocumentSelect, 
-  onDocumentAnalyze, 
+const KnowledgeGraph = ({
+  documents,
+  selectedDocument,
+  onDocumentSelect,
+  onDocumentAnalyze,
   onDocumentDelete,
   isProcessing,
-  ragStats 
+  ragStats,
 }) => {
   return (
     <div className="knowledge-graph">
       <h2>Knowledge Graph</h2>
       <p>Visualize relationships and connections between documents</p>
-      
+
       {/* Knowledge graph will be implemented with visualization library */}
       <div className="graph-placeholder">
         <div className="placeholder-content">

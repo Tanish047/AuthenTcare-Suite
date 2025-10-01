@@ -19,7 +19,7 @@ const PerformanceInsights = ({ analyticsData, timeRange, isLoading, aiStatus }) 
     <div className="performance-insights">
       <h2>Performance Insights</h2>
       <p>System performance metrics and optimization recommendations</p>
-      
+
       {/* Performance metrics will be implemented based on actual data structure */}
       <div className="metrics-placeholder">
         <div className="placeholder-content">

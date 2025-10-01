@@ -11,34 +11,34 @@ const ChatInterface = forwardRef(({ messages, isTyping, onSendMessage, settings 
   const fileInputRef = useRef(null);
 
   // Handle file drop
-  const handleDrop = (e) => {
+  const handleDrop = e => {
     e.preventDefault();
     setDragOver(false);
-    
+
     const files = Array.from(e.dataTransfer.files);
     if (files.length > 0) {
       handleFileUpload(files);
     }
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = e => {
     e.preventDefault();
     setDragOver(true);
   };
 
-  const handleDragLeave = (e) => {
+  const handleDragLeave = e => {
     e.preventDefault();
     setDragOver(false);
   };
 
   // Handle file upload
-  const handleFileUpload = (files) => {
+  const handleFileUpload = files => {
     const attachments = files.map(file => ({
       id: `file_${Date.now()}_${Math.random()}`,
       name: file.name,
       size: file.size,
       type: file.type,
-      file: file
+      file: file,
     }));
 
     // Send message with attachments
@@ -50,7 +50,7 @@ const ChatInterface = forwardRef(({ messages, isTyping, onSendMessage, settings 
       {/* Message Container Box - Above Search Bar */}
       <div className="message-container-box">
         {/* Messages Container with Scroller */}
-        <div 
+        <div
           ref={ref}
           className={`messages-container ${dragOver ? 'drag-over' : ''}`}
           onDrop={handleDrop}
@@ -70,14 +70,10 @@ const ChatInterface = forwardRef(({ messages, isTyping, onSendMessage, settings 
 
           {/* Messages */}
           <div className="messages-list">
-            {messages.map((message) => (
-              <MessageBubble
-                key={message.id}
-                message={message}
-                settings={settings}
-              />
+            {messages.map(message => (
+              <MessageBubble key={message.id} message={message} settings={settings} />
             ))}
-            
+
             {/* Typing indicator */}
             {isTyping && <TypingIndicator />}
           </div>
@@ -88,7 +84,10 @@ const ChatInterface = forwardRef(({ messages, isTyping, onSendMessage, settings 
               <div className="empty-state-content">
                 <div className="empty-state-icon">🤖</div>
                 <h3>AI Regulatory Assistant</h3>
-                <p>Ask me anything about medical device regulations, FDA requirements, compliance processes, and more.</p>
+                <p>
+                  Ask me anything about medical device regulations, FDA requirements, compliance
+                  processes, and more.
+                </p>
               </div>
             </div>
           )}
@@ -97,10 +96,7 @@ const ChatInterface = forwardRef(({ messages, isTyping, onSendMessage, settings 
 
       {/* Search Bar Container - Below Message Box */}
       <div className="search-bar-container">
-        <SimpleQueryInput
-          onSendMessage={onSendMessage}
-          disabled={isTyping}
-        />
+        <SimpleQueryInput onSendMessage={onSendMessage} disabled={isTyping} />
       </div>
 
       {/* Hidden file input */}
@@ -109,7 +105,7 @@ const ChatInterface = forwardRef(({ messages, isTyping, onSendMessage, settings 
         type="file"
         multiple
         style={{ display: 'none' }}
-        onChange={(e) => handleFileUpload(Array.from(e.target.files))}
+        onChange={e => handleFileUpload(Array.from(e.target.files))}
         accept=".pdf,.docx,.txt,.md,.json,.xml,.csv,.xlsx,.jpg,.jpeg,.png,.gif"
       />
     </div>

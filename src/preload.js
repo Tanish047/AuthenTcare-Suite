@@ -110,8 +110,10 @@ contextBridge.exposeInMainWorld('maintenanceAPI', {
 // Telemetry API
 contextBridge.exposeInMainWorld('telemetryAPI', {
   logError: (category, data) => ipcRenderer.invoke('telemetry-log-error', category, data),
-  logEvent: (category, event, data) => ipcRenderer.invoke('telemetry-log-event', category, event, data),
-  logPerformance: (operation, duration, metadata) => ipcRenderer.invoke('telemetry-log-performance', operation, duration, metadata),
+  logEvent: (category, event, data) =>
+    ipcRenderer.invoke('telemetry-log-event', category, event, data),
+  logPerformance: (operation, duration, metadata) =>
+    ipcRenderer.invoke('telemetry-log-performance', operation, duration, metadata),
 });
 
 // User Database API

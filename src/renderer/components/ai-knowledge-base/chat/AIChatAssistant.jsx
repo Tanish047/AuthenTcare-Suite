@@ -16,10 +16,11 @@ const AIChatAssistant = ({ aiStatus, onStatusUpdate }) => {
     {
       id: 'welcome',
       type: 'assistant',
-      content: 'Hello! I\'m your AI regulatory compliance assistant. I can help you with FDA regulations, medical device classifications, compliance requirements, and much more. How can I assist you today?',
+      content:
+        "Hello! I'm your AI regulatory compliance assistant. I can help you with FDA regulations, medical device classifications, compliance requirements, and much more. How can I assist you today?",
       timestamp: new Date(),
-      metadata: { type: 'welcome' }
-    }
+      metadata: { type: 'welcome' },
+    },
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [currentSession, setCurrentSession] = useState(null);
@@ -28,10 +29,11 @@ const AIChatAssistant = ({ aiStatus, onStatusUpdate }) => {
     model: 'auto', // Use smart auto-selection by default
     temperature: 0.7,
     maxTokens: 2000, // Allow for detailed responses
-    systemPrompt: 'You are an expert AI assistant specializing in medical device regulatory compliance. Provide comprehensive, accurate, and detailed responses about FDA regulations, medical device classifications, quality management systems, and regulatory pathways. Always provide complete answers with examples and practical guidance.',
+    systemPrompt:
+      'You are an expert AI assistant specializing in medical device regulatory compliance. Provide comprehensive, accurate, and detailed responses about FDA regulations, medical device classifications, quality management systems, and regulatory pathways. Always provide complete answers with examples and practical guidance.',
     enableRAG: true,
     enableMCP: true,
-    useFreeAI: true // Prioritize free AI
+    useFreeAI: true, // Prioritize free AI
   });
   const [selectedModel, setSelectedModel] = useState('auto');
   const modelSelectorRef = useRef(null);
@@ -39,12 +41,12 @@ const AIChatAssistant = ({ aiStatus, onStatusUpdate }) => {
 
   // Model configurations for display
   const modelConfigs = {
-    'auto': { name: 'Auto Mode', icon: '🤖' },
+    auto: { name: 'Auto Mode', icon: '🤖' },
     'phi3:mini': { name: 'Phi-3 Mini', icon: '⚡' },
     'mistral:7b': { name: 'Mistral 7B', icon: '🚀' },
     'qwen2:7b': { name: 'Qwen2 7B', icon: '🧠' },
     'llama3.1:8b': { name: 'Llama 3.1', icon: '🦙' },
-    'gpt-oss:20b': { name: 'GPT-OSS 20B', icon: '🎯' }
+
   };
   const [showSettings, setShowSettings] = useState(false);
   const messagesContainerRef = useRef(null);
@@ -60,7 +62,7 @@ const AIChatAssistant = ({ aiStatus, onStatusUpdate }) => {
     const sessionId = `chat_${Date.now()}`;
     setCurrentSession(sessionId);
     console.log('Chat session started:', sessionId);
-    
+
     // Check connection status (non-blocking)
     checkConnectionStatus();
   }, []);
@@ -70,36 +72,35 @@ const AIChatAssistant = ({ aiStatus, onStatusUpdate }) => {
     // Only check once per session to avoid spam
     if (connectionCheckedRef.current) return;
     connectionCheckedRef.current = true;
-    
+
     try {
       // Check ChromaDB connection (non-blocking, single attempt)
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2000);
-      
-      fetch('http://localhost:8000/api/v1/heartbeat', { 
+
+      fetch('http://localhost:8000/api/v1/heartbeat', {
         method: 'GET',
-        signal: controller.signal
+        signal: controller.signal,
       })
-      .then(response => {
-        clearTimeout(timeoutId);
-        if (response.ok) {
-          console.log('✅ ChromaDB connection available');
-          if (onStatusUpdate) {
-            onStatusUpdate(prev => ({
-              ...prev,
-              services: { ...prev.services, chromadb: true }
-            }));
+        .then(response => {
+          clearTimeout(timeoutId);
+          if (response.ok) {
+            console.log('✅ ChromaDB connection available');
+            if (onStatusUpdate) {
+              onStatusUpdate(prev => ({
+                ...prev,
+                services: { ...prev.services, chromadb: true },
+              }));
+            }
           }
-        }
-      })
-      .catch(() => {
-        clearTimeout(timeoutId);
-        // Silent fail - no need to log this repeatedly
-      });
+        })
+        .catch(() => {
+          clearTimeout(timeoutId);
+          // Silent fail - no need to log this repeatedly
+        });
 
       // MCP servers status (no external calls needed)
       console.log('ℹ️ MCP servers: Using built-in intelligence');
-      
     } catch (error) {
       // Silent fail
     }
@@ -110,32 +111,32 @@ const AIChatAssistant = ({ aiStatus, onStatusUpdate }) => {
     const scrollToBottom = () => {
       if (messagesContainerRef.current) {
         const container = messagesContainerRef.current;
-        
+
         // Calculate the exact scroll position to show all content
         const scrollToPosition = container.scrollHeight - container.clientHeight;
-        
+
         // Multiple scroll attempts with different strategies
         const performScroll = () => {
           // Method 1: Direct scrollTop assignment
           container.scrollTop = scrollToPosition;
         };
-        
+
         const performSmoothScroll = () => {
           // Method 2: Smooth scroll to bottom
           container.scrollTo({
             top: scrollToPosition,
-            behavior: 'smooth'
+            behavior: 'smooth',
           });
         };
-        
+
         // Immediate scroll
         performScroll();
-        
+
         // Delayed scrolls to handle dynamic content rendering
         setTimeout(performScroll, 50);
         setTimeout(performScroll, 150);
         setTimeout(performSmoothScroll, 300);
-        
+
         // Final scroll with extra margin to ensure visibility
         setTimeout(() => {
           container.scrollTop = container.scrollHeight;
@@ -145,7 +146,7 @@ const AIChatAssistant = ({ aiStatus, onStatusUpdate }) => {
 
     // Scroll when messages change
     scrollToBottom();
-    
+
     // Also scroll when typing state changes
     if (isTyping) {
       setTimeout(scrollToBottom, 100);
@@ -154,7 +155,8 @@ const AIChatAssistant = ({ aiStatus, onStatusUpdate }) => {
 
   // Additional scroll trigger for new messages with proper timing
   useEffect(() => {
-    if (messages.length > 1) { // Skip initial welcome message
+    if (messages.length > 1) {
+      // Skip initial welcome message
       // Multiple timers to handle different rendering phases
       const timers = [
         setTimeout(() => {
@@ -162,24 +164,24 @@ const AIChatAssistant = ({ aiStatus, onStatusUpdate }) => {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
           }
         }, 100),
-        
+
         setTimeout(() => {
           if (messagesContainerRef.current) {
             const container = messagesContainerRef.current;
             container.scrollTo({
               top: container.scrollHeight,
-              behavior: 'smooth'
+              behavior: 'smooth',
             });
           }
         }, 300),
-        
+
         setTimeout(() => {
           if (messagesContainerRef.current) {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
           }
-        }, 600)
+        }, 600),
       ];
-      
+
       return () => timers.forEach(timer => clearTimeout(timer));
     }
   }, [messages.length]);
@@ -193,7 +195,7 @@ const AIChatAssistant = ({ aiStatus, onStatusUpdate }) => {
       type: 'user',
       content,
       attachments,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -204,7 +206,7 @@ const AIChatAssistant = ({ aiStatus, onStatusUpdate }) => {
       try {
         // Generate intelligent response based on query
         const response = generateIntelligentResponse(content);
-        
+
         const assistantMessage = {
           id: `msg_${Date.now()}_assistant`,
           type: 'assistant',
@@ -214,29 +216,29 @@ const AIChatAssistant = ({ aiStatus, onStatusUpdate }) => {
             model: response.model,
             provider: response.provider,
             confidence: response.confidence,
-            sources: response.sources || []
-          }
+            sources: response.sources || [],
+          },
         };
 
         setMessages(prev => [...prev, assistantMessage]);
-        
+
         // Optional: Log successful interaction (without external dependencies)
         console.log('Message sent successfully:', {
           sessionId: currentSession,
           messageLength: content.length,
           hasAttachments: attachments.length > 0,
-          model: response.model
+          model: response.model,
         });
-
       } catch (error) {
         console.error('Chat error:', error);
-        
+
         const errorMessage = {
           id: `msg_${Date.now()}_error`,
           type: 'assistant',
-          content: 'I apologize, but I encountered an error processing your request. Please try asking your question again.',
+          content:
+            'I apologize, but I encountered an error processing your request. Please try asking your question again.',
           timestamp: new Date(),
-          metadata: { error: error.message }
+          metadata: { error: error.message },
         };
 
         setMessages(prev => [...prev, errorMessage]);
@@ -247,16 +249,20 @@ const AIChatAssistant = ({ aiStatus, onStatusUpdate }) => {
   };
 
   // Simple model selection without external dependencies
-  const getSelectedModel = (query) => {
+  const getSelectedModel = query => {
     return selectedModel === 'auto' ? 'built-in-ai' : selectedModel;
   };
 
   // Generate intelligent mock responses based on query content
-  const generateIntelligentResponse = (query) => {
+  const generateIntelligentResponse = query => {
     const lowerQuery = query.toLowerCase();
-    
+
     // FDA Class II responses
-    if (lowerQuery.includes('fda class ii') || lowerQuery.includes('class 2') || lowerQuery.includes('class ii')) {
+    if (
+      lowerQuery.includes('fda class ii') ||
+      lowerQuery.includes('class 2') ||
+      lowerQuery.includes('class ii')
+    ) {
       return {
         content: `FDA Class II medical devices are moderate-risk devices that require special controls to ensure safety and effectiveness. Examples include:
 
@@ -278,12 +284,16 @@ Would you like more specific information about any aspect of Class II device reg
         model: 'intelligent-mock',
         provider: 'built-in',
         confidence: 0.8,
-        sources: ['21 CFR 860.3', 'FDA Guidance Documents']
+        sources: ['21 CFR 860.3', 'FDA Guidance Documents'],
       };
     }
 
     // 510(k) process responses
-    if (lowerQuery.includes('510(k)') || lowerQuery.includes('510k') || lowerQuery.includes('premarket notification')) {
+    if (
+      lowerQuery.includes('510(k)') ||
+      lowerQuery.includes('510k') ||
+      lowerQuery.includes('premarket notification')
+    ) {
       return {
         content: `The 510(k) premarket notification process is required for most Class II medical devices. Here's the step-by-step process:
 
@@ -316,12 +326,16 @@ Would you like details about any specific aspect of the 510(k) process?`,
         model: 'intelligent-mock',
         provider: 'built-in',
         confidence: 0.9,
-        sources: ['21 CFR 807', 'FDA 510(k) Guidance']
+        sources: ['21 CFR 807', 'FDA 510(k) Guidance'],
       };
     }
 
     // ISO 13485 responses
-    if (lowerQuery.includes('iso 13485') || lowerQuery.includes('quality management') || lowerQuery.includes('qms')) {
+    if (
+      lowerQuery.includes('iso 13485') ||
+      lowerQuery.includes('quality management') ||
+      lowerQuery.includes('qms')
+    ) {
       return {
         content: `ISO 13485 is the international standard for quality management systems specific to medical devices. Key requirements include:
 
@@ -358,12 +372,16 @@ Would you like specific guidance on implementing any of these QMS elements?`,
         model: 'intelligent-mock',
         provider: 'built-in',
         confidence: 0.85,
-        sources: ['ISO 13485:2016', 'FDA QSR Guidelines']
+        sources: ['ISO 13485:2016', 'FDA QSR Guidelines'],
       };
     }
 
     // General regulatory responses
-    if (lowerQuery.includes('fda') || lowerQuery.includes('regulation') || lowerQuery.includes('compliance')) {
+    if (
+      lowerQuery.includes('fda') ||
+      lowerQuery.includes('regulation') ||
+      lowerQuery.includes('compliance')
+    ) {
       return {
         content: `I can help you with various aspects of medical device regulatory compliance:
 
@@ -395,12 +413,16 @@ What specific regulatory topic would you like to explore further?`,
         model: 'intelligent-mock',
         provider: 'built-in',
         confidence: 0.7,
-        sources: ['FDA Regulations', 'ISO Standards']
+        sources: ['FDA Regulations', 'ISO Standards'],
       };
     }
 
     // Enhanced responses for common topics
-    if (lowerQuery.includes('class iii') || lowerQuery.includes('class 3') || lowerQuery.includes('pma')) {
+    if (
+      lowerQuery.includes('class iii') ||
+      lowerQuery.includes('class 3') ||
+      lowerQuery.includes('pma')
+    ) {
       return {
         content: `**FDA Class III Medical Devices - High Risk Category**
 
@@ -438,7 +460,7 @@ Would you like specific details about the PMA submission process or clinical tri
         model: 'intelligent-mock',
         provider: 'built-in',
         confidence: 0.9,
-        sources: ['21 CFR 814', 'FDA PMA Guidance']
+        sources: ['21 CFR 814', 'FDA PMA Guidance'],
       };
     }
 
@@ -487,7 +509,7 @@ Would you like guidance on preparing a De Novo submission or understanding the c
         model: 'intelligent-mock',
         provider: 'built-in',
         confidence: 0.85,
-        sources: ['21 CFR 860', 'FDA De Novo Guidance']
+        sources: ['21 CFR 860', 'FDA De Novo Guidance'],
       };
     }
 
@@ -543,7 +565,7 @@ What specific regulatory topic would you like to explore? I'm here to provide de
       model: 'intelligent-mock',
       provider: 'built-in',
       confidence: 0.7,
-      sources: ['FDA Guidance Documents', 'ISO Standards']
+      sources: ['FDA Guidance Documents', 'ISO Standards'],
     };
   };
 
@@ -557,7 +579,7 @@ What specific regulatory topic would you like to explore? I'm here to provide de
     }
 
     setIsSearchingKB(true);
-    
+
     // Simulate search with built-in regulatory knowledge
     setTimeout(() => {
       const mockResults = generateKBResults(query);
@@ -568,7 +590,7 @@ What specific regulatory topic would you like to explore? I'm here to provide de
   };
 
   // Generate mock KB results based on query
-  const generateKBResults = (query) => {
+  const generateKBResults = query => {
     const lowerQuery = query.toLowerCase();
     const results = [];
 
@@ -576,8 +598,9 @@ What specific regulatory topic would you like to explore? I'm here to provide de
       results.push({
         id: 'fda-classification',
         metadata: { title: 'FDA Device Classification Guide', filename: 'fda-classification.pdf' },
-        snippet: 'FDA classifies medical devices into Class I, II, and III based on risk level. Class I devices have the lowest risk, while Class III devices pose the highest risk to patients.',
-        similarity: 0.95
+        snippet:
+          'FDA classifies medical devices into Class I, II, and III based on risk level. Class I devices have the lowest risk, while Class III devices pose the highest risk to patients.',
+        similarity: 0.95,
       });
     }
 
@@ -585,8 +608,9 @@ What specific regulatory topic would you like to explore? I'm here to provide de
       results.push({
         id: '510k-guide',
         metadata: { title: '510(k) Submission Guide', filename: '510k-process.pdf' },
-        snippet: 'The 510(k) premarket notification process requires demonstration of substantial equivalence to a legally marketed predicate device. The process typically takes 90 days for FDA review.',
-        similarity: 0.92
+        snippet:
+          'The 510(k) premarket notification process requires demonstration of substantial equivalence to a legally marketed predicate device. The process typically takes 90 days for FDA review.',
+        similarity: 0.92,
       });
     }
 
@@ -594,28 +618,35 @@ What specific regulatory topic would you like to explore? I'm here to provide de
       results.push({
         id: 'iso-13485',
         metadata: { title: 'ISO 13485 Quality Management', filename: 'iso-13485-standard.pdf' },
-        snippet: 'ISO 13485 specifies requirements for a quality management system where an organization needs to demonstrate its ability to provide medical devices that consistently meet customer and regulatory requirements.',
-        similarity: 0.88
+        snippet:
+          'ISO 13485 specifies requirements for a quality management system where an organization needs to demonstrate its ability to provide medical devices that consistently meet customer and regulatory requirements.',
+        similarity: 0.88,
       });
     }
 
     if (results.length === 0) {
       results.push({
         id: 'general-regulatory',
-        metadata: { title: 'Medical Device Regulatory Overview', filename: 'regulatory-overview.pdf' },
-        snippet: 'Comprehensive guide covering FDA regulations, international standards, and compliance requirements for medical device manufacturers.',
-        similarity: 0.75
+        metadata: {
+          title: 'Medical Device Regulatory Overview',
+          filename: 'regulatory-overview.pdf',
+        },
+        snippet:
+          'Comprehensive guide covering FDA regulations, international standards, and compliance requirements for medical device manufacturers.',
+        similarity: 0.75,
       });
     }
 
     return results;
   };
 
-  const handleKBResultClick = (result) => {
+  const handleKBResultClick = result => {
     // Try to extract a snippet/content for context
     const snippet = result?.snippet || result?.content || '';
-    const filename = result?.metadata?.filename || result?.metadata?.source || result?.filename || '';
-    const composed = `Using knowledge from ${filename ? `"${filename}"` : 'documents'}: ${snippet}\n\nQuestion: ${kbQuery}`.trim();
+    const filename =
+      result?.metadata?.filename || result?.metadata?.source || result?.filename || '';
+    const composed =
+      `Using knowledge from ${filename ? `"${filename}"` : 'documents'}: ${snippet}\n\nQuestion: ${kbQuery}`.trim();
     handleSendMessage(composed);
     setShowKBResults(false);
   };
@@ -626,15 +657,15 @@ What specific regulatory topic would you like to explore? I'm here to provide de
       id: currentSession,
       messages,
       timestamp: new Date(),
-      settings
+      settings,
     };
-    
+
     setChatHistory(prev => [session, ...prev]);
     console.log('Session saved:', currentSession);
   };
 
   // Load chat session - simplified
-  const handleLoadSession = (session) => {
+  const handleLoadSession = session => {
     setMessages(session.messages);
     setCurrentSession(session.id);
     setSettings(session.settings);
@@ -649,10 +680,10 @@ What specific regulatory topic would you like to explore? I'm here to provide de
         type: 'assistant',
         content: 'Chat cleared. How can I help you with regulatory compliance today?',
         timestamp: new Date(),
-        metadata: { type: 'welcome' }
-      }
+        metadata: { type: 'welcome' },
+      },
     ]);
-    
+
     const newSessionId = `chat_${Date.now()}`;
     setCurrentSession(newSessionId);
     console.log('Chat cleared, new session:', newSessionId);
@@ -668,7 +699,7 @@ What specific regulatory topic would you like to explore? I'm here to provide de
           onModelChange={setSelectedModel}
           className="compact"
         />
-        
+
         <ChatSidebar
           chatHistory={chatHistory}
           currentSession={currentSession}
@@ -686,22 +717,43 @@ What specific regulatory topic would you like to explore? I'm here to provide de
           <div className="chat-title">
             <h2>AI Regulatory Assistant</h2>
             <div className="chat-status">
-              <span className={`status-dot ${aiStatus.services.free ? 'active' : 'inactive'}`}></span>
-              {selectedModel === 'auto' ? 'Auto Mode' : modelConfigs[selectedModel]?.name || selectedModel} - FREE
+              <span
+                className={`status-dot ${aiStatus.services.free ? 'active' : 'inactive'}`}
+              ></span>
+              {selectedModel === 'auto'
+                ? 'Auto Mode'
+                : modelConfigs[selectedModel]?.name || selectedModel}{' '}
+              - FREE
             </div>
           </div>
-          
+
           <div className="chat-actions">
             {/* Knowledge Base Search */}
-            <div className="kb-search" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginRight: '0.5rem' }}>
+            <div
+              className="kb-search"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                marginRight: '0.5rem',
+              }}
+            >
               <input
                 type="text"
                 value={kbQuery}
-                onChange={(e) => setKbQuery(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { handleKBSearch(); } }}
+                onChange={e => setKbQuery(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    handleKBSearch();
+                  }
+                }}
                 placeholder="Search knowledge base..."
                 className="kb-search-input"
-                style={{ padding: '0.4rem 0.6rem', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                style={{
+                  padding: '0.4rem 0.6rem',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                }}
               />
               <button
                 className="btn btn-secondary"
@@ -712,25 +764,17 @@ What specific regulatory topic would you like to explore? I'm here to provide de
                 {isSearchingKB ? '⏳' : '🔍'}
               </button>
             </div>
-            <button 
+            <button
               className="btn btn-secondary"
               onClick={() => setShowSettings(!showSettings)}
               title="Chat Settings"
             >
               ⚙️
             </button>
-            <button 
-              className="btn btn-secondary"
-              onClick={handleSaveSession}
-              title="Save Session"
-            >
+            <button className="btn btn-secondary" onClick={handleSaveSession} title="Save Session">
               💾
             </button>
-            <button 
-              className="btn btn-secondary"
-              onClick={handleClearChat}
-              title="Clear Chat"
-            >
+            <button className="btn btn-secondary" onClick={handleClearChat} title="Clear Chat">
               🗑️
             </button>
           </div>
@@ -738,21 +782,61 @@ What specific regulatory topic would you like to explore? I'm here to provide de
 
         {/* KB Results Panel (in-flow, above messages) */}
         {showKBResults && kbResults?.length > 0 && (
-          <div className="kb-results" style={{ margin: '0 1rem 0.5rem 1rem', alignSelf: 'flex-end', width: '520px', maxWidth: '95%', maxHeight: '40vh', overflowY: 'auto', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.08)', zIndex: 1 }}>
-            <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #e2e8f0', fontWeight: 600 }}>Knowledge Base Results ({kbResults.length})</div>
+          <div
+            className="kb-results"
+            style={{
+              margin: '0 1rem 0.5rem 1rem',
+              alignSelf: 'flex-end',
+              width: '520px',
+              maxWidth: '95%',
+              maxHeight: '40vh',
+              overflowY: 'auto',
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '12px',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+              zIndex: 1,
+            }}
+          >
+            <div
+              style={{
+                padding: '0.75rem 1rem',
+                borderBottom: '1px solid #e2e8f0',
+                fontWeight: 600,
+              }}
+            >
+              Knowledge Base Results ({kbResults.length})
+            </div>
             <div>
               {kbResults.map((r, idx) => (
-                <div key={r.id || idx} style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f1f5f9', cursor: 'pointer' }} onClick={() => handleKBResultClick(r)}>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0f172a' }}>{r?.metadata?.title || r?.metadata?.filename || 'Document'}</div>
-                  <div style={{ fontSize: '0.85rem', color: '#475569', marginTop: '0.25rem' }}>{(r?.snippet || r?.content || '').slice(0, 180)}{(r?.snippet || r?.content || '').length > 180 ? '…' : ''}</div>
+                <div
+                  key={r.id || idx}
+                  style={{
+                    padding: '0.75rem 1rem',
+                    borderBottom: '1px solid #f1f5f9',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => handleKBResultClick(r)}
+                >
+                  <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0f172a' }}>
+                    {r?.metadata?.title || r?.metadata?.filename || 'Document'}
+                  </div>
+                  <div style={{ fontSize: '0.85rem', color: '#475569', marginTop: '0.25rem' }}>
+                    {(r?.snippet || r?.content || '').slice(0, 180)}
+                    {(r?.snippet || r?.content || '').length > 180 ? '…' : ''}
+                  </div>
                   {typeof r?.similarity === 'number' && (
-                    <div style={{ marginTop: '0.25rem', fontSize: '0.75rem', color: '#64748b' }}>Similarity: {(r.similarity * 100).toFixed(0)}%</div>
+                    <div style={{ marginTop: '0.25rem', fontSize: '0.75rem', color: '#64748b' }}>
+                      Similarity: {(r.similarity * 100).toFixed(0)}%
+                    </div>
                   )}
                 </div>
               ))}
             </div>
             <div style={{ padding: '0.5rem 1rem', textAlign: 'right' }}>
-              <button className="btn btn-secondary" onClick={() => setShowKBResults(false)}>Close</button>
+              <button className="btn btn-secondary" onClick={() => setShowKBResults(false)}>
+                Close
+              </button>
             </div>
           </div>
         )}
@@ -776,7 +860,6 @@ What specific regulatory topic would you like to explore? I'm here to provide de
           settings={settings}
         />
       </div>
-
     </div>
   );
 };

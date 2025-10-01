@@ -20,33 +20,33 @@ const KnowledgeAnalytics = ({ aiStatus, onStatusUpdate }) => {
       avgResponseTime: 0,
       successRate: 0,
       topQueries: [],
-      queryTrends: []
+      queryTrends: [],
     },
     performance: {
       ragPerformance: {
         avgSearchTime: 0,
         avgRetrievalAccuracy: 0,
-        indexEfficiency: 0
+        indexEfficiency: 0,
       },
       aiPerformance: {
         avgGenerationTime: 0,
         modelAccuracy: 0,
-        tokenUsage: 0
-      }
+        tokenUsage: 0,
+      },
     },
     documents: {
       totalDocuments: 0,
       totalChunks: 0,
       mostReferencedDocs: [],
       documentTypes: {},
-      knowledgeCoverage: {}
+      knowledgeCoverage: {},
     },
     insights: {
       knowledgeGaps: [],
       popularTopics: [],
       userPatterns: [],
-      recommendations: []
-    }
+      recommendations: [],
+    },
   });
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('7d'); // 1d, 7d, 30d, 90d
@@ -61,41 +61,40 @@ const KnowledgeAnalytics = ({ aiStatus, onStatusUpdate }) => {
         // Get usage analytics
         const usageData = await window.electronAPI?.analyticsAPI?.getUsageMetrics({
           timeRange,
-          includeDetails: true
+          includeDetails: true,
         });
 
         // Get performance metrics
         const performanceData = await window.electronAPI?.analyticsAPI?.getPerformanceMetrics({
-          timeRange
+          timeRange,
         });
 
         // Get document analytics
         const documentData = await window.electronAPI?.ragAPI?.getAnalytics({
-          timeRange
+          timeRange,
         });
 
         // Get AI insights
         const insightsData = await window.electronAPI?.analyticsAPI?.getInsights({
-          timeRange
+          timeRange,
         });
 
         setAnalyticsData({
           usage: usageData?.data || analyticsData.usage,
           performance: performanceData?.data || analyticsData.performance,
           documents: documentData?.data || analyticsData.documents,
-          insights: insightsData?.data || analyticsData.insights
+          insights: insightsData?.data || analyticsData.insights,
         });
 
         await telemetry.logEvent('knowledge_analytics', 'data_loaded', {
           timeRange,
-          loadTime: timer.end()
+          loadTime: timer.end(),
         });
-
       } catch (error) {
         console.error('Failed to load analytics:', error);
         await telemetry.logError('analytics_load_failed', {
           error: error.message,
-          timeRange
+          timeRange,
         });
       } finally {
         setIsLoading(false);
@@ -107,30 +106,30 @@ const KnowledgeAnalytics = ({ aiStatus, onStatusUpdate }) => {
 
   // Analytics views
   const views = [
-    { 
-      id: 'dashboard', 
-      label: 'Overview', 
-      icon: '📊', 
-      description: 'High-level metrics and KPIs' 
+    {
+      id: 'dashboard',
+      label: 'Overview',
+      icon: '📊',
+      description: 'High-level metrics and KPIs',
     },
-    { 
-      id: 'usage', 
-      label: 'Usage Metrics', 
-      icon: '📈', 
-      description: 'User interaction and query analytics' 
+    {
+      id: 'usage',
+      label: 'Usage Metrics',
+      icon: '📈',
+      description: 'User interaction and query analytics',
     },
-    { 
-      id: 'performance', 
-      label: 'Performance', 
-      icon: '⚡', 
-      description: 'System performance and optimization insights' 
+    {
+      id: 'performance',
+      label: 'Performance',
+      icon: '⚡',
+      description: 'System performance and optimization insights',
     },
-    { 
-      id: 'documents', 
-      label: 'Document Insights', 
-      icon: '📚', 
-      description: 'Document usage and knowledge coverage' 
-    }
+    {
+      id: 'documents',
+      label: 'Document Insights',
+      icon: '📚',
+      description: 'Document usage and knowledge coverage',
+    },
   ];
 
   // Time range options
@@ -138,7 +137,7 @@ const KnowledgeAnalytics = ({ aiStatus, onStatusUpdate }) => {
     { value: '1d', label: 'Last 24 Hours' },
     { value: '7d', label: 'Last 7 Days' },
     { value: '30d', label: 'Last 30 Days' },
-    { value: '90d', label: 'Last 90 Days' }
+    { value: '90d', label: 'Last 90 Days' },
   ];
 
   // Render active view
@@ -147,7 +146,7 @@ const KnowledgeAnalytics = ({ aiStatus, onStatusUpdate }) => {
       analyticsData,
       timeRange,
       isLoading,
-      aiStatus
+      aiStatus,
     };
 
     switch (activeView) {
@@ -170,11 +169,11 @@ const KnowledgeAnalytics = ({ aiStatus, onStatusUpdate }) => {
       const exportData = {
         timestamp: new Date().toISOString(),
         timeRange,
-        analytics: analyticsData
+        analytics: analyticsData,
       };
 
       const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-        type: 'application/json'
+        type: 'application/json',
       });
 
       const url = URL.createObjectURL(blob);
@@ -188,9 +187,8 @@ const KnowledgeAnalytics = ({ aiStatus, onStatusUpdate }) => {
 
       await telemetry.logEvent('knowledge_analytics', 'data_exported', {
         timeRange,
-        dataSize: blob.size
+        dataSize: blob.size,
       });
-
     } catch (error) {
       console.error('Export failed:', error);
     }
@@ -210,9 +208,9 @@ const KnowledgeAnalytics = ({ aiStatus, onStatusUpdate }) => {
           {/* Time Range Selector */}
           <div className="time-range-selector">
             <label>Time Range:</label>
-            <select 
+            <select
               value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value)}
+              onChange={e => setTimeRange(e.target.value)}
               className="time-range-select"
             >
               {timeRanges.map(range => (
@@ -224,16 +222,12 @@ const KnowledgeAnalytics = ({ aiStatus, onStatusUpdate }) => {
           </div>
 
           {/* Export Button */}
-          <button 
-            className="btn btn-secondary"
-            onClick={handleExportData}
-            disabled={isLoading}
-          >
+          <button className="btn btn-secondary" onClick={handleExportData} disabled={isLoading}>
             📥 Export Data
           </button>
 
           {/* Refresh Button */}
-          <button 
+          <button
             className="btn btn-secondary"
             onClick={() => window.location.reload()}
             disabled={isLoading}
@@ -269,9 +263,7 @@ const KnowledgeAnalytics = ({ aiStatus, onStatusUpdate }) => {
       </div>
 
       {/* Main Content */}
-      <div className="analytics-content">
-        {renderActiveView()}
-      </div>
+      <div className="analytics-content">{renderActiveView()}</div>
 
       {/* Analytics Footer */}
       <div className="analytics-footer">

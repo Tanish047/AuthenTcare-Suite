@@ -11,7 +11,7 @@ import ResearchWorkspace from './components/ResearchWorkspace.jsx';
 import UserDatabase from './components/UserDatabase.jsx';
 import SOPGenerator from './components/SOPGenerator.jsx';
 import Settings from './components/Settings.jsx';
-import ModernRAGWorkspace from './components/ModernRAGWorkspace_Clean.jsx';
+
 import AIKnowledgeBase from './components/ai-knowledge-base/index.jsx';
 
 const menuData = [
@@ -286,7 +286,7 @@ function AppContent() {
         dispatch({ type: 'SET_PAGE', page: 'dashboard', pageParent: null });
         break;
       case 'ai-knowledge-base':
-        dispatch({ type: 'SET_PAGE', page: 'ai-knowledge-base', pageParent: null });
+        dispatch({ type: 'SET_PAGE', page: 'dashboard', pageParent: null });
         break;
       case 'rag-workspace':
       case 'rag-chat':

@@ -11,7 +11,7 @@ const AnalyticsDashboard = ({ analyticsData, timeRange, isLoading, aiStatus }) =
     successRate: analyticsData.usage.successRate || 0,
     totalDocuments: analyticsData.documents.totalDocuments || 0,
     ragAccuracy: analyticsData.performance.ragPerformance?.avgRetrievalAccuracy || 0,
-    aiAccuracy: analyticsData.performance.aiPerformance?.modelAccuracy || 0
+    aiAccuracy: analyticsData.performance.aiPerformance?.modelAccuracy || 0,
   };
 
   // Get trend indicators
@@ -24,19 +24,19 @@ const AnalyticsDashboard = ({ analyticsData, timeRange, isLoading, aiStatus }) =
   };
 
   // Format numbers
-  const formatNumber = (num) => {
+  const formatNumber = num => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
     if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
     return num.toString();
   };
 
   // Format percentage
-  const formatPercentage = (num) => {
+  const formatPercentage = num => {
     return (num * 100).toFixed(1) + '%';
   };
 
   // Format time
-  const formatTime = (ms) => {
+  const formatTime = ms => {
     if (ms < 1000) return ms.toFixed(0) + 'ms';
     return (ms / 1000).toFixed(1) + 's';
   };
@@ -116,7 +116,9 @@ const AnalyticsDashboard = ({ analyticsData, timeRange, isLoading, aiStatus }) =
           <div className="health-card">
             <div className="health-header">
               <h4>🤖 AI Services</h4>
-              <div className={`health-status ${aiStatus.services.openai || aiStatus.services.cohere ? 'healthy' : 'warning'}`}>
+              <div
+                className={`health-status ${aiStatus.services.openai || aiStatus.services.cohere ? 'healthy' : 'warning'}`}
+              >
                 {aiStatus.services.openai || aiStatus.services.cohere ? 'Healthy' : 'Limited'}
               </div>
             </div>
@@ -165,9 +167,7 @@ const AnalyticsDashboard = ({ analyticsData, timeRange, isLoading, aiStatus }) =
             <div className="health-metrics">
               <div className="metric">
                 <span className="metric-label">Tools Available:</span>
-                <span className="metric-value">
-                  {aiStatus.mcp.initialized ? '5' : '0'}
-                </span>
+                <span className="metric-value">{aiStatus.mcp.initialized ? '5' : '0'}</span>
               </div>
               <div className="metric">
                 <span className="metric-label">Tool Usage:</span>
@@ -257,7 +257,10 @@ const AnalyticsDashboard = ({ analyticsData, timeRange, isLoading, aiStatus }) =
             <div className="insight-icon">🎯</div>
             <div className="insight-content">
               <h4>Popular Topics</h4>
-              <p>FDA classification queries are trending. Consider adding more regulatory guidance documents.</p>
+              <p>
+                FDA classification queries are trending. Consider adding more regulatory guidance
+                documents.
+              </p>
             </div>
           </div>
 
@@ -265,7 +268,10 @@ const AnalyticsDashboard = ({ analyticsData, timeRange, isLoading, aiStatus }) =
             <div className="insight-icon">⚠️</div>
             <div className="insight-content">
               <h4>Knowledge Gap</h4>
-              <p>Limited coverage for EU MDR topics. Adding European regulatory documents could improve coverage.</p>
+              <p>
+                Limited coverage for EU MDR topics. Adding European regulatory documents could
+                improve coverage.
+              </p>
             </div>
           </div>
 
@@ -273,7 +279,9 @@ const AnalyticsDashboard = ({ analyticsData, timeRange, isLoading, aiStatus }) =
             <div className="insight-icon">✅</div>
             <div className="insight-content">
               <h4>High Accuracy</h4>
-              <p>RAG retrieval accuracy is at 94%, indicating excellent document relevance matching.</p>
+              <p>
+                RAG retrieval accuracy is at 94%, indicating excellent document relevance matching.
+              </p>
             </div>
           </div>
         </div>
