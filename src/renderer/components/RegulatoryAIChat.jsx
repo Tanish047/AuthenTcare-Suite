@@ -106,7 +106,9 @@ What regulatory topic would you like to explore today?`,
             console.log('🔍 Loading available Ollama models...');
             const models = await localAIService.getAvailableModels();
             console.log('📋 Available models:', models);
+            console.log(`📊 Models count: ${models.length}`);
             setAvailableModels(models);
+            console.log('✅ Models state updated');
 
             // Set default model prioritizing newest and fastest
             if (models.length > 0) {
@@ -742,7 +744,10 @@ Try asking a question about your uploaded documents!`,
                                 <textarea
                                     ref={inputRef}
                                     value={inputValue}
-                                    onChange={e => setInputValue(e.target.value)}
+                                    onChange={e => {
+                                        console.log('📝 Input changed:', e.target.value);
+                                        setInputValue(e.target.value);
+                                    }}
                                     onKeyDown={handleKeyDown}
                                     placeholder={isChromaConnected
                                         ? "Ask about FDA regulations, your uploaded documents, or any regulatory topic..."
