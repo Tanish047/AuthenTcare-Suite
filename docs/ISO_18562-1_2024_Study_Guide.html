@@ -174,11 +174,18 @@ caption{caption-side:top;text-align:left;font-family:"IBM Plex Mono",monospace;f
 .chain{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;align-items:stretch}
 .chain>div{display:flex;align-items:center;justify-content:center}
 .chain .node,.chain .dia{width:100%}
-.hchain{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px}
-.hchain>.node,.hchain>.dia{flex:1 1 132px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.hchain>.ar{flex:0 0 auto;display:flex;align-items:center;color:var(--ink2);font-size:15px;font-weight:600}
-.hchain>.ar .yn{font-family:"IBM Plex Mono",monospace;font-size:9.5px;display:block;line-height:1.1}
-.exitnote{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink2);margin:6px 0 0;text-align:right}
+.hchain{display:grid;align-items:stretch;gap:5px}
+.hchain.c5{grid-template-columns:1fr 26px 1fr 26px 1fr 26px 1fr 26px 1fr}
+.hchain.c3{grid-template-columns:1fr 26px 1fr 26px 1fr}
+.hchain>.node,.hchain>.dia{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11.5px;padding:8px 7px}
+.hchain>.ar{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink2);font-size:14px;font-weight:600}
+.hchain>.ar .yn{font-family:"IBM Plex Mono",monospace;font-size:9px;display:block;line-height:1.1;text-align:center}
+.hchain>.node .yn,.hchain>.dia .yn{font-family:"IBM Plex Mono",monospace;font-size:9px;display:block;
+  line-height:1.15;margin-bottom:3px}
+.hchain>.inflow{display:flex;flex-direction:column;justify-content:center;font-family:"IBM Plex Mono",monospace;
+  font-size:9.5px;line-height:1.35;color:var(--ink2)}
+.hchain>.inflow b{display:block;color:var(--ink);font-family:"IBM Plex Sans",sans-serif;font-size:10.5px;font-weight:600}
+.exitnote{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink2);margin:7px 0 0;text-align:right}
 .exitnote b{color:var(--amber)}
 
 /* two-branch fig3 */
@@ -225,6 +232,10 @@ footer{max-width:var(--maxw);margin:0 auto;padding:26px 20px 60px;color:var(--in
   .progwrap{display:none}
   .branchgrid{grid-template-columns:1fr}
   .chain{grid-template-columns:1fr}
+  .hchain.c5,.hchain.c3{grid-template-columns:1fr}
+  .hchain>.ar{font-size:0;padding:1px 0}
+  .hchain>.ar .yn{font-size:9.5px}
+  .hchain>.ar::after{content:"\2193";font-size:15px;color:var(--ink2)}
   body{font-size:16px}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
@@ -614,69 +625,69 @@ footer{max-width:var(--maxw);margin:0 auto;padding:26px 20px 60px;color:var(--in
 
           <div class="lane" style="margin:0 0 10px">
             <div class="lane-t">&#9312; PARTICULATES EVALUATION (ISO 18562-2)</div>
-            <div class="hchain">
+            <div class="hchain c5">
               <div class="dia sm">Is particulate generation credible?</div>
               <div class="ar"><span class="yn ylab">YES</span>&rarr;</div>
-              <div class="node act small2">Condition test articles appropriately</div>
+              <div class="node act">Condition test articles appropriately</div>
               <div class="ar">&rarr;</div>
-              <div class="node proc small2">Test and report</div>
+              <div class="node proc">Test and report</div>
               <div class="ar">&rarr;</div>
               <div class="dia sm">Are acceptance criteria met?</div>
               <div class="ar"><span class="yn nlab">NO</span>&rarr;</div>
               <div class="dia sm">Is further <em>risk control</em> practicable?</div>
             </div>
-            <div class="hchain" style="margin-top:8px">
-              <div class="node doc small2"><span class="yn nlab">credible? NO &darr;</span>Supply rationale</div>
+            <div class="hchain c3" style="margin-top:7px">
+              <div class="node doc"><span class="yn nlab">credible? NO &darr;</span>Supply rationale</div>
               <div class="ar">&rarr;</div>
-              <div class="node doc small2"><span class="yn">criteria met? YES &darr;</span>Document outcome</div>
+              <div class="node doc"><strong>Document outcome</strong></div>
               <div class="ar">&larr;</div>
-              <div class="node doc small2"><span class="yn">further control? NO &darr;</span>Document outcome</div>
+              <div class="inflow"><b>Also arrives here</b>acceptance criteria met? YES<br>further risk control practicable? NO</div>
             </div>
             <p class="exitnote">further <em>risk control</em> practicable? <span class="yn ylab">YES</span> &rarr; <b>Attempt risk control</b> (top right) &rarr; back to the use specification</p>
           </div>
 
           <div class="lane" style="margin:0 0 10px">
             <div class="lane-t">&#9313; VOLATILE ORGANIC SUBSTANCES (VOS) EVALUATION (ISO 18562-3)</div>
-            <div class="hchain">
+            <div class="hchain c5">
               <div class="dia sm">Is VOS generation credible?</div>
               <div class="ar"><span class="yn ylab">YES</span>&rarr;</div>
-              <div class="node act small2">Condition test articles appropriately</div>
+              <div class="node act">Condition test articles appropriately</div>
               <div class="ar">&rarr;</div>
-              <div class="node proc small2">Test and report</div>
+              <div class="node proc">Test and report</div>
               <div class="ar">&rarr;</div>
               <div class="dia sm">Are acceptance criteria met?</div>
               <div class="ar"><span class="yn nlab">NO</span>&rarr;</div>
               <div class="dia sm">Is further <em>risk control</em> practicable?</div>
             </div>
-            <div class="hchain" style="margin-top:8px">
-              <div class="node doc small2"><span class="yn nlab">credible? NO &darr;</span>Supply rationale</div>
+            <div class="hchain c3" style="margin-top:7px">
+              <div class="node doc"><span class="yn nlab">credible? NO &darr;</span>Supply rationale</div>
               <div class="ar">&rarr;</div>
-              <div class="node doc small2"><span class="yn">criteria met? YES &darr;</span>Document outcome</div>
+              <div class="node doc"><strong>Document outcome</strong></div>
               <div class="ar">&larr;</div>
-              <div class="node doc small2"><span class="yn">further control? NO &darr;</span>Document outcome</div>
+              <div class="inflow"><b>Also arrives here</b>acceptance criteria met? YES<br>further risk control practicable? NO</div>
             </div>
             <p class="exitnote">further <em>risk control</em> practicable? <span class="yn ylab">YES</span> &rarr; <b>Attempt risk control</b> (top right) &rarr; back to the use specification</p>
           </div>
 
           <div class="lane" style="margin:0">
             <div class="lane-t">&#9314; LEACHABLES IN CONDENSATE EVALUATION (ISO 18562-4)</div>
-            <div class="hchain">
+            <div class="hchain c5">
               <div class="dia sm">Is leachable exposure credible?</div>
               <div class="ar"><span class="yn ylab">YES</span>&rarr;</div>
-              <div class="node act small2">Condition test articles appropriately</div>
+              <div class="node act">Condition test articles appropriately</div>
               <div class="ar">&rarr;</div>
-              <div class="node proc small2">Test and report &mdash; <strong>can include biological testing</strong></div>
+              <div class="node proc">Test and report &mdash; <strong>can include biological testing</strong></div>
               <div class="ar">&rarr;</div>
               <div class="dia sm">Are acceptance criteria met?</div>
               <div class="ar"><span class="yn nlab">NO</span>&rarr;</div>
               <div class="dia sm">Is further <em>risk control</em> practicable?</div>
             </div>
-            <div class="hchain" style="margin-top:8px">
-              <div class="node doc small2"><span class="yn nlab">credible? NO &darr;</span>Supply rationale</div>
+            <div class="hchain c3" style="margin-top:7px">
+              <div class="node doc"><span class="yn nlab">credible? NO &darr;</span>Supply rationale</div>
               <div class="ar">&rarr;</div>
-              <div class="node doc small2"><span class="yn">criteria met? YES &darr;</span>Document outcome</div>
+              <div class="node doc"><strong>Document outcome</strong></div>
               <div class="ar">&larr;</div>
-              <div class="node doc small2"><span class="yn">further control? NO &darr;</span>Document outcome</div>
+              <div class="inflow"><b>Also arrives here</b>acceptance criteria met? YES<br>further risk control practicable? NO</div>
             </div>
             <p class="exitnote">further <em>risk control</em> practicable? <span class="yn ylab">YES</span> &rarr; <b>Attempt risk control</b> (top right) &rarr; back to the use specification</p>
           </div>
